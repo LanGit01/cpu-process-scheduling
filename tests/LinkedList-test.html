@@ -24,8 +24,22 @@
 				}
 			}
 
+			function getKey(data){
+				return data.number;
+			}
+
+			function printList(list){
+				var current;
+
+				for(current = list._head; current !== null; current = current.next){
+					console.log(current.data);
+				}
+			}
+
+
 			var list1 = new LinkedList();
 			var list2 = new LinkedList(compareData);
+			var list3 = new LinkedList(compareData, getKey);
 
 			var data1 = new Data(100, "one hundred"),
 				data2 = new Data(200, "two hundred"),
@@ -47,13 +61,8 @@
 			list1.insert(new Data(6, "E"));
 			list1.insert(new Data(4, "F"));
 
-			var current = list1._head;
-
-			console.log("\n\nList w/o compareFunc");
-			while(current !== null){
-				console.log(current.data);
-				current = current.next;
-			}
+			console.log("\n\nList w/o compareFunc [1, 2, 7, 3, 6, 4]");
+			printList(list1);
 
 			// With compare function
 			list2.insert(new Data(1, "A"));
@@ -64,14 +73,46 @@
 			list2.insert(new Data(4, "F"));
 			list2.insert(new Data(0, "G"));
 
+			console.log("\n\nList w/ compareFunc [1, 2, 7, 3, 6, 4]");
+			printList(list2);
 
-			current = list2._head;
+			// Remove method
+			list3.insert(new Data(1, "A"));
+			list3.insert(new Data(2, "B"));
+			list3.insert(new Data(3, "C"));
+			list3.insert(new Data(4, "D"));
+			list3.insert(new Data(5, "E"));
 
-			console.log("\n\nList w/ compareFunc");
-			while(current !== null){
-				console.log(current.data);
-				current = current.next;
-			}
+			console.log("\n\nBefore deletion [1, 2, 3, 4, 5]");
+			printList(list3);
+
+			list3.remove(2);
+			list3.remove(4);
+
+			console.log("\n\n2 and 4 deleted");
+			printList(list3);
+
+			list3.insert(new Data(4, "D"));
+			list3.insert(new Data(6, "F"));
+
+			console.log("\n\n4 and 6 inserted");
+			printList(list3);
+
+			var dataRef1 = new Data(10, "J"),
+				dataRef2 = new Data(5, "-");
+
+			list2.insert(dataRef1);
+			list2.insert(dataRef2);
+
+			console.log("\n\n10 and 5 inserted [1, 2, 7, 3, 6, 4]");
+			printList(list2);
+
+			list2.remove(dataRef1);
+			list2.remove(dataRef2);
+
+			console.log("\n\n10 and 5 removed");
+			printList(list2);
+
 		</script>
 	</head>
 </html>

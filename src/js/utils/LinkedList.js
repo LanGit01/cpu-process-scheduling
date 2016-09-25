@@ -17,12 +17,25 @@
 	 *								- a negative number if the second element is greater,
 	 *								- zero if they are equal
 	 */
-	function LinkedList(compareFunc){
+	function LinkedList(compareFunc, keyFunc){
 		this._head = null;
 		this._tail = null;
 
-		// function for comparing elements
-		this._compareFunc = (typeof compareFunc === "function" ? compareFunc : null);	
+		this._compareFunc = (typeof compareFunc === "function" ? compareFunc : null);
+		this._keyFunc = (typeof keyFunc === "function" ? keyFunc : function(v){
+			return v;
+		});
+
+		/*
+		if(typeof keyFunc === "function"){
+			this._keyFunc = keyFunc;
+		}else{
+			this._keyFunc = function(v){
+				return v;
+			}
+		}
+		*/
+		
 	}
 
 	/*
@@ -68,8 +81,43 @@
 	}
 
 
-	LinkedList.prototype.remove = function(){
+	LinkedList.prototype.remove = function(value){
+		var element = prev = null,
+			current,
+			keyFunc = this._keyFunc;
 
+			for(current = this._head; current !== null; current = current.next){
+				if(value === keyFunc(current.data)){
+					element = current.data;
+					break;
+				}
+				prev = current;
+			}
+		
+
+		// No matching element found
+		if(current === null){
+			return null;
+		}
+
+		// matching element found, remove and make adjustments
+		if(prev === null){
+			// element matched at head
+			this._head = this._head.next;
+
+			if(this._head === null){
+				this._tail = null;
+			}
+		}else{
+			prev.next = current.next;
+
+			// if the tail was deleted
+			if(current.next === null){
+				this._tail = prev;
+			}
+		}
+
+		return element;
 	}
 
 

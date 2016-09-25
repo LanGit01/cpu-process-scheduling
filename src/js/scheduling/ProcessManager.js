@@ -1,8 +1,8 @@
 (function(global){
 
 	// Check namespace
-	if(typeof global.CPUscheduler !== "object" || global.CPUscheduler === null){
-		console.log("CPUscheduler is not defined. Module unable to load.");
+	if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
+		console.log("CPUscheduling is not defined. Module unable to load.");
 		return;
 	}
 
