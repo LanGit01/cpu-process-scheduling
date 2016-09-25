@@ -21,21 +21,30 @@
 	 *	Processes arrives as specified, and needs to use N steps of the processor's time to complete. 
 	 */
 	function ProcessManager(){
-		this._processes = [];
+		this._processes = {};
 		this._scheduler = null;	
 
 		this._idcount = 0;
 	}
 
 
-	ProcessManager.prototype.addProcess = function(burstTime, arrivalTime){
+	ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime){
 		// Probably perform type checking in the future
-		
+	
+		var processes = this._processes;
+
+		if(!processes[id]){
+			processes[id] = new Process(id, burstTime, arrivalTime);
+			return true;
+		}
+
+		return false;
 	}
 
 
 	ProcessManager.prototype.removeProcess = function(id){
-
+		var toRemove = this._processes[id];
+		
 	}
 
 
