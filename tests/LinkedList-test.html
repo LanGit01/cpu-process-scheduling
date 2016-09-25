@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script>
+			var LinkedList = CPUscheduling.LinkedList;
+
+			function Data(number, name){
+				this.number = number;
+				this.name = name;
+			}
+
+			function compareData(data1, data2){
+				var num1 = data1.number,
+					num2 = data2.number;
+
+				if(num1 > num2){
+					return 1;
+				}else
+				if(num1 < num2){
+					return -1;
+				}else{
+					return 0;
+				}
+			}
+
+			var list1 = new LinkedList();
+			var list2 = new LinkedList(compareData);
+
+			var data1 = new Data(100, "one hundred"),
+				data2 = new Data(200, "two hundred"),
+				data3 = new Data(100, "same as data 1");
+
+			// Testing
+
+			console.log("\n\nCompare function test");
+			console.log("Compare 100 and 200: " + compareData(data1, data2));
+			console.log("Compare 200 and 100: " + compareData(data2, data1));
+			console.log("Compare 100 and 100: " + compareData(data1, data3));
+
+
+			// Without compare function
+			list1.insert(new Data(1, "A"));
+			list1.insert(new Data(2, "B"));
+			list1.insert(new Data(7, "C"));
+			list1.insert(new Data(3, "D"));
+			list1.insert(new Data(6, "E"));
+			list1.insert(new Data(4, "F"));
+
+			var current = list1._head;
+
+			console.log("\n\nList w/o compareFunc");
+			while(current !== null){
+				console.log(current.data);
+				current = current.next;
+			}
+
+			// With compare function
+			list2.insert(new Data(1, "A"));
+			list2.insert(new Data(2, "B"));
+			list2.insert(new Data(7, "C"));
+			list2.insert(new Data(3, "D"));
+			list2.insert(new Data(6, "E"));
+			list2.insert(new Data(4, "F"));
+			list2.insert(new Data(0, "G"));
+
+
+			current = list2._head;
+
+			console.log("\n\nList w/ compareFunc");
+			while(current !== null){
+				console.log(current.data);
+				current = current.next;
+			}
+		</script>
+	</head>
+</html>
