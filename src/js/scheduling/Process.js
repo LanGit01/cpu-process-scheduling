@@ -14,7 +14,7 @@
 	 *		initial data - 
 	 *		log data - data collected after the process is ran and completed
 	 */
-	function Process(id, burstTime, arrivalTime){
+	function Process(id, burstTime, arrivalTime, priority){
 		// Initial data
 		this.id = id;
 		this.burstTime = burstTime;
@@ -25,6 +25,8 @@
 		this.waitTime = NO_VALUE;
 		this.startTime = NO_VALUE;
 		this.responseTime = NO_VALUE;
+
+		this.priority = priority;
 	}
 
 

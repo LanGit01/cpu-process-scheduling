@@ -7,10 +7,18 @@
 	}
 
 	// Check dependencies
-	if(!global.CPUscheduler.Process){
-		console.log("CPUscheduler.Process is not defined");
+	if(!global.CPUscheduling.Process){
+		console.log("CPUscheduling.Process is not defined");
 		return;
 	}
+
+	if(!global.CPUscheduling.LinkedList){
+		console.log("CPUscheduling.LinkedList is not defined");
+		return;
+	}
+
+	var Process = global.CPUscheduling.Process,
+		LinkedList = global.CPUscheduling.LinkedList;
 
 
 
@@ -21,30 +29,19 @@
 	 *	Processes arrives as specified, and needs to use N steps of the processor's time to complete. 
 	 */
 	function ProcessManager(){
-		this._processes = {};
-		this._scheduler = null;	
-
-		this._idcount = 0;
+		this._processes = new LinkedList(compareArrivalTime, getProcessID);
+		this._scheduler = null;
 	}
 
 
-	ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime){
-		// Probably perform type checking in the future
-	
-		var processes = this._processes;
-
-		if(!processes[id]){
-			processes[id] = new Process(id, burstTime, arrivalTime);
-			return true;
-		}
-
-		return false;
+	ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime, priority){
+		priority = priority || Process.NO_VALUE;
+		this._processes.insert(new Process(id, burstTime, arrivalTime, priority));
 	}
 
 
 	ProcessManager.prototype.removeProcess = function(id){
-		var toRemove = this._processes[id];
-		
+		this._processes.remove(id);
 	}
 
 
@@ -59,5 +56,30 @@
 	ProcessManager.prototype.getScheduler = function(){
 
 	}
+
+
+
+
+	/*		Auxillary functions		*/
+	function compareArrivalTime(p1, p2){
+		var at1 = p1.arrivalTime,
+			at2 = p2.arrivalTime;
+
+		if(at1 > at2){
+			return 1;
+		}else
+		if(at2 < at1){
+			return -1;
+		}else{
+			return 0;
+		}
+	}
+
+
+	function getProcessID(process){
+		return process.id;
+	}
+
+	global.CPUscheduling.ProcessManager = ProcessManager;
 
 })(window);
