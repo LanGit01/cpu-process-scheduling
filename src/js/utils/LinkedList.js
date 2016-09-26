@@ -22,11 +22,8 @@
 		this._tail = null;
 
 		this._compareFunc = (typeof compareFunc === "function" ? compareFunc : null);
-		this._keyFunc = (typeof keyFunc === "function" ? keyFunc : function(v){
-			return v;
-		});
 
-		/*
+		
 		if(typeof keyFunc === "function"){
 			this._keyFunc = keyFunc;
 		}else{
@@ -34,7 +31,6 @@
 				return v;
 			}
 		}
-		*/
 		
 	}
 
