@@ -53,7 +53,8 @@
 			console.log("Compare 100 and 100: " + compareData(data1, data3));
 
 
-			// Without compare function
+
+			/* 		Without compare function		*/
 			list1.insert(new Data(1, "A"));
 			list1.insert(new Data(2, "B"));
 			list1.insert(new Data(7, "C"));
@@ -61,10 +62,13 @@
 			list1.insert(new Data(6, "E"));
 			list1.insert(new Data(4, "F"));
 
-			console.log("\n\nList w/o compareFunc [1, 2, 7, 3, 6, 4]");
+			console.log("\n\nList w/o compareFunc\nExpected: [1, 2, 7, 3, 6, 4, 0]" + 
+						"\nLength: " + list1.getLength() + "\n");
 			printList(list1);
 
-			// With compare function
+
+
+			/* 		With compare function		*/
 			list2.insert(new Data(1, "A"));
 			list2.insert(new Data(2, "B"));
 			list2.insert(new Data(7, "C"));
@@ -73,46 +77,71 @@
 			list2.insert(new Data(4, "F"));
 			list2.insert(new Data(0, "G"));
 
-			console.log("\n\nList w/ compareFunc [1, 2, 7, 3, 6, 4]");
+			console.log("\n\nList w/ compareFunc\nExpected: [1, 2, 7, 3, 6, 4]" +
+						"\nLength: " + list2.getLength() + "\n");
 			printList(list2);
 
-			// Remove method
+			
+
+			/*		Testing remove method		*/
 			list3.insert(new Data(1, "A"));
 			list3.insert(new Data(2, "B"));
 			list3.insert(new Data(3, "C"));
 			list3.insert(new Data(4, "D"));
 			list3.insert(new Data(5, "E"));
 
-			console.log("\n\nBefore deletion [1, 2, 3, 4, 5]");
+			console.log("\n\nBefore deletion [1, 2, 3, 4, 5]"+
+						"\nLength: " + list3.getLength() + "\n");
 			printList(list3);
 
 			list3.remove(2);
 			list3.remove(4);
 
-			console.log("\n\n2 and 4 deleted");
+			console.log("\n\n2 and 4 deleted"+
+						"\nLength: " + list3.getLength() + "\n");
 			printList(list3);
 
 			list3.insert(new Data(4, "D"));
 			list3.insert(new Data(6, "F"));
 
-			console.log("\n\n4 and 6 inserted");
+			console.log("\n\n4 and 6 inserted"+
+						"\nLength: " + list3.getLength() + "\n");
 			printList(list3);
 
+
+			/*		Testing remove on references		*/
 			var dataRef1 = new Data(10, "J"),
 				dataRef2 = new Data(5, "-");
 
 			list2.insert(dataRef1);
 			list2.insert(dataRef2);
 
-			console.log("\n\n10 and 5 inserted [1, 2, 7, 3, 6, 4]");
+			console.log("\n\n10 and 5 inserted [1, 2, 7, 3, 6, 4, 0]"+
+						"\nLength: " + list2.getLength() + "\n");
 			printList(list2);
 
 			list2.remove(dataRef1);
 			list2.remove(dataRef2);
 
-			console.log("\n\n10 and 5 removed");
+			console.log("\n\n10 and 5 removed"+
+						"\nLength: " + list2.getLength() + "\n");
 			printList(list2);
+
+
+			/*		Testing element fetching	*/
+			console.log("[0, 1, 2, 3, 4, 6, 7]" + 
+						"\nLength: " + list2.getLength() +
+						"\nFetch at index 2: " + list2.elementAt(2).number +
+						"\nFetch at index 6: " + list2.elementAt(6).number +
+						"\nFetch at index 5: " + list2.elementAt(5).number);
+
+			console.log("Fetching outside of bounds" +
+						"\nFetch at index -1: " + list2.elementAt(-1) +
+						"\nFetch at index 7: " + list2.elementAt(7));
 
 		</script>
 	</head>
+	<body>
+		Open the console
+	</body>
 </html>

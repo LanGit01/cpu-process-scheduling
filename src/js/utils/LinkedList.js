@@ -21,8 +21,9 @@
 		this._head = null;
 		this._tail = null;
 
-		this._compareFunc = (typeof compareFunc === "function" ? compareFunc : null);
+		this._length = 0;
 
+		this._compareFunc = (typeof compareFunc === "function" ? compareFunc : null);
 		
 		if(typeof keyFunc === "function"){
 			this._keyFunc = keyFunc;
@@ -39,7 +40,6 @@
 	 *	
 	 */
 	LinkedList.prototype.insert = function(element){
-
 		var compareFunc = this._compareFunc,
 			current, newNode;
 		
@@ -74,9 +74,16 @@
 			this._tail.next = newNode;
 			this._tail = newNode;
 		}
+
+		this._length++;
 	}
 
-
+	/*
+	 *	Removes the first node that contains the value of the `value` argument
+	 *
+	 *	If a keyFunc is provided in the construction of the list, the node data is 
+	 *	passed to `keyFunc`, and the return value is used for comparison 
+	 */
 	LinkedList.prototype.remove = function(value){
 		var element = prev = null,
 			current,
@@ -113,7 +120,32 @@
 			}
 		}
 
+		this._length--;
+
 		return element;
+	}
+
+	/**
+	 *	return - element at `index` or
+	 *			 null if index is out of bounds
+	 */
+	LinkedList.prototype.elementAt = function(index){
+		var current = this._head, i;
+
+		if(index < 0 || index > this._length - 1){
+			return null;
+		}
+
+		for(i = 0; i < index; i++){
+			current = current.next;
+		}
+
+		return current.data;
+	}
+
+
+	LinkedList.prototype.getLength = function(){
+		return this._length;
 	}
 
 
