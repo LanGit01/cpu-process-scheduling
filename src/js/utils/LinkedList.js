@@ -149,6 +149,34 @@
 	}
 
 
+	LinkedList.prototype.getIterator = function(){
+		return new Iterator(this);
+	}
+
+
+
+
+
+
+	/*		Iterator for LinkedList		*/
+	function Iterator(list){
+		this._current = list._head;
+	}
+
+
+	Iterator.prototype.hasNext = function(){
+		return (this._current !== null);
+	}
+
+
+	Iterator.prototype.getNext = function(){
+		var element = this._current.data;
+		this._current = this._current.next;
+		return element;
+	}
+
+
+
 	global.CPUscheduling.LinkedList = LinkedList;
 
 })(window);

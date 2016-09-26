@@ -129,7 +129,7 @@
 
 
 			/*		Testing element fetching	*/
-			console.log("[0, 1, 2, 3, 4, 6, 7]" + 
+			console.log("\n\n[0, 1, 2, 3, 4, 6, 7]" + 
 						"\nLength: " + list2.getLength() +
 						"\nFetch at index 2: " + list2.elementAt(2).number +
 						"\nFetch at index 6: " + list2.elementAt(6).number +
@@ -138,6 +138,21 @@
 			console.log("Fetching outside of bounds" +
 						"\nFetch at index -1: " + list2.elementAt(-1) +
 						"\nFetch at index 7: " + list2.elementAt(7));
+
+
+			/*		Testing iterator		*/
+			console.log("\n\nIterator [0, 1, 2, 3, 4, 6, 7]");
+			
+			var iterator = list2.getIterator();
+			while(iterator.hasNext()){
+				console.log(iterator.getNext());
+			}
+
+			console.log("\n\nIterator [1, 3, 4, 5, 6]");
+			iterator = list3.getIterator();
+			while(iterator.hasNext()){
+				console.log(iterator.getNext());
+			}
 
 		</script>
 	</head>
