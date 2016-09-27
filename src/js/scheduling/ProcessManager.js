@@ -29,19 +29,21 @@
 	 *	Processes arrives as specified, and needs to use N steps of the processor's time to complete. 
 	 */
 	function ProcessManager(){
+		// compareArrivalTime ensures list is sorted in ascending arrival time
 		this._processes = new LinkedList(compareArrivalTime, getProcessID);
 		this._scheduler = null;
 	}
 
 
 	ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime, priority){
+		// Add  argument validation later
 		priority = priority || Process.NO_VALUE;
 		this._processes.insert(new Process(id, burstTime, arrivalTime, priority));
 	}
 
 
 	ProcessManager.prototype.removeProcess = function(id){
-		this._processes.remove(id);
+		return this._processes.remove(id);
 	}
 
 
@@ -49,12 +51,52 @@
 	// and allows the underlying implementation to be changed without changing
 	// the interface. Don't be afraid to use them if needed!
 	ProcessManager.prototype.setScheduler = function(scheduler){
-
+		this._scheduler = scheduler;
 	}
 
 
 	ProcessManager.prototype.getScheduler = function(){
+		return this._scheduler;
+	}
 
+
+	ProcessManager.prototype.run = function(){
+		var processesItr = this._processes.getIterator(),
+			time = 0, 
+			nextProcess = null, latestProcess = null,
+			running;
+
+		
+		while(running){
+			if(time === nextProcess.arrivalTime){
+				// add process to scheuler
+				nextProcess = (processItr.hasNext() ? processItr.getNext() : null);
+			}
+
+			// scheduler step
+
+			// check if still running
+			if(!processItr.hasNext() && true){
+				running = false;
+			}else{
+				time++;
+			}
+		}
+		/*
+			Pseudocode:
+				
+				Until all processes are completed
+					if(new process arrived)
+						add process to scheduler
+					
+					step
+					time++
+				end
+
+			Processes are completed if:
+				1. no more arriving processes left
+				2. no more running processes
+		*/
 	}
 
 
