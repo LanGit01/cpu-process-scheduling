@@ -196,9 +196,22 @@
 
 
 	Iterator.prototype.getNext = function(){
+		if(!this.hasNext()){
+			return null;
+		}
+
 		var element = this._current.data;
 		this._current = this._current.next;
 		return element;
+	}
+
+
+	Iterator.prototype.peekNext = function(){
+		if(!this.hasNext()){
+			return null;
+		}
+
+		return this._current.data;
 	}
 
 
