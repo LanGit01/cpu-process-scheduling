@@ -125,6 +125,32 @@
 		return element;
 	}
 
+
+	LinkedList.prototype.removeHead = function(){
+		var element;
+
+		if(this._head === null){
+			return null;
+		}
+
+		element = this._head.data;
+
+		if(this._head === this._tail){
+			this._head = this._tail = null;
+		}else{
+			this._head = this._head.next;
+		}
+
+		return element;
+	}
+
+
+	LinkedList.prototype.removeTail = function(){
+
+	}
+
+
+
 	/**
 	 *	return - element at `index` or
 	 *			 null if index is out of bounds

@@ -36,6 +36,7 @@
 				}
 			}
 
+			var element;
 
 			var list1 = new LinkedList();
 			var list2 = new LinkedList(compareData);
@@ -108,6 +109,17 @@
 						"\nLength: " + list3.getLength() + "\n");
 			printList(list3);
 
+			
+			element = list3.removeHead();
+			console.log("\n\nFront removed"+
+						"\nLength: " + list3.getLength() + "\n");
+			printList(list3);
+
+
+			list3.insert(element);
+			console.log("\n\nReadd previously removed"+
+						"\nLength: " + list3.getLength() + "\n");
+			printList(list3);
 
 			/*		Testing remove on references		*/
 			var dataRef1 = new Data(10, "J"),
@@ -153,6 +165,7 @@
 			while(iterator.hasNext()){
 				console.log(iterator.getNext());
 			}
+
 
 		</script>
 	</head>
