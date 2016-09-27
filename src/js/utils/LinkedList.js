@@ -121,7 +121,6 @@
 		}
 
 		this._length--;
-
 		return element;
 	}
 
@@ -141,6 +140,7 @@
 			this._head = this._head.next;
 		}
 
+		this._length--;
 		return element;
 	}
 
