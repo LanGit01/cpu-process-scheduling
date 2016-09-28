@@ -42,15 +42,9 @@
 				console.log(element.id + " " + element.arrivalTime);
 			}
 
-			console.log("\nRemove Processes [0, 3]");
-			pm.removeProcess(0);
-			pm.removeProcess(3);
-
-			itr = pm._processes.getIterator();
-			while(itr.hasNext()){
-				element = itr.getNext();
-				console.log(element.id + " " + element.arrivalTime);
-			}
+			// Run test
+			console.log("\n\nRun Test");
+			pm.run();
 
 		</script>
 	</head>

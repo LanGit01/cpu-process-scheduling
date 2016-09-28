@@ -92,10 +92,6 @@
 
 			// scheduler step
 			this._scheduler.step();
-			var p = this._scheduler.getRunningProcess();
-			if(p){
-				console.log("Time: " + time + ", PID: " + p.id + ", Arrival: " + p.arrivalTime + ", Remaining: " + p.remainingTime);
-			}
 
 			// check if still running
 			if(!processItr.hasNext() && !this._scheduler.hasRunningProcess()){
