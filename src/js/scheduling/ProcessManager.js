@@ -17,8 +17,15 @@
 		return;
 	}
 
+	if(!global.CPUscheduling.SchedulerLog){
+		console.log("CPUscheduling.SchedulerLog is not defined");
+		return;
+	}
+
+
 	var Process = global.CPUscheduling.Process,
-		LinkedList = global.CPUscheduling.LinkedList;
+		LinkedList = global.CPUscheduling.LinkedList,
+		SchedulerLog = global.CPUscheduling.SchedulerLog;
 
 
 
@@ -32,6 +39,7 @@
 		// compareArrivalTime ensures list is sorted in ascending arrival time
 		this._processes = new LinkedList(compareArrivalTime, getProcessID);
 		this._scheduler = null;
+		this._logger = new SchedulerLog();
 	}
 
 
@@ -59,8 +67,9 @@
 		return this._scheduler;
 	}
 
+
 	ProcessManager.prototype.getProcesses = function(){
-		return this._processes.getIterator();
+		return this._processes;
 	}
 
 
@@ -92,35 +101,18 @@
 
 			// scheduler step
 			this._scheduler.step();
-
+			
 			// check if still running
 			if(!processItr.hasNext() && !this._scheduler.hasRunningProcess()){
 				running = false;
 			}else{
+				this._logger.log(this._scheduler.getRunningProcess(), this._scheduler.getWaitingProcesses());
 				time++;
 			}
 		}
-		/*
-			Pseudocode:
-				
-				Until all processes are completed
-					if(new process arrived)
-						add process to scheduler
-					
-					step
-					time++
-				end
 
-			Processes are completed if:
-				1. no more arriving processes left
-				2. no more running processes
-		*/
 
-		/*
-
-			
-
-		*/
+		return this._logger.getLogs();
 	}
 
 

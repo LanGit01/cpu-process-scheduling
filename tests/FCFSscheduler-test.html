@@ -2,6 +2,7 @@
 	<head>
 		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/SchedulerLog.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/FCFSscheduler.js"></script>
 		<script>
@@ -11,7 +12,8 @@
 				FCFSscheduler = CPUscheduling.FCFSscheduler;
 
 			var pm = new ProcessManager(),
-				text = "";
+				itr, p,
+				log, logs, logsItr, time, text;
 
 			pm.setScheduler(new FCFSscheduler());
 			pm.addProcess(1, 5, 0);
@@ -19,16 +21,33 @@
 			pm.addProcess(3, 2, 2);
 			pm.addProcess(4, 5, 15);
 
-			var processes = pm.getProcesses(), p;
 
 			console.log("Processes: ");
-			while(processes.hasNext()){
-				p = processes.getNext();
-				console.log("id: " + p.id + ", arrival: " + p.arrivalTime + ", burst: " + p.burstTime);
+			itr = pm.getProcesses().getIterator();
+
+			while(itr.hasNext()){
+				p = itr.getNext();
+				console.log("PID: " + p.id + " | Arriving: " + p.arrivalTime + " | Burst Time: " + p.burstTime);
 			}
 			console.log("\n\n");
 
-			pm.run();
+
+			logs = pm.run();
+			logsItr = logs.getIterator();
+
+			time = 0;
+			while(logsItr.hasNext()){
+				log = logsItr.getNext();
+				text = "Time: " + (time++);
+				
+				if(log.running){
+					text += " | PID: " + log.running.id + " | Remaining: " + log.running.remainingTime;
+				}else{
+					text += " | None running";
+				}
+
+				console.log(text);
+			}
 
 		</script>
 	</head>

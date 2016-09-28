@@ -21,6 +21,8 @@
 	function FCFSscheduler(){
 		this._runningProcess = null;
 		this._waitingProcesses = new LinkedList();
+
+		this._logger = null;
 	}
 
 
@@ -29,12 +31,28 @@
 	}
 
 
+	FCFSscheduler.prototype.hasRunningProcess = function(){
+		return (this._runningProcess !== null);
+	}
+
+
 	FCFSscheduler.prototype.getRunningProcess = function(){
 		return this._runningProcess;
 	}
 
-	FCFSscheduler.prototype.hasRunningProcess = function(){
-		return (this._runningProcess !== null);
+
+	FCFSscheduler.prototype.hasWaitingProcesses = function(){
+		return (this._waitingProcesses.getLength() > 0);
+	}
+
+
+	FCFSscheduler.prototype.getWaitingProcesses = function(){
+		return this._waitingProcesses;
+	}
+
+
+	FCFSscheduler.prototype.setLogger = function(logger){
+		this._logger = logger;
 	}
 
 	/**
