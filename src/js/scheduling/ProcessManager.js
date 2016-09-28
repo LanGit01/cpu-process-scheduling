@@ -79,7 +79,7 @@
 		nextArrivalTime = processItr.peekNext().arrivalTime;
 
 		while(running){
-			if(time === nextArrivalTime){
+			if(processItr.hasNext() && time === nextArrivalTime){
 				// add process to scheduler
 				do{
 					this._scheduler.newArrivingProcess(processItr.getNext());
