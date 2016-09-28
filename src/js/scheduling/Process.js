@@ -20,6 +20,8 @@
 		this.burstTime = burstTime;
 		this.arrivalTime = arrivalTime;
 
+		this.remainingTime = burstTime;
+
 		// Log data
 		this.endTime = NO_VALUE;
 		this.waitTime = NO_VALUE;

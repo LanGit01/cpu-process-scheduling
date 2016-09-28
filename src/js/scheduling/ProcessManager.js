@@ -59,24 +59,46 @@
 		return this._scheduler;
 	}
 
+	ProcessManager.prototype.getProcesses = function(){
+		return this._processes.getIterator();
+	}
+
 
 	ProcessManager.prototype.run = function(){
-		var processesItr = this._processes.getIterator(),
+		var processItr = this._processes.getIterator(),
 			time = 0, 
-			nextProcess = null, latestProcess = null,
-			running;
+			running, nextArrivalTime,
+			nextProcess = null, arrivedProcess = null;
 
 		
+		if(!processItr.hasNext()){
+			return;
+		}	
+
+		running = true;
+		nextArrivalTime = processItr.peekNext().arrivalTime;
+
 		while(running){
-			if(time === nextProcess.arrivalTime){
-				// add process to scheuler
-				nextProcess = (processItr.hasNext() ? processItr.getNext() : null);
+			if(time === nextArrivalTime){
+				// add process to scheduler
+				do{
+					this._scheduler.newArrivingProcess(processItr.getNext());
+				}while(processItr.hasNext() && processItr.peekNext().arrivalTime === time);
+
+				if(processItr.hasNext()){
+					nextArrivalTime = processItr.peekNext().arrivalTime;
+				}
 			}
 
 			// scheduler step
+			this._scheduler.step();
+			var p = this._scheduler.getRunningProcess();
+			if(p){
+				console.log("Time: " + time + ", PID: " + p.id + ", Arrival: " + p.arrivalTime + ", Remaining: " + p.remainingTime);
+			}
 
 			// check if still running
-			if(!processItr.hasNext() && true){
+			if(!processItr.hasNext() && !this._scheduler.hasRunningProcess()){
 				running = false;
 			}else{
 				time++;
