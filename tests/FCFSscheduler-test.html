@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/FCFSscheduler.js"></script>
+		<script>
+			var Process = CPUscheduling.Process,
+				LinkedList = CPUscheduling.LinkedList,
+				ProcessManager = CPUscheduling.ProcessManager,
+				FCFSscheduler = CPUscheduling.FCFSscheduler;
+
+			var pm = new ProcessManager(),
+				text = "";
+
+			pm.setScheduler(new FCFSscheduler());
+			pm.addProcess(1, 5, 0);
+			pm.addProcess(2, 3, 4);
+			pm.addProcess(3, 2, 2);
+			pm.addProcess(4, 5, 15);
+
+			var processes = pm.getProcesses(), p;
+
+			console.log("Processes: ");
+			while(processes.hasNext()){
+				p = processes.getNext();
+				console.log("id: " + p.id + ", arrival: " + p.arrivalTime + ", burst: " + p.burstTime);
+			}
+			console.log("\n\n");
+
+			pm.run();
+
+		</script>
+	</head>
+	<body>
+
+	</body>
+</html>
