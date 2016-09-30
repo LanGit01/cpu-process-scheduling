@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/SchedulerLog.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/FCFSscheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
+		<script>
+			var Process = CPUscheduling.Process,
+				LinkedList = CPUscheduling.LinkedList,
+				ProcessManager = CPUscheduling.ProcessManager,
+				FCFSscheduler = CPUscheduling.FCFSscheduler,
+				TextDisplay = CPUscheduling.TextDisplay;
+
+				var pm = new ProcessManager(),
+					logs, pids, itr;
+
+
+				pm.setScheduler(new FCFSscheduler());
+				pm.addProcess(1, 5, 0);
+				pm.addProcess(2, 3, 4);
+				pm.addProcess(3, 2, 2);
+				pm.addProcess(4, 5, 15);
+
+				logs = pm.run();
+				pids = [];
+
+				itr = pm.getProcesses().getIterator();
+				while(itr.hasNext()){
+					pids[pids.length] = itr.getNext().id;
+				}
+
+				window.onload = function(){
+					var div;
+					div = document.getElementById("gantt-chart-text");
+					div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, logs)));
+				}
+		</script>
+	</head>
+	<body>
+		<pre>
+			<div id = "gantt-chart-text"></div>
+		</pre>
+	</body>
+</html>
