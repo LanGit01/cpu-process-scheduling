@@ -16,11 +16,38 @@
 
 
 
+	/**
+	 *	Keeps track of what's happening at each time-step:
+	 *		- Which process is using the processor's time
+	 *		- Which processes are waiting for their turn
+	 *
+	 *	The state of the simulation in each time-step is recorded in a log object
+	 *
+	 *		LogObject = {
+	 *						running,
+	 *						waiting
+	 *					}
+	 *	
+	 *	Where running is a `ProcessLog` object, and waiting is an array of `ProcessLog` objects. The `ProcessLog` object
+	 *	stores the relevant data of a process in the current state. The data structure for
+	 *	`ProcessLog` is:
+	 *
+	 *		ProcessLog = {
+	 *						id,
+	 *						remainingTime
+	 *					 }
+	 *
+	 *	`id` - process id
+	 *	`remainingTime` - the remaining time needed to complete the process
+	 */
 	function SchedulerLog(){
 		this._logs = new LinkedList();
 	}
 
 
+	/**
+	 * Create a log(state record) of the state
+	 */
 	SchedulerLog.prototype.log = function(runningProcess, waitingProcesses){
 		var running, 
 			itr = waitingProcesses.getIterator(),
@@ -38,7 +65,9 @@
 		});
 	}
 
-
+	/**
+	 *	Return a `LinkedList` of logs. The logs are ordered from first added to last added
+	 */
 	SchedulerLog.prototype.getLogs = function(){
 		return this._logs;
 	}
