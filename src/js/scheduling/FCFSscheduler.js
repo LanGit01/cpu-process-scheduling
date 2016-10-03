@@ -27,7 +27,11 @@
 
 
 	FCFSscheduler.prototype.newArrivingProcess = function(process){
-		this._waitingProcesses.insert(process);
+		if(this._runningProcess === null){
+			this._runningProcess = process;
+		}else{
+			this._waitingProcesses.insert(process);
+		}
 	}
 
 
@@ -63,16 +67,18 @@
 		var running = this._runningProcess,
 			waiting = this._waitingProcesses;
 
-		if(running !== null){
-			running.remainingTime--;
-		}
-
 		if(running === null || running.remainingTime === 0){
 			if(waiting.getLength() > 0){
 				this._runningProcess = waiting.removeHead();
 			}else{
 				this._runningProcess = null;
 			}
+
+			running = this._runningProcess;
+		}
+
+		if(running !== null){
+			running.remainingTime--;
 		}
 	}
 

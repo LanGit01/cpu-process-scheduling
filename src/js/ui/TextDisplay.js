@@ -23,6 +23,7 @@
 			hrUnit = "___", hr = "", timeText = "", chartText = "";
 
 
+		pids = sort(pids);
 		// Populate
 		for(i = 0; i < pids.length; i++){
 			processHistories[pids[i]] = "";
@@ -100,6 +101,40 @@
 		return chartText;
 	}
 
+
+	TextDisplay.generateTextProcessTable = function(processes){
+		var headers, hr;
+
+		hr = "";
+		
+		heades = "PID\tBT\tAT\tPrio\tST\tWT\tTT\tRT\tET\n"
+	}
+
+
+	function sort(array){
+		var i, j, min, swapIndex, temp;
+
+		for(i = 0; i < array.length - 1; i++){
+			min = array[i];
+			swapIndex = -1;
+
+			for(j = i + 1; j < array.length; j++){
+				if(min > array[j]){
+					min = array[j];
+					swapIndex = j;
+				}
+			}
+
+			// swap
+			if(swapIndex > -1){
+				temp = array[i];
+				array[i] = array[swapIndex];
+				array[swapIndex] = temp;
+			}
+		}
+
+		return array;
+	}
 
 	global.CPUscheduling.TextDisplay = TextDisplay;
 	/*		Helper Functions		*/

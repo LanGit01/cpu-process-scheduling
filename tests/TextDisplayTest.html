@@ -18,13 +18,12 @@
 
 
 				pm.setScheduler(new FCFSscheduler());
-				pm.addProcess(1, 5, 0);
-				pm.addProcess(2, 3, 4);
-				pm.addProcess(3, 2, 2);
-				pm.addProcess(4, 5, 15);
-				pm.addProcess(5, 20, 20);
-				pm.addProcess(6, 12, 50);
-				pm.addProcess(7, 40, 70);
+				pm.addProcess(0, 5, 0);
+				pm.addProcess(1, 4, 10);
+				pm.addProcess(2, 2, 4);
+				pm.addProcess(3, 8, 2);
+				pm.addProcess(4, 4, 25);
+				pm.addProcess(5, 7, 26);
 
 				logs = pm.run();
 				pids = [];

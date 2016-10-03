@@ -69,6 +69,13 @@
 
 
 	ProcessManager.prototype.getProcesses = function(){
+		var processList = [],
+			itr = this._processes.getIterator();
+
+		while(itr.hasNext()){
+			processList[processList.length] = itr.getNext();
+		}
+
 		return this._processes;
 	}
 
@@ -100,8 +107,9 @@
 			}
 
 			// scheduler step
+			console.log("Time: " + time);
 			this._scheduler.step();
-			
+
 			// check if still running
 			if(!processItr.hasNext() && !this._scheduler.hasRunningProcess()){
 				running = false;
