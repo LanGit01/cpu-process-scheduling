@@ -116,8 +116,108 @@
 	}
 
 
+	function addCellData(tableMatrix, columnWidths, col, row, data){
+		var dataStr = data.toString();
+
+		tableMatrix[col][row] = data;
+
+		if(columnWidths[col] < data.length){
+			columnWidths[col] = data.length;
+		}
+	}
+
+
+
+
 	TextDisplay.generateTextProcessTable = function(processes){
-		var i, j, header,
+		var headers = ["PID", "BT", "AT", "ST", "ET"];
+
+		var i, j,
+			tableMatrix = [], columnWidths = [], columnPadding = [],
+			column,	pItr, process,
+			maxWidth, rowData, cellData,
+			tempText, hrSingle, hrDouble,
+			tableText, rowText, strlen,
+			rows, cols;
+
+
+		// Build table matrix
+		for(i = 0; i < headers.length; i++){
+			column = [];
+			column[0] = headers[i];
+			columnWidths[i] = headers[i].length;
+			tableMatrix[i] = column;
+		}
+
+
+		i = 1;
+		pItr = processes.getIterator();
+		while(pItr.hasNext()){
+			process = pItr.getNext();
+
+			rowData = [process.id, process.burstTime, process.arrivalTime, process.startTime, process.endTime];
+			for(j = 0; j < rowData.length; j++){
+				cellData = rowData[j];
+
+				if(cellData && cellData > -1){
+					cellData = cellData.toString();
+				}else{
+					cellData = "none";
+				}
+
+				if(cellData.length > columnWidths[j]){
+					columnWidths[j] = cellData.length;
+				}
+
+				tableMatrix[j][i] = cellData;
+			}
+
+			i++;
+		}
+
+		// create sting padding and templates
+		hrSingle = "+";
+		hrDouble = "+";
+		for(i = 0; i < columnWidths.length; i++){
+			tempText = "";
+			
+			strlen = columnWidths[i];
+			for(j = 0; j < strlen; j++){
+				tempText += " ";
+				hrSingle += "-";
+				hrDouble += "=";
+			}
+
+			hrSingle += "----+";
+			hrDouble += "====+";
+
+			columnPadding[i] = tempText;
+		}
+
+
+		// Create table text
+		tableText = hrDouble + "\n";
+
+		rows = tableMatrix[0].length;
+		cols = tableMatrix.length;
+		for(i = 0; i < rows; i++){
+			rowText = "|";
+
+			for(j = 0; j < cols; j++){
+				rowText += "  " + (tableMatrix[j][i] + columnPadding[j]).slice(0, columnWidths[j]) + "  |";
+			}
+
+			if(i === 0){
+				tableText += rowText + "\n" + hrDouble + "\n";
+			}else{
+				tableText += rowText + "\n" + hrSingle + "\n";
+			}
+		}
+
+		return tableText;
+
+
+		/*var i, j, header,
 			tableMatrix = [], tableColumn,
 			maxLength, process, value, temp, numRows, numCols,
 			pItr, hLength = headers.length,
@@ -180,6 +280,7 @@
 
 
 		return tableText;
+		*/
 	}
 
 
