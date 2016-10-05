@@ -107,7 +107,6 @@
 			}
 
 			// scheduler step
-			console.log("Time: " + time);
 			this._scheduler.step();
 
 			// check if still running

@@ -33,16 +33,20 @@
 					pids[pids.length] = itr.getNext().id;
 				}
 
+				
 				window.onload = function(){
 					var div;
 					div = document.getElementById("gantt-chart-text");
 					div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, logs)));
+					div = document.getElementById("table-text");
+					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 				}
 		</script>
 	</head>
 	<body>
 		<pre>
 			<div id = "gantt-chart-text"></div>
+			<div id = "table-text"></div>
 		</pre>
 	</body>
 </html>

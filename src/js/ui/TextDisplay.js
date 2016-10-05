@@ -7,6 +7,20 @@
 	}
 
 
+	var headers = [
+		["PID", "id"],
+		["BT", "burstTime"],
+		["AT", "arrivalTime"],
+		["Priority", "priority"],
+		["ST", "startTime"],
+		["WT", "waitTime"],
+		["TT", "turnaroundTime"],
+		["RT", "responseTime"],
+		["ET", "endTime"],
+	];
+
+	var TEXT_NONE = "n/a";
+
 
 	var TextDisplay = {};
 
@@ -103,12 +117,72 @@
 
 
 	TextDisplay.generateTextProcessTable = function(processes){
-		var headers, hr;
+		var i, j, header,
+			tableMatrix = [], tableColumn,
+			maxLength, process, value, temp, numRows, numCols,
+			pItr, hLength = headers.length,
+			columnSpaces = [], maxColLengths = [];
+			hr = "", tableText = "";
 
-		hr = "";
-		
-		heades = "PID\tBT\tAT\tPrio\tST\tWT\tTT\tRT\tET\n"
+
+		hr = "+";
+		for(i = 0; i < hLength; i++){
+			header = headers[i];
+			maxLength = header[0].length;
+
+			tableColumn = [];
+			tableColumn[0] = header[0];
+
+			pItr = processes.getIterator();
+			while(pItr.hasNext()){
+				value = pItr.getNext()[header[1]];
+
+				if((!value && value !== 0) || value === -1){
+					value = TEXT_NONE;
+				}else{
+					value = value.toString();
+				}
+
+
+				if(value.length > maxLength){
+					maxLength = value.length;
+				}
+
+				tableColumn[tableColumn.length] = value;
+			}
+
+			tableMatrix[i] = tableColumn;
+			maxColLengths[i] = maxLength;
+
+			temp = "";
+			for(j = 0; j < maxLength; j++){
+				temp += " ";
+				hr += "-";
+			}
+			columnSpaces[i] = temp;
+			hr += "----+";
+		}
+
+		// Create Table
+		numRows = tableMatrix[0].length;
+		numCols = tableMatrix.length;
+		for(i = 0; i < numRows; i++){
+			tableText += hr + "\n|";
+
+			for(j = 0; j < numCols; j++){
+				tableText += "  " + (columnSpaces[j] + tableMatrix[j][i]).slice(-maxColLengths[j]) + "  |";
+			}
+
+			tableText += "\n";
+		}
+
+		tableText += hr;
+
+
+		return tableText;
 	}
+
+
 
 
 	function sort(array){
@@ -135,6 +209,8 @@
 
 		return array;
 	}
+
+
 
 	global.CPUscheduling.TextDisplay = TextDisplay;
 	/*		Helper Functions		*/
