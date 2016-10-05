@@ -19,7 +19,7 @@
 		["ET", "endTime"],
 	];
 
-	var TEXT_NONE = "n/a";
+	var TEXT_NONE = "none";
 
 
 	var TextDisplay = {};

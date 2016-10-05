@@ -73,6 +73,9 @@
 	}
 
 
+
+
+
 	/*		Helper functions		*/
 	function createProcessLogData(process){
 		if(!process){
