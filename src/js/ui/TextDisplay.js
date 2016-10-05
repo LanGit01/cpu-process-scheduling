@@ -130,7 +130,7 @@
 
 
 	TextDisplay.generateTextProcessTable = function(processes){
-		var headers = ["PID", "BT", "AT", "ST", "ET"];
+		var headers = ["PID", "BT", "AT", "ST", "ET", "TT", 'RT'];
 
 		var i, j,
 			tableMatrix = [], columnWidths = [], columnPadding = [],
@@ -155,14 +155,15 @@
 		while(pItr.hasNext()){
 			process = pItr.getNext();
 
-			rowData = [process.id, process.burstTime, process.arrivalTime, process.startTime, process.endTime];
+			rowData = [process.id, process.burstTime, process.arrivalTime, process.startTime, process.endTime,
+					   process.getTurnaroundTime(), process.getResponseTime()];
 			for(j = 0; j < rowData.length; j++){
 				cellData = rowData[j];
 
-				if(cellData && cellData > -1){
+				if(cellData > -1){
 					cellData = cellData.toString();
 				}else{
-					cellData = "none";
+					cellData = TEXT_NONE;
 				}
 
 				if(cellData.length > columnWidths[j]){

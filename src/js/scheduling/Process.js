@@ -32,6 +32,24 @@
 	}
 
 
+	Process.prototype.getTurnaroundTime = function(){
+		if(this.arrivalTime !== NO_VALUE && this.endTime !== NO_VALUE){
+			return this.endTime - this.arrivalTime + 1;
+		}
+
+		return NO_VALUE;
+	}
+
+
+	Process.prototype.getResponseTime = function(){
+		if(this.arrivalTime !== NO_VALUE && this.startTime !== NO_VALUE){
+			return this.startTime - this.arrivalTime;
+		}
+
+		return NO_VALUE;
+	}
+
+
 	Process.NO_VALUE = NO_VALUE;
 
 	global.CPUscheduling.Process = Process;
