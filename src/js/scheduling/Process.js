@@ -50,6 +50,17 @@
 	}
 
 
+	Process.prototype.getWaitTime = function(){
+		var tt = this.getTurnaroundTime();
+
+		if(tt !== NO_VALUE && this.burstTime !== NO_VALUE){
+			return tt - this.burstTime;
+		}
+
+		return NO_VALUE;
+	}
+
+
 	Process.NO_VALUE = NO_VALUE;
 
 	global.CPUscheduling.Process = Process;

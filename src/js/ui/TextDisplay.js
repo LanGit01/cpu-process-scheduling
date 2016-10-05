@@ -116,21 +116,9 @@
 	}
 
 
-	function addCellData(tableMatrix, columnWidths, col, row, data){
-		var dataStr = data.toString();
-
-		tableMatrix[col][row] = data;
-
-		if(columnWidths[col] < data.length){
-			columnWidths[col] = data.length;
-		}
-	}
-
-
-
 
 	TextDisplay.generateTextProcessTable = function(processes){
-		var headers = ["PID", "BT", "AT", "ST", "ET", "TT", 'RT'];
+		var headers = ["PID", "BT", "AT", "ST", "ET", "TT", "RT", "WT"];
 
 		var i, j,
 			tableMatrix = [], columnWidths = [], columnPadding = [],
@@ -156,7 +144,7 @@
 			process = pItr.getNext();
 
 			rowData = [process.id, process.burstTime, process.arrivalTime, process.startTime, process.endTime,
-					   process.getTurnaroundTime(), process.getResponseTime()];
+					   process.getTurnaroundTime(), process.getResponseTime(), process.getWaitTime()];
 			for(j = 0; j < rowData.length; j++){
 				cellData = rowData[j];
 
@@ -283,7 +271,6 @@
 		return tableText;
 		*/
 	}
-
 
 
 
