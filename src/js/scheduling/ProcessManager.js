@@ -83,7 +83,7 @@
 	ProcessManager.prototype.run = function(){
 		var processItr = this._processes.getIterator(),
 			time = 0, 
-			running, nextArrivalTime,
+			running, nextArrivalTime, process,
 			nextProcess = null, arrivedProcess = null;
 
 		
@@ -108,6 +108,17 @@
 
 			// scheduler step
 			this._scheduler.step();
+
+			if(this._scheduler.hasRunningProcess()){
+				process = this._scheduler.getRunningProcess();
+
+				if(process.burstTime === (process.remainingTime + 1)){
+					process.startTime = time;
+				}
+				if(process.remainingTime === 0){
+					process.endTime = time;
+				}
+			}
 
 			// check if still running
 			if(!processItr.hasNext() && !this._scheduler.hasRunningProcess()){
