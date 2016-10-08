@@ -17,13 +17,27 @@
 					logs, pids, itr;
 
 
-				pm.setScheduler(new RRscheduler(2));
+				pm.setScheduler(new RRscheduler(3));
+
+				// Same time arrival
 				pm.addProcess(0, 5, 0);
-				pm.addProcess(1, 4, 10);
-				pm.addProcess(2, 2, 4);
-				pm.addProcess(3, 8, 2);
-				pm.addProcess(4, 4, 25);
-				pm.addProcess(5, 7, 26);
+				pm.addProcess(1, 4, 0);
+
+				// Single
+				pm.addProcess(2, 7, 10);
+				pm.addProcess(3, 6, 18);
+
+				// Different Time arrival
+				pm.addProcess(4, 5, 28);
+				pm.addProcess(5, 5, 30);
+
+				// Arrival coincides with quantum
+				pm.addProcess(6, 6, 45);
+				pm.addProcess(7, 5, 48);
+
+				// Arrival coincides with quantum 2
+				pm.addProcess(8, 3, 58);
+				pm.addProcess(9, 10, 61);
 
 				logs = pm.run();
 				pids = [];
