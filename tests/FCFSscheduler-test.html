@@ -1,19 +1,23 @@
 <html>
 	<head>
+		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/SchedulerLog.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/FCFSscheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
-				FCFSscheduler = CPUscheduling.FCFSscheduler;
+				FCFSscheduler = CPUscheduling.FCFSscheduler,
+				TextDisplay = CPUscheduling.TextDisplay;
 
 			var pm = new ProcessManager(),
 				itr, p,
 				log, logs, logsItr, time, text;
+
 
 			pm.setScheduler(new FCFSscheduler());
 			pm.addProcess(1, 5, 0);
@@ -22,36 +26,44 @@
 			pm.addProcess(4, 5, 15);
 
 
-			console.log("Processes: ");
-			itr = pm.getProcesses().getIterator();
-
-			while(itr.hasNext()){
-				p = itr.getNext();
-				console.log("PID: " + p.id + " | Arriving: " + p.arrivalTime + " | Burst Time: " + p.burstTime);
-			}
-			console.log("\n\n");
-
-
 			logs = pm.run();
-			logsItr = logs.getIterator();
+			pids = [];
 
-			time = 0;
-			while(logsItr.hasNext()){
-				log = logsItr.getNext();
-				text = "Time: " + (time++);
-				
-				if(log.running){
-					text += " | PID: " + log.running.id + " | Remaining: " + log.running.remainingTime;
+			processList = selectionSort(pm.getProcesses(), function(p1, p2){
+				var id1 = p1.id,
+					id2 = p2.id;
+
+				if(id1 > id2){
+					return 1;
+				}else
+				if(id1 < id2){
+					return -1;
 				}else{
-					text += " | None running";
+					return 0;
 				}
+			});
 
-				console.log(text);
+			for(i = 0; i < processList.length; i++){
+				pids[i] = processList[i].id;
 			}
+
+				
+			window.onload = function(){
+				var div;
+				div = document.getElementById("gantt-chart-text");
+				div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, logs)));
+				div = document.getElementById("table-text");
+				div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(processList)));
+			}
+
+
 
 		</script>
 	</head>
 	<body>
-
+		<pre>
+			<div id = "gantt-chart-text"></div>
+			<div id = "table-text"></div>
+		</pre>
 	</body>
 </html>
