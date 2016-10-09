@@ -76,7 +76,7 @@
 			processList[processList.length] = itr.getNext();
 		}
 
-		return this._processes;
+		return processList;
 	}
 
 

@@ -138,10 +138,9 @@
 		}
 
 
-		i = 1;
-		pItr = processes.getIterator();
-		while(pItr.hasNext()){
-			process = pItr.getNext();
+		
+		for(i = 0; i < processes.length; i++){	
+			process = processes[i];
 
 			rowData = [process.id, process.burstTime, process.arrivalTime, process.startTime, process.endTime,
 					   process.getTurnaroundTime(), process.getResponseTime(), process.getWaitTime()];
@@ -158,10 +157,9 @@
 					columnWidths[j] = cellData.length;
 				}
 
-				tableMatrix[j][i] = cellData;
+				tableMatrix[j][i + 1] = cellData;
 			}
 
-			i++;
 		}
 
 		// create sting padding and templates
