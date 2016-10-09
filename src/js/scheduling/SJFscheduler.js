@@ -63,7 +63,19 @@
 	 */
 	SJFscheduler.prototype.step = function(){
 		var running = this._runningProcess,
-			waiting = this._waitingProcesses;
+			waiting = this._waitingProcesses,
+			firstWaiting;
+
+		if(this._preemptive && waiting.getLength() > 0 && running !== null){
+			firstWaiting = waiting.elementAt(0);
+
+			// Check if should preempt
+			if(firstWaiting.remainingTime < running.remainingTime){
+				this._runningProcess = waiting.removeHead();
+				waiting.insert(running);
+				running = this._runningProcess;
+			}
+		}
 
 		if(running === null || running.remainingTime === 0){
 			if(waiting.getLength() > 0){

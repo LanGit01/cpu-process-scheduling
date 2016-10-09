@@ -1,0 +1,80 @@
+<html>
+	<head>
+		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/SchedulerLog.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/SJFscheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
+		<script>
+			var Process = CPUscheduling.Process,
+				LinkedList = CPUscheduling.LinkedList,
+				ProcessManager = CPUscheduling.ProcessManager,
+				SJFscheduler = CPUscheduling.SJFscheduler,
+				TextDisplay = CPUscheduling.TextDisplay;
+
+				var pm = new ProcessManager(),
+					logs, pids, processList;
+
+
+				pm.setScheduler(new SJFscheduler(true));
+
+				// Same time arrival
+				pm.addProcess(0, 5, 0);
+				pm.addProcess(1, 2, 0);
+				pm.addProcess(2, 7, 0);
+				pm.addProcess(3, 3, 0);
+
+
+				// Different time arrivals -> preempt
+				pm.addProcess(4, 6, 20);
+				pm.addProcess(5, 4, 21);
+				pm.addProcess(6, 1, 22);
+
+				// Different time arrivals -> no preempt
+				pm.addProcess(7, 6, 32);
+				pm.addProcess(8, 7, 33);
+
+				// Coinciding remainingTimes
+				pm.addProcess(9, 5, 50);
+				pm.addProcess(10, 4, 51);
+
+				logs = pm.run();
+				pids = [];
+
+				processList = selectionSort(pm.getProcesses(), function(p1, p2){
+					var id1 = p1.id,
+						id2 = p2.id;
+
+					if(id1 > id2){
+						return 1;
+					}else
+					if(id1 < id2){
+						return -1;
+					}else{
+						return 0;
+					}
+				});
+
+				for(i = 0; i < processList.length; i++){
+					pids[i] = processList[i].id;
+				}
+
+				
+				window.onload = function(){
+					var div;
+					div = document.getElementById("gantt-chart-text");
+					div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, logs)));
+					div = document.getElementById("table-text");
+					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
+				}
+		</script>
+	</head>
+	<body>
+		<pre>
+			<div id = "gantt-chart-text"></div>
+			<div id = "table-text"></div>
+		</pre>
+	</body>
+</html>
