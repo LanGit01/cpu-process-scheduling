@@ -31,14 +31,15 @@
 				pm.addProcess(4, 6, 20);
 				pm.addProcess(5, 4, 21);
 				pm.addProcess(6, 1, 22);
+				pm.addProcess(7, 2, 28);
 
 				// Different time arrivals -> no preempt
-				pm.addProcess(7, 6, 32);
-				pm.addProcess(8, 7, 33);
+				pm.addProcess(8, 6, 32);
+				pm.addProcess(9, 7, 33);
 
 				// Coinciding remainingTimes
-				pm.addProcess(9, 5, 50);
-				pm.addProcess(10, 4, 51);
+				pm.addProcess(10, 5, 50);
+				pm.addProcess(11, 4, 51);
 
 				logs = pm.run();
 				pids = [];
