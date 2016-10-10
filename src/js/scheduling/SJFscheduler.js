@@ -23,6 +23,7 @@
 		this._waitingProcesses = new LinkedList(compareRemainingTimes);
 
 		this._preemptive = preemptive;
+		this._newArrival = false;
 
 		this._logger = null;
 	}
@@ -30,6 +31,7 @@
 
 	SJFscheduler.prototype.newArrivingProcess = function(process){
 		this._waitingProcesses.insert(process);
+		this._newArrival = true;
 	}
 
 
@@ -66,30 +68,34 @@
 			waiting = this._waitingProcesses,
 			firstWaiting;
 
-		if(this._preemptive && waiting.getLength() > 0 && running !== null){
-			firstWaiting = waiting.elementAt(0);
-
-			// Check if should preempt
-			if(firstWaiting.remainingTime < running.remainingTime){
-				this._runningProcess = waiting.removeHead();
-				waiting.insert(running);
-				running = this._runningProcess;
-			}
+		// Check if a process terminates
+		if(running !== null && running.remainingTime === 0){
+			running = null;
 		}
 
-		if(running === null || running.remainingTime === 0){
-			if(waiting.getLength() > 0){
-				this._runningProcess = waiting.removeHead();
-			}else{
-				this._runningProcess = null;
-			}
+		if(waiting.getLength() > 0){
+			if(running === null){
+				// if no processes are running, load one
+				running = waiting.removeHead();
+			}else
+			if(this._preemptive && this._newArrival){
+				// if should preempt
+				firstWaiting = waiting.elementAt(0);
 
-			running = this._runningProcess;
+				if(compareRemainingTimes(firstWaiting, running) < 0){
+					firstWaiting = waiting.removeHead();
+					waiting.insert(running);
+					running = firstWaiting;
+				}
+			}
 		}
 
 		if(running !== null){
 			running.remainingTime--;
 		}
+
+		this._runningProcess = running;
+		this._newArrival = false;
 	}
 
 
