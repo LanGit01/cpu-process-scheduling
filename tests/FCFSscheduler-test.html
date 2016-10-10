@@ -5,13 +5,13 @@
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/SchedulerLog.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
-		<script type = "text/javascript" src = "../src/js/scheduling/FCFSscheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
-				FCFSscheduler = CPUscheduling.FCFSscheduler,
+				FCFSScheduler = CPUscheduling.FCFSScheduler,
 				TextDisplay = CPUscheduling.TextDisplay;
 
 			var pm = new ProcessManager(),
@@ -19,7 +19,7 @@
 				log, logs, logsItr, time, text;
 
 
-			pm.setScheduler(new FCFSscheduler());
+			pm.setScheduler(new FCFSScheduler());
 			pm.addProcess(1, 5, 0);
 			pm.addProcess(2, 3, 4);
 			pm.addProcess(3, 2, 2);

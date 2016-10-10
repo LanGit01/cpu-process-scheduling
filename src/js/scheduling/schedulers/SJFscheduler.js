@@ -18,7 +18,7 @@
 	/**
 	 *	Implementation of the "Shortest Job First" scheduling strategy
 	 */
-	function SJFscheduler(preemptive){
+	function SJFScheduler(preemptive){
 		this._runningProcess = null;
 		this._waitingProcesses = new LinkedList(compareRemainingTimes);
 
@@ -29,33 +29,33 @@
 	}
 
 
-	SJFscheduler.prototype.newArrivingProcess = function(process){
+	SJFScheduler.prototype.newArrivingProcess = function(process){
 		this._waitingProcesses.insert(process);
 		this._newArrival = true;
 	}
 
 
-	SJFscheduler.prototype.hasRunningProcess = function(){
+	SJFScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}
 
 
-	SJFscheduler.prototype.getRunningProcess = function(){
+	SJFScheduler.prototype.getRunningProcess = function(){
 		return this._runningProcess;
 	}
 
 
-	SJFscheduler.prototype.hasWaitingProcesses = function(){
+	SJFScheduler.prototype.hasWaitingProcesses = function(){
 		return (this._waitingProcesses.getLength() > 0);
 	}
 
 
-	SJFscheduler.prototype.getWaitingProcesses = function(){
+	SJFScheduler.prototype.getWaitingProcesses = function(){
 		return this._waitingProcesses;
 	}
 
 
-	SJFscheduler.prototype.setLogger = function(logger){
+	SJFScheduler.prototype.setLogger = function(logger){
 		this._logger = logger;
 	}
 
@@ -63,7 +63,7 @@
 	 *	Consume 1 time-step of the processor, and if there is a running process, allocates the
 	 *	processor resources to it. 
 	 */
-	SJFscheduler.prototype.step = function(){
+	SJFScheduler.prototype.step = function(){
 		var running = this._runningProcess,
 			waiting = this._waitingProcesses,
 			firstWaiting;
@@ -117,7 +117,7 @@
 
 
 
-	global.CPUscheduling.SJFscheduler = SJFscheduler;
+	global.CPUscheduling.SJFScheduler = SJFScheduler;
 
 
 })(window);

@@ -5,20 +5,20 @@
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/SchedulerLog.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
-		<script type = "text/javascript" src = "../src/js/scheduling/Priorityscheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/PriorityScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
-				Priorityscheduler = CPUscheduling.Priorityscheduler,
+				PriorityScheduler = CPUscheduling.PriorityScheduler,
 				TextDisplay = CPUscheduling.TextDisplay;
 
 				var pm = new ProcessManager(),
 					logs, pids, processList;
 
 
-				pm.setScheduler(new Priorityscheduler(true));
+				pm.setScheduler(new PriorityScheduler(true));
 
 				// Same time arrival
 				pm.addProcess(0, 5, 0, 6);

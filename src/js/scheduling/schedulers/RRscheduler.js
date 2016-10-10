@@ -18,7 +18,7 @@
 	/**
 	 *	Implementation of the "Round Robin" scheduling strategy
 	 */
-	function RRscheduler(quanta){
+	function RRScheduler(quanta){
 		this._runningProcess = null;
 		this._waitingProcesses = new LinkedList();
 
@@ -29,7 +29,7 @@
 	}
 
 
-	RRscheduler.prototype.newArrivingProcess = function(process){
+	RRScheduler.prototype.newArrivingProcess = function(process){
 		if(this._runningProcess === null){
 			this._runningProcess = process;
 			this._quantumCount = this._quanta;
@@ -38,32 +38,32 @@
 		}
 	}
 
-	RRscheduler.prototype.hasRunningProcess = function(){
+	RRScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}
 
 
-	RRscheduler.prototype.getRunningProcess = function(){
+	RRScheduler.prototype.getRunningProcess = function(){
 		return this._runningProcess;
 	}
 
 
-	RRscheduler.prototype.hasWaitingProcesses = function(){
+	RRScheduler.prototype.hasWaitingProcesses = function(){
 		return (this._waitingProcesses.getLength() > 0);
 	}
 
 
-	RRscheduler.prototype.getWaitingProcesses = function(){
+	RRScheduler.prototype.getWaitingProcesses = function(){
 		return this._waitingProcesses;
 	}
 
 
-	RRscheduler.prototype.setLogger = function(logger){
+	RRScheduler.prototype.setLogger = function(logger){
 		this._logger = logger;
 	}
 
 
-	RRscheduler.prototype.step = function(){
+	RRScheduler.prototype.step = function(){
 		var running = this._runningProcess,
 			waiting = this._waitingProcesses;
 
@@ -92,6 +92,6 @@
 	}
 
 
-	global.CPUscheduling.RRscheduler = RRscheduler;
+	global.CPUscheduling.RRScheduler = RRScheduler;
 
 })(this);

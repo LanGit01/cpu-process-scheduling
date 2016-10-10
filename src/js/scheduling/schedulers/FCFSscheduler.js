@@ -18,7 +18,7 @@
 	/**
 	 *	Implementation of the "First Come, First Served" scheduling strategy
 	 */
-	function FCFSscheduler(){
+	function FCFSScheduler(){
 		this._runningProcess = null;
 		this._waitingProcesses = new LinkedList();
 
@@ -26,7 +26,7 @@
 	}
 
 
-	FCFSscheduler.prototype.newArrivingProcess = function(process){
+	FCFSScheduler.prototype.newArrivingProcess = function(process){
 		if(this._runningProcess === null){
 			this._runningProcess = process;
 		}else{
@@ -35,27 +35,27 @@
 	}
 
 
-	FCFSscheduler.prototype.hasRunningProcess = function(){
+	FCFSScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}
 
 
-	FCFSscheduler.prototype.getRunningProcess = function(){
+	FCFSScheduler.prototype.getRunningProcess = function(){
 		return this._runningProcess;
 	}
 
 
-	FCFSscheduler.prototype.hasWaitingProcesses = function(){
+	FCFSScheduler.prototype.hasWaitingProcesses = function(){
 		return (this._waitingProcesses.getLength() > 0);
 	}
 
 
-	FCFSscheduler.prototype.getWaitingProcesses = function(){
+	FCFSScheduler.prototype.getWaitingProcesses = function(){
 		return this._waitingProcesses;
 	}
 
 
-	FCFSscheduler.prototype.setLogger = function(logger){
+	FCFSScheduler.prototype.setLogger = function(logger){
 		this._logger = logger;
 	}
 
@@ -63,7 +63,7 @@
 	 *	Consume 1 time-step of the processor, and if there is a running process, allocates the
 	 *	processor resources to it. 
 	 */
-	FCFSscheduler.prototype.step = function(){
+	FCFSScheduler.prototype.step = function(){
 		var running = this._runningProcess,
 			waiting = this._waitingProcesses;
 
@@ -84,7 +84,7 @@
 
 
 
-	global.CPUscheduling.FCFSscheduler = FCFSscheduler;
+	global.CPUscheduling.FCFSScheduler = FCFSScheduler;
 
 
 })(window);

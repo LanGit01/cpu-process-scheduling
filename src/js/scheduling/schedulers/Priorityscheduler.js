@@ -20,7 +20,7 @@
 	 *
 	 *	The priority goes higher as the priority number goes higher, i.e. 2 has more priority than 1
 	 */
-	function Priorityscheduler(preemptive){
+	function PriorityScheduler(preemptive){
 		this._runningProcess = null;
 		this._waitingProcesses = new LinkedList(function(a, b){
 			return comparePriority(a, b) * -1;
@@ -33,33 +33,33 @@
 	}
 
 
-	Priorityscheduler.prototype.newArrivingProcess = function(process){
+	PriorityScheduler.prototype.newArrivingProcess = function(process){
 		this._waitingProcesses.insert(process);
 		this._newArrival = true;
 	}
 
 
-	Priorityscheduler.prototype.hasRunningProcess = function(){
+	PriorityScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}
 
 
-	Priorityscheduler.prototype.getRunningProcess = function(){
+	PriorityScheduler.prototype.getRunningProcess = function(){
 		return this._runningProcess;
 	}
 
 
-	Priorityscheduler.prototype.hasWaitingProcesses = function(){
+	PriorityScheduler.prototype.hasWaitingProcesses = function(){
 		return (this._waitingProcesses.getLength() > 0);
 	}
 
 
-	Priorityscheduler.prototype.getWaitingProcesses = function(){
+	PriorityScheduler.prototype.getWaitingProcesses = function(){
 		return this._waitingProcesses;
 	}
 
 
-	Priorityscheduler.prototype.setLogger = function(logger){
+	PriorityScheduler.prototype.setLogger = function(logger){
 		this._logger = logger;
 	}
 
@@ -67,7 +67,7 @@
 	 *	Consume 1 time-step of the processor, and if there is a running process, allocates the
 	 *	processor resources to it. 
 	 */
-	Priorityscheduler.prototype.step = function(){
+	PriorityScheduler.prototype.step = function(){
 		var running = this._runningProcess,
 			waiting = this._waitingProcesses,
 			firstWaiting;
@@ -119,7 +119,7 @@
 	}
 
 
-	global.CPUscheduling.Priorityscheduler = Priorityscheduler;
+	global.CPUscheduling.PriorityScheduler = PriorityScheduler;
 
 
 })(window);
