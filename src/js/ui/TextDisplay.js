@@ -7,19 +7,33 @@
 	}
 
 
-	var headers = [
-		["PID", "id"],
-		["BT", "burstTime"],
-		["AT", "arrivalTime"],
-		["Priority", "priority"],
-		["ST", "startTime"],
-		["WT", "waitTime"],
-		["TT", "turnaroundTime"],
-		["RT", "responseTime"],
-		["ET", "endTime"],
-	];
+	var Process = global.CPUscheduling.Process;
+
 
 	var TEXT_NONE = "none";
+
+	var headers = ["PID", "BT", "AT", "Priority", "ST", "ET", "WT", "TT", "RT"];
+
+
+	function getProcessData(header, process){
+		var value;
+
+		switch(header){
+			case "PID": value = process.id; break;
+			case "BT": value = process.burstTime; break;
+			case "AT": value = process.arrivalTime; break;
+			case "Priority": value = process.priority !== Process.NO_VALUE || TEXT_NONE; break;
+			case "ST": value = process.startTime; break;
+			case "ET": value = process.endTime; break;
+			case "WT": value = process.getWaitTime(); break;
+			case "TT": value = process.getTurnaroundTime(); break;
+			case "RT": value = process.getResponseTime(); break;
+		}
+
+		return value;
+	}
+
+	
 
 
 	var TextDisplay = {};
@@ -119,247 +133,56 @@
 
 
 		return ganttChartText;
-		/*var processHistories = {},
-			pHistoryWrittenFlags = {},
-			logsItr = logList.getIterator(),
-			log, i, running, waiting, id, 
-			time = 0, nextDigit = 10,
-			leftPad = " ", rightPad = " ", oddFlag = true,
-			hrUnit = "___", hr = "", timeText = "", chartText = "";
-
-
-		pids = sort(pids);
-		// Populate
-		for(i = 0; i < pids.length; i++){
-			processHistories[pids[i]] = "";
-			pHistoryWrittenFlags[pids[i]] = false;
-		}
-
-
-		while(logsItr.hasNext()){
-			// For counting padding
-			if(time === nextDigit){
-				if(oddFlag){
-					leftPad += " ";
-				}else{
-					rightPad += " ";
-				}
-
-				hrUnit += "_";
-
-				oddFlag = !oddFlag;
-				nextDigit *= 10;
-			}
-
-			log = logsItr.getNext();
-
-			// Running process
-			running = log.running;
-			if(running){
-				id = running.id;
-
-				if(processHistories[id] || processHistories[id] === ""){
-					processHistories[id] += leftPad + "R" + rightPad;
-				}
-
-				pHistoryWrittenFlags[id] = true;
-			}
-
-			// Waiting processes
-			waiting = log.waiting;
-			for(i = 0; i < waiting.length; i++){
-				id = waiting[i].id;
-
-				if(processHistories[id] || processHistories[id] === ""){
-					processHistories[id] += leftPad + "W" + rightPad;
-				}
-
-				pHistoryWrittenFlags[id] = true;
-			}
-
-			// Else
-			for(i = 0; i < pids.length; i++){
-				id = pids[i];
-
-				if(!pHistoryWrittenFlags[id]){
-					processHistories[id] += leftPad + "-" + rightPad;
-				}else{
-					pHistoryWrittenFlags[id] = false;
-				}
-			}
-
-			hr += hrUnit;
-
-			timeText += " " + (time++) + " ";
-			
-		}
-
-
-		// Build chart
-		//chartText = "  " + hr + "\n";
-		for(i = 0; i < pids.length; i++){
-			chartText += pids[i] + " |" + processHistories[pids[i]] + "\n";
-		}
-		chartText += "   " + hr + "\n";
-		chartText += "   " + timeText;
-
-		return chartText;
-		*/
 	}
 
 
-
 	TextDisplay.generateTextProcessTable = function(processes){
-		var headers = ["PID", "BT", "AT", "ST", "ET", "TT", "RT", "WT"];
-
-		var i, j,
-			tableMatrix = [], columnWidths = [], columnPadding = [],
-			column,	pItr, process,
-			maxWidth, rowData, cellData,
-			tempText, hrSingle, hrDouble,
-			tableText, rowText, strlen,
-			rows, cols;
+		var columnPads = [], header, process, width, maxWidth, 
+			hr = "+", dhr = "+", tableText = "",
+			i, j;
 
 
-		// Build table matrix
 		for(i = 0; i < headers.length; i++){
-			column = [];
-			column[0] = headers[i];
-			columnWidths[i] = headers[i].length;
-			tableMatrix[i] = column;
+			header = headers[i];
+
+			maxWidth = header.length;
+			for(j = 0; j < processes.length; j++){
+				width = ('' + getProcessData(header, processes[j])).length;
+
+				if(width > maxWidth){
+					maxWidth = width;
+				}
+			}
+
+			columnPads[i] = fillString(" ", maxWidth + 4);
+			hr += fillString("-", maxWidth + 5) + "+";
+			//dhr += fillString("=", maxWidth + 5) + "+";
 		}
 
 
+		/*			Build Table			*/
+
+		// Headers
+		tableText += hr + "\n|";
+		for(i = 0; i < headers.length; i++){
+			tableText += " " + padRight(headers[i], columnPads[i]) + "|";
+		}
+		tableText += "\n" + hr + "\n";
 		
-		for(i = 0; i < processes.length; i++){	
+		for(i = 0; i < processes.length; i++){
 			process = processes[i];
 
-			rowData = [process.id, process.burstTime, process.arrivalTime, process.startTime, process.endTime,
-					   process.getTurnaroundTime(), process.getResponseTime(), process.getWaitTime()];
-			for(j = 0; j < rowData.length; j++){
-				cellData = rowData[j];
-
-				if(cellData > -1){
-					cellData = cellData.toString();
-				}else{
-					cellData = TEXT_NONE;
-				}
-
-				if(cellData.length > columnWidths[j]){
-					columnWidths[j] = cellData.length;
-				}
-
-				tableMatrix[j][i + 1] = cellData;
+			tableText += "|";
+			for(j = 0; j < headers.length; j++){
+				tableText += " " + padRight(getProcessData(headers[j], process), columnPads[j]) + "|";
 			}
-
-		}
-
-		// create sting padding and templates
-		hrSingle = "+";
-		hrDouble = "+";
-		for(i = 0; i < columnWidths.length; i++){
-			tempText = "";
-			
-			strlen = columnWidths[i];
-			for(j = 0; j < strlen; j++){
-				tempText += " ";
-				hrSingle += "-";
-				hrDouble += "=";
-			}
-
-			hrSingle += "----+";
-			hrDouble += "====+";
-
-			columnPadding[i] = tempText;
-		}
-
-
-		// Create table text
-		tableText = hrDouble + "\n";
-
-		rows = tableMatrix[0].length;
-		cols = tableMatrix.length;
-		for(i = 0; i < rows; i++){
-			rowText = "|";
-
-			for(j = 0; j < cols; j++){
-				rowText += "  " + (tableMatrix[j][i] + columnPadding[j]).slice(0, columnWidths[j]) + "  |";
-			}
-
-			if(i === 0){
-				tableText += rowText + "\n" + hrDouble + "\n";
-			}else{
-				tableText += rowText + "\n" + hrSingle + "\n";
-			}
-		}
-
-		return tableText;
-
-
-		/*var i, j, header,
-			tableMatrix = [], tableColumn,
-			maxLength, process, value, temp, numRows, numCols,
-			pItr, hLength = headers.length,
-			columnSpaces = [], maxColLengths = [];
-			hr = "", tableText = "";
-
-
-		hr = "+";
-		for(i = 0; i < hLength; i++){
-			header = headers[i];
-			maxLength = header[0].length;
-
-			tableColumn = [];
-			tableColumn[0] = header[0];
-
-			pItr = processes.getIterator();
-			while(pItr.hasNext()){
-				value = pItr.getNext()[header[1]];
-
-				if((!value && value !== 0) || value === -1){
-					value = TEXT_NONE;
-				}else{
-					value = value.toString();
-				}
-
-
-				if(value.length > maxLength){
-					maxLength = value.length;
-				}
-
-				tableColumn[tableColumn.length] = value;
-			}
-
-			tableMatrix[i] = tableColumn;
-			maxColLengths[i] = maxLength;
-
-			temp = "";
-			for(j = 0; j < maxLength; j++){
-				temp += " ";
-				hr += "-";
-			}
-			columnSpaces[i] = temp;
-			hr += "----+";
-		}
-
-		// Create Table
-		numRows = tableMatrix[0].length;
-		numCols = tableMatrix.length;
-		for(i = 0; i < numRows; i++){
-			tableText += hr + "\n|";
-
-			for(j = 0; j < numCols; j++){
-				tableText += "  " + (columnSpaces[j] + tableMatrix[j][i]).slice(-maxColLengths[j]) + "  |";
-			}
-
 			tableText += "\n";
 		}
 
-		tableText += hr;
+		tableText += hr + "\n";
 
 
 		return tableText;
-		*/
 	}
 
 
