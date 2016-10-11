@@ -28,7 +28,98 @@
 	TextDisplay.generateTextGanttChart = function(pids, logList){
 		// Typechecking maybe?
 
-		var processHistories = {},
+		var processLines = {}, processLineActiveFlags = {}, 
+			maxPidDigits = 0, pidPad = "",
+			logsItr, log, id, waiting,
+			time = 0, nextNewDigit = 10, oddNumDigits = true, leftPad = rightPad = " ",
+			timeLine = "", ganttChartText = "",
+			i, n;
+
+
+		/*			Initialize			*/
+		for(i = 0; i < pids.length; i++){
+			processLines[pids[i]] = "";
+			processLineActiveFlags[pids[i]] = false;
+			
+			// Findng max length of digits
+			n = ('' + pids[i]).length;
+			if(n > maxPidDigits){
+				maxPidDigits = n;
+			}
+		}
+
+		pidPad = fillString(" ", maxPidDigits + 1);
+		timeLine = pidPad + " ";
+
+
+		/*			Generate Process Lines			*/
+		logsItr = logList.getIterator();
+		while(logsItr.hasNext()){
+			log = logsItr.getNext();
+
+			if(time === nextNewDigit){
+				if(oddNumDigits){
+					leftPad += " ";
+				}else{
+					rightPad += " ";
+				}
+
+				oddNumDigits = !oddNumDigits;
+				nextNewDigit *= 10;
+			}
+
+			// Place marks on active processes (running or waiting processes)
+			if(log.running){
+				id = log.running.id;
+
+				// Note: "" converts to false
+				if(processLines[id] || processLines[id] === ""){
+					processLines[id] += leftPad + "R" + rightPad;
+				}
+
+				processLineActiveFlags[id] = true;
+			}
+
+			waiting = log.waiting;
+			for(i = 0; i < waiting.length; i++){
+				id = waiting[i].id;
+
+				if(processLines[id] || processLines[id] === ""){
+					processLines[id] += leftPad + "W" + rightPad;
+				}
+
+				processLineActiveFlags[id] = true;
+			}
+
+
+			// Places marks on non-active processes
+			for(i = 0; i < pids.length; i++){
+				id = pids[i];
+
+				if(!processLineActiveFlags[id]){
+					processLines[id] += leftPad + "-" + rightPad;
+				}else{
+					processLineActiveFlags[id] = false;
+				}
+			}
+
+			timeLine += " " + (time++) + " ";
+		}
+
+		// Build Gantt Chart
+		for(i = 0; i < pids.length; i++){
+			id = pids[i];
+
+			ganttChartText += padRight(id, pidPad) + "|" + processLines[id] + "\n";
+		}
+
+		
+		ganttChartText += pidPad + " " + fillString("_", timeLine.length - pidPad.length) + "\n";
+		ganttChartText += timeLine;
+
+
+		return ganttChartText;
+		/*var processHistories = {},
 			pHistoryWrittenFlags = {},
 			logsItr = logList.getIterator(),
 			log, i, running, waiting, id, 
@@ -113,6 +204,7 @@
 		chartText += "   " + timeText;
 
 		return chartText;
+		*/
 	}
 
 
@@ -270,6 +362,36 @@
 		*/
 	}
 
+
+
+	// ============		String Manipulation Helper Functions	============ //
+	function fillString(ch, length){
+		var c, count, str;
+
+		if(length === 0){
+			return "";
+		}
+
+		c = ch;
+		count = length / 2;
+		str = c;
+
+		while(str.length <= count){
+			str += str;
+		}
+
+		return str + str.slice(0, length - str.length);
+	}
+
+
+	function padLeft(str, pad){
+		return (pad + str).slice(-pad.length);
+	}
+
+
+	function padRight(str, pad){
+		return (str + pad).slice(0, pad.length);
+	}
 
 
 	function sort(array){
