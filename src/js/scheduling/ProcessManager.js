@@ -51,6 +51,10 @@
 	}
 
 
+	/*
+	 * Returns an array containing the processes. It is ordered based on when it was added.
+	 *
+	 */
 	ProcessManager.prototype.getProcesses = function(){
 		var processList = [],
 			itr = this._processes.getIterator();
