@@ -6,12 +6,6 @@
 		return;
 	}
 
-	if(!global.CPUscheduling.LinkedList){
-		console.log("CPUscheduling.LinkedList is not defined");
-		return;
-	}
-
-
 	var LinkedList = global.CPUscheduling.LinkedList;
 
 
@@ -103,7 +97,7 @@
 	}
 
 
-
+	/*			Auxillary functions			*/
 	function comparePriority(p1, p2){
 		var pr1 = p1.priority,
 			pr2 = p2.priority;
@@ -122,4 +116,4 @@
 	global.CPUscheduling.PriorityScheduler = PriorityScheduler;
 
 
-})(window);
+})(this);

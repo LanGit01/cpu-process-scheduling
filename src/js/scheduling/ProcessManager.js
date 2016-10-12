@@ -6,23 +6,6 @@
 		return;
 	}
 
-	// Check dependencies
-	if(!global.CPUscheduling.Process){
-		console.log("CPUscheduling.Process is not defined");
-		return;
-	}
-
-	if(!global.CPUscheduling.LinkedList){
-		console.log("CPUscheduling.LinkedList is not defined");
-		return;
-	}
-
-	if(!global.CPUscheduling.SchedulerLog){
-		console.log("CPUscheduling.SchedulerLog is not defined");
-		return;
-	}
-
-
 	var Process = global.CPUscheduling.Process,
 		LinkedList = global.CPUscheduling.LinkedList,
 		SchedulerLog = global.CPUscheduling.SchedulerLog;
@@ -158,4 +141,4 @@
 
 	global.CPUscheduling.ProcessManager = ProcessManager;
 
-})(window);
+})(this);

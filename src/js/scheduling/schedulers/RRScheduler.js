@@ -6,12 +6,6 @@
 		return;
 	}
 
-	if(!global.CPUscheduling.LinkedList){
-		console.log("CPUscheduling.LinkedList is not defined");
-		return;
-	}
-
-
 	var LinkedList = global.CPUscheduling.LinkedList;
 
 
@@ -67,13 +61,14 @@
 		var running = this._runningProcess,
 			waiting = this._waitingProcesses;
 
-
+		// Check for preemption
 		if(this._quantumCount === 0 && running !== null && running.remainingTime > 0){
 			waiting.insert(running);
 			running = null;
 		}
 
 		if(running === null || running.remainingTime === 0){
+			// If no processes are running, load one
 			if(waiting.getLength() > 0){
 				running = waiting.removeHead();
 				this._quantumCount = this._quanta;

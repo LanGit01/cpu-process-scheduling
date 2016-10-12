@@ -6,12 +6,6 @@
 		return;
 	}
 
-	if(!global.CPUscheduling.LinkedList){
-		console.log("CPUscheduling.LinkedList is not defined");
-		return;
-	}
-
-
 	var LinkedList = global.CPUscheduling.LinkedList;
 
 
@@ -87,4 +81,4 @@
 	global.CPUscheduling.FCFSScheduler = FCFSScheduler;
 
 
-})(window);
+})(this);

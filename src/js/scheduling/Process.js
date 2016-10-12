@@ -11,8 +11,8 @@
 	 *	Container object for scheduling-related data of a single process
 	 *
 	 *	Holds the two data categories:
-	 *		initial data - 
-	 *		log data - data collected after the process is ran and completed
+	 *		1. initial data
+	 *		2. log data - data collected after the process is ran and completed
 	 */
 	function Process(id, burstTime, arrivalTime, priority){
 		// Initial data
@@ -65,4 +65,4 @@
 
 	global.CPUscheduling.Process = Process;
 
-})(window);
+})(this);

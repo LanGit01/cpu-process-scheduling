@@ -65,6 +65,7 @@
 		});
 	}
 
+
 	/**
 	 *	Return a `LinkedList` of logs. The logs are ordered from first added to last added
 	 */

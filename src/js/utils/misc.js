@@ -1,7 +1,14 @@
 (function(global){
 
-	
-	function selectionSort(array, comparator){
+	/**
+	 *	Sorts the array in ascending order using the selection sort algorithm
+	 *
+	 *	compareFunc - function - a function that compares two elements, returning:
+	 *							 	- a positive number if the first element is greater,
+	 *								- a negative number if the second element is greater,
+	 *								- zero if they are equal
+	 */
+	function selectionSort(array, compareFunc){
 		var min, swapIndex, temp, i, j
 			len = array.length;
 
@@ -11,7 +18,7 @@
 
 
 			for(j = i + 1; j < len; j++){
-				if(comparator(min, array[j]) > 0){
+				if(compareFunc(min, array[j]) > 0){
 					min = array[j];
 					swapIndex = j;
 				}

@@ -6,12 +6,6 @@
 		return;
 	}
 
-	if(!global.CPUscheduling.LinkedList){
-		console.log("CPUscheduling.LinkedList is not defined");
-		return;
-	}
-
-
 	var LinkedList = global.CPUscheduling.LinkedList;
 
 
@@ -99,20 +93,19 @@
 	}
 
 
-
-
+	/*			Auxillary functions			*/
 	function compareRemainingTimes(p1, p2){
 		var r1 = p1.remainingTime,
 			r2 = p2.remainingTime;
 
-			if(r1 > r2){
-				return 1;
-			}else
-			if(r1 < r2){
-				return -1;
-			}else{
-				return 0;
-			}
+		if(r1 > r2){
+			return 1;
+		}else
+		if(r1 < r2){
+			return -1;
+		}else{
+			return 0;
+		}
 	}
 
 
@@ -120,4 +113,4 @@
 	global.CPUscheduling.SJFScheduler = SJFScheduler;
 
 
-})(window);
+})(this);
