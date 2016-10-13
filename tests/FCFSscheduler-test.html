@@ -1,5 +1,10 @@
 <html>
 	<head>
+		<style>
+			canvas{
+				border: 1px solid black;
+			}
+		</style>
 		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
@@ -7,16 +12,20 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChart.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
 				FCFSScheduler = CPUscheduling.FCFSScheduler,
-				TextDisplay = CPUscheduling.TextDisplay;
+				TextDisplay = CPUscheduling.TextDisplay,
+				GanttChart = CPUscheduling.GanttChart;
+
 
 			var pm = new ProcessManager(),
 				itr, p,
-				log, logs, logsItr, time, text;
+				log, logs, logsItr, time, text,
+				ganttChart;
 
 
 			pm.setScheduler(new FCFSScheduler());
@@ -47,13 +56,22 @@
 				pids[i] = processList[i].id;
 			}
 
+
+			ganttChart = new GanttChart(pids, logs);
+
+
 				
 			window.onload = function(){
 				var div;
 				div = document.getElementById("gantt-chart-text");
 				div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, logs)));
+				
 				div = document.getElementById("table-text");
 				div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(processList)));
+
+				div = document.getElementById("gantt-chart-canvas");
+				div.appendChild(ganttChart.createDisplay());
+				ganttChart.setVisible(true);
 			}
 
 
@@ -64,6 +82,7 @@
 		<pre>
 			<div id = "gantt-chart-text"></div>
 			<div id = "table-text"></div>
+			<div id = "gantt-chart-canvas"></div>
 		</pre>
 	</body>
 </html>
