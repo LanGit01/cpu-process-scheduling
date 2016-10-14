@@ -72,7 +72,7 @@
 
 		this._displayOptions = {};
 		this._displayInitialized = false;
-
+		this._visible = false;
 	}
 
 
@@ -114,7 +114,6 @@
 		bufferCtx.textBaseline = "middle";
 		
 		this._displayInitialized = true;
-		this._visible = false;
 
 		return this._view;
 	}
