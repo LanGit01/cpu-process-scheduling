@@ -136,7 +136,8 @@
 			return;
 		}
 
-		var i, x, y
+		var i, x, y = this._y,
+			start, end,
 			cellHeight = this._markHeight + CELL_SPACING,
 			maxHeight = this._view.canvas.height - this._timelineHeight;
 			ctx = this._buffer.context;
@@ -146,10 +147,17 @@
 		ctx.fillStyle = DEFAULT_FONT_COLOR;
 		ctx.clearRect(0, 0, this._labelWidth, this._buffer.height);
 
+		start = ~~(y / cellHeight);
+		end = ~~((y + maxHeight) / cellHeight);
+
+		if(end > this._pids.length - 1){
+			end = this._pids.length - 1;
+		}
+
 		x = PID_LABEL_PAD;
-		y = ~~(cellHeight / 2) + CELL_SPACING;
+		y = -(y % cellHeight) + ~~(cellHeight / 2);		// y = CELL_SPACING + (cellHeight / 2);
 		
-		for(i = 0; i < this._pids.length && y < maxHeight; i++){
+		for(i = start; i < end; i++){
 			ctx.fillText("P" + this._pids[i], x, y);
 			y += cellHeight;
 		}
@@ -326,8 +334,6 @@
 
 		numCols = ~~((gridWidth - startx + gridx) / cellWidth);
 		numRows = ~~((gridHeight - starty + gridy - CELL_SPACING - 1) / cellWidth);
-
-		console.log(numCols);
 
 		ctx.strokeRect(gridx + 0.5, gridy + 0.5, gridWidth - 1, gridHeight - 1);
 
