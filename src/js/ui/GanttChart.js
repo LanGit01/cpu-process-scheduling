@@ -11,9 +11,9 @@
 		DEFAULT_VIEW_WIDTH = 800,
 		DEFAULT_FONT = "12px sans-serif",
 		DEFAULT_FONT_COLOR,
-		DEFAULT_RUNNING_COLOR = "#000000",
-		DEFAULT_WAITING_COLOR,
-		DEFAULT_CELL_SPACE_COLOR = "#444444";
+		DEFAULT_RUNNING_COLOR = "#333333",
+		DEFAULT_WAITING_COLOR = "#aaaaaa",
+		DEFAULT_CELL_SPACE_COLOR = "#555555";
 		AUTO = -1,
 		NO_VALUE = -2,
 		CELL_SPACING = 1,
@@ -165,11 +165,13 @@
 			cellHeight = markWidth + CELL_SPACING,
 			chartOffset = this._chartOffset,
 			ctx = this._bufferCtx,
-			gridStartX, gridStartY,
-			colStart, colEnd, rowStart, rowEnd, i, j, log, row, col,
+			gridStartX, gridColEnd, gridStartY,
+			colStart, colEnd, rowStart, rowEnd, i, log, waiting, row, col,
 			markx, marky, markw, markh;
 
 		/*			Calculate drawing ranges		*/
+		gridColEnd = ~~(xEnd / cellWidth);
+
 		if(xEnd > this._drawLine){
 			xEnd = this._drawLine;
 		}
@@ -189,8 +191,6 @@
 			yEnd = this._chartHeight;
 		}
 
-		console.log(x);
-		console.log(this._chartOffset);
 		/*				Drawing				*/
 		// Clear Background
 		ctx.clearRect(this._chartOffset, 0, this._buffer.width, this._buffer.height);		
@@ -202,9 +202,10 @@
 		// Draw Grid
 		ctx.strokeStyle = DEFAULT_CELL_SPACE_COLOR;
 		ctx.strokeRect(this._chartOffset + 0.5, 0.5, this._buffer.width - this._chartOffset - 1, this._buffer.height - 1);
-		drawGrid(ctx, gridStartX, gridStartY, (colEnd - colStart), (rowEnd - colStart), cellWidth, cellHeight, this._buffer.width, this._buffer.height);
+		drawGrid(ctx, gridStartX, gridStartY, (gridColEnd - colStart), (rowEnd - colStart), cellWidth, cellHeight, this._buffer.width, this._buffer.height);
 
 		/*			Draw Marks			*/
+
 		// Draw Running
 		ctx.fillStyle = DEFAULT_RUNNING_COLOR;
 		for(col = colStart; col <= colEnd; col++){
@@ -216,8 +217,24 @@
 			}
 		}
 
+		// Draw Waiting
+		ctx.fillStyle = DEFAULT_WAITING_COLOR;
+		for(col = colStart; col <= colEnd; col++){
+			log = this._logs[col];
+			waiting = log.waiting;
 
-	this.flipChart();
+			for(i = 0; i < waiting.length; i++){
+				row = this._rowMapping[waiting[i].id];
+				console.log(row);
+
+				if(row !== null){
+					drawMark(ctx, x, y, xEnd, yEnd, chartOffset, col, row, cellWidth, cellHeight);
+				}
+			}
+		}
+
+
+		this.flipChart();
 	}
 
 
