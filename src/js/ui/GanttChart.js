@@ -20,6 +20,10 @@
 		PID_LABEL_PAD = 10;
 
 
+	/**
+	 *
+	 *
+	 */
 	function GanttChart(pids, logs){
 		var i, itr;
 
@@ -67,6 +71,7 @@
 		this._viewHeight = 0;
 
 		this._displayOptions = {};
+		this._displayInitialized = false;
 
 	}
 
@@ -108,6 +113,8 @@
 		bufferCtx.font = DEFAULT_FONT;
 		bufferCtx.textBaseline = "middle";
 		
+		this._displayInitialized = true;
+
 		return this._view;
 	}
 
@@ -135,6 +142,10 @@
 	
 
 	GanttChart.prototype.drawLabels = function(){
+		if(!this._displayInitialized){
+			return;
+		}
+
 		var i, x, y
 			cellHeight = this._markHeight + CELL_SPACING,
 			ctx = this._bufferCtx;
@@ -151,7 +162,10 @@
 
 
 	GanttChart.prototype.drawChart = function(){
-	
+		if(!this._displayInitialized){
+			return;
+		}
+
 		var x = this._x,
 			y = this._y,
 			xEnd = x + this._view.width,
@@ -235,6 +249,10 @@
 
 
 	GanttChart.prototype.setVisible = function(boolValue){
+		if(!this._displayInitialized){
+			return;
+		}
+
 		if(boolValue){
 			this.drawLabels();
 			this.drawChart();
