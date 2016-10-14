@@ -58,28 +58,25 @@
 		this._chartOffset = 0;	// To allow space for PID labels
 		this._drawLine = 0;		// Every mark to the right of the line is not drawn
 
+		//	Display options
 		this._markWidth = DEFAULT_MARK_WIDTH;
 		this._markHeight = DEFAULT_MARK_HEIGHT;
+		this._runningColor = DEFAULT_RUNNING_COLOR;
+		this._waitingColor = DEFAULT_WAITING_COLOR;
+		this._viewWidth = 0;
+		this._viewHeight = 0;
+
+		this._displayOptions = {};
+
 	}
 
 
 	GanttChart.prototype.createDisplay = function(options){
 		var viewWidth, viewHeight, 
-			view, viewCtx, buffer, bufferCtx, i;
+			view, viewCtx, buffer, bufferCtx, i,
+			displayOptions = this._displayOptions;
 
-		if(typeof options === "object"){
-			this._markWidth = options.markWidth || DEFAULT_MARK_WIDTH;
-			this._markHeight = options.markHeight || DEFAULT_MARK_HEIGHT;
-
-			viewWidth = options.viewWidth || DEFAULT_VIEW_WIDTH;
-			viewHeight = options.viewHeight || ((this._markHeight + CELL_SPACING) * this._pids.length) + CELL_SPACING;
-		}else{
-			this._markWidth = DEFAULT_MARK_WIDTH;
-			this._markHeight =  DEFAULT_MARK_HEIGHT;
-
-			viewWidth = DEFAULT_VIEW_WIDTH;
-			viewHeight = ((this._markHeight + CELL_SPACING) * this._pids.length) + CELL_SPACING;
-		}
+		setDisplayOptions(this, options);
 
 		// Calculate dimensions of chart (full size)
 		this._x = this._y = 0;		// With respect to the chart ONLY (does not include space of labels)
@@ -88,8 +85,8 @@
 
 		// Create canvas
 		view = document.createElement("canvas");
-		view.width = viewWidth;
-		view.height = viewHeight;
+		view.width = displayOptions.viewWidth;
+		view.height = displayOptions.viewHeight;
 		viewCtx = view.getContext("2d");
 		this._view = view;
 		this._viewCtx = viewCtx;
@@ -98,8 +95,8 @@
 		this._chartOffset = this._viewCtx.measureText("P" + this._pids[this._pids.length - 1]).width + (PID_LABEL_PAD * 2);
 
 		buffer = document.createElement("canvas");
-		buffer.width = viewWidth;
-		buffer.height = viewHeight;
+		buffer.width = displayOptions.viewWidth;
+		buffer.height = displayOptions.viewHeight;
 		bufferCtx = buffer.getContext("2d");
 		this._buffer = buffer;
 		this._bufferCtx = bufferCtx;
@@ -116,6 +113,7 @@
 
 
 	GanttChart.prototype.flip = function(){
+
 		this._viewCtx.drawImage(this._buffer, 0, 0);
 	}
 
@@ -136,17 +134,16 @@
 	}
 	
 
-
 	GanttChart.prototype.drawLabels = function(){
 		var i, x, y
-			markHeight = this._markHeight,
+			cellHeight = this._markHeight + CELL_SPACING,
 			ctx = this._bufferCtx;
 
 		x = PID_LABEL_PAD;
-		y = ~~(markHeight / 2);
+		y = ~~(cellHeight / 2) + CELL_SPACING;
 		for(i = 0; i < this._pids.length; i++){
 			ctx.fillText("P" + this._pids[i], x, y);
-			y += markHeight;
+			y += cellHeight;
 		}
 
 		this.flipLabels();
@@ -225,7 +222,6 @@
 
 			for(i = 0; i < waiting.length; i++){
 				row = this._rowMapping[waiting[i].id];
-				console.log(row);
 
 				if(row !== null){
 					drawMark(ctx, x, y, xEnd, yEnd, chartOffset, col, row, cellWidth, cellHeight);
@@ -238,13 +234,42 @@
 	}
 
 
-
 	GanttChart.prototype.setVisible = function(boolValue){
 		if(boolValue){
 			this.drawLabels();
 			this.drawChart();
 		}else{
 			this._viewCtx.clearRect(0, 0, this._view.width, this._view.height);
+		}
+	}
+
+
+	/*				Helper Functions			*/
+	function setDisplayOptions(that, options){
+		var d = that._displayOptions;
+
+		/*	markWidth, markHeight
+		 *	viewWidth, viewHeight
+		 * 	runningColor, waitingColor
+		 */
+		if(typeof options === "object"){
+			d.markWidth = options.markWidth || DEFAULT_MARK_WIDTH;
+			d.markHeight = options.markHeight || DEFAULT_MARK_HEIGHT;
+
+			d.viewWidth = options.viewWidth || DEFAULT_VIEW_WIDTH;
+			d.viewHeight = options.viewHeight || ((d.markHeight + CELL_SPACING) * that._pids.length + CELL_SPACING);
+
+			d.runningColor = options.runningColor || DEFAULT_RUNNING_COLOR;
+			d.waitingColor = options.waitingColor || DEFAULT_WAITING_COLOR;
+		}else{
+			d.markWidth = DEFAULT_MARK_WIDTH;
+			d.markHeight = DEFAULT_MARK_HEIGHT;
+
+			d.viewWidth = DEFAULT_VIEW_WIDTH;
+			d.viewHeight = ((d.markHeight + CELL_SPACING) * that._pids.length + CELL_SPACING);
+			
+			d.runningColor = DEFAULT_RUNNING_COLOR;
+			d.waitingColor = DEFAULT_WAITING_COLOR;
 		}
 	}
 
