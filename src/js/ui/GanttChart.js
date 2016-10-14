@@ -45,25 +45,21 @@
 			this._logs[this._logs.length] = itr.getNext();
 		}
 
-
 		this._chartWidth = 0;
 		this._chartHeight = 0;
-
 		
 		/*			Canvas Display		*/
 		
 		// Canvas
 		this._view = null;
-		this._viewCtx = null;
 		this._buffer = null;
-		this._bufferCtx = null;
 
 		// Positioning
-		this._x = 0;
+		this._x = 0;				// x and y relative to chart
 		this._y = 0;
 		this._labelWidth = 0;		// To allow space for PID labels
 		this._timelineHeight = 0;	
-		this._drawLine = 0;			// Every mark to the right of the line is not drawn
+		this._drawLine = 0;			// Every mark to the right of the line is not drawn, drawLine relative to chart
 
 		//	Display options
 		this._markWidth = DEFAULT_MARK_WIDTH;
@@ -89,61 +85,49 @@
 		// Calculate dimensions of chart (full size)
 		this._x = this._y = 0;		// With respect to the chart ONLY (does not include space of labels)
 		this._chartWidth = (this._logs.length * (this._markWidth + CELL_SPACING)) + CELL_SPACING;
-		this._chartHeight = ((this._pids.length) * (this._markHeight + CELL_SPACING)) + CELL_SPACING;
+		this._chartHeight = (this._pids.length * (this._markHeight + CELL_SPACING)) + CELL_SPACING;
 
-		// Create canvas
-		view = document.createElement("canvas");
-		view.width = displayOptions.viewWidth;
-		view.height = displayOptions.viewHeight;
-		viewCtx = view.getContext("2d");
+		// Create canvas objects
+		view = createCanvasObject(displayOptions.viewWidth, displayOptions.viewHeight);
+		buffer = createCanvasObject(displayOptions.viewWidth, displayOptions.viewHeight);
+
 		this._view = view;
-		this._viewCtx = viewCtx;
-
-		// Determine chartOffset by measuring pid string length
-		this._labelWidth = this._viewCtx.measureText("P" + this._pids[this._pids.length - 1]).width + (PID_LABEL_PAD * 2);
-
-		this._timelineHeight = DEFAULT_TIMELINE_HEIGHT;
-
-		buffer = document.createElement("canvas");
-		buffer.width = displayOptions.viewWidth;
-		buffer.height = displayOptions.viewHeight;
-		bufferCtx = buffer.getContext("2d");
 		this._buffer = buffer;
-		this._bufferCtx = bufferCtx;
 
+		// Determine relevant sizes of labels (Process IDs and time)
+		this._labelWidth = view.context.measureText("P" + this._pids[this._pids.length - 1]).width + (PID_LABEL_PAD * 2);
+		this._timelineHeight = DEFAULT_TIMELINE_HEIGHT;
 
 		this._drawLine = viewWidth - this._labelWidth;
 
 		// Initialize contexts
-		bufferCtx.font = DEFAULT_FONT;
-		bufferCtx.textBaseline = "middle";
+		buffer.context.font = DEFAULT_FONT;
+		buffer.context.textBaseline = "middle";
 		
 		this._displayInitialized = true;
 
-		return this._view;
+		return view.canvas;
 	}
 
 
 	GanttChart.prototype.flip = function(){
-
-		this._viewCtx.drawImage(this._buffer, 0, 0);
+		this._view.context.drawImage(this._buffer.canvas, 0, 0);
 	}
 
 
 	GanttChart.prototype.flipLabels = function(){
 		var x = y = 0,
-			w = this._labelWidth, h = this._buffer.height;
+			w = this._labelWidth, h = this._buffer.canvas.height;
 
-		this._viewCtx.drawImage(this._buffer, x, y, w, h, x, y, w, h);
-
+		this._view.context.drawImage(this._buffer.canvas, x, y, w, h, x, y, w, h);
 	}
 
 
 	GanttChart.prototype.flipChart = function(){
 		var x = this._labelWidth, y = 0, 
-			w = this._buffer.width - x, h = this._buffer.height;
+			w = this._buffer.canvas.width - x, h = this._buffer.canvas.height;
 
-		this._viewCtx.drawImage(this._buffer, x, y, w, h, x, y, w, h);
+		this._view.context.drawImage(this._buffer.canvas, x, y, w, h, x, y, w, h);
 	}
 	
 
@@ -154,7 +138,8 @@
 
 		var i, x, y
 			cellHeight = this._markHeight + CELL_SPACING,
-			ctx = this._bufferCtx;
+			maxHeight = this._view.canvas.height - this._timelineHeight;
+			ctx = this._buffer.context;
 
 
 		ctx.textAlign = "left";
@@ -164,10 +149,13 @@
 		x = PID_LABEL_PAD;
 		y = ~~(cellHeight / 2) + CELL_SPACING;
 		
-		for(i = 0; i < this._pids.length; i++){
+		for(i = 0; i < this._pids.length && y < maxHeight; i++){
 			ctx.fillText("P" + this._pids[i], x, y);
 			y += cellHeight;
 		}
+
+		// clear extra
+
 
 		this.flipLabels();
 	}
@@ -178,25 +166,23 @@
 			return;
 		}
 
-		var x = this._x,
+		var viewWidth = this._view.canvas.width,
+			viewHeight = this._view.canvas.height,
+			x = this._x,
 			y = this._y,
-			xEnd = x + this._view.width,
-			yEnd = y + this._view.height,
-			markWidth = this._markWidth,
-			markHeight = this._markHeight,
-			cellWidth = markWidth + CELL_SPACING,
-			cellHeight = markWidth + CELL_SPACING,
+			xEnd = x + viewWidth,
+			yEnd = y + viewWidth,
+			cellWidth = this._markWidth + CELL_SPACING,
+			cellHeight = this._markWidth + CELL_SPACING,
 			timelineCenterX,
-			timelineCenterY = this._view.height - ~~(this._timelineHeight / 2),
+			timelineCenterY = viewHeight - ~~(this._timelineHeight / 2),
 			chartOffset = this._labelWidth,
-			ctx = this._bufferCtx,
-			gridStartX, gridColEnd, gridStartY, gridWidth, gridHeight,
+			ctx = this._buffer.context,
+			gridStartX, gridStartY, gridWidth, gridHeight,
 			colStart, colEnd, rowStart, rowEnd, i, log, waiting, row, col,
-			markx, marky, markw, markh;
+			markx, celly, markw, markh;
 
 		/*			Calculate drawing ranges		*/
-		gridColEnd = ~~(xEnd / cellWidth);
-
 		if(xEnd > this._drawLine){
 			xEnd = this._drawLine;
 		}
@@ -218,17 +204,17 @@
 
 		/*				Drawing				*/
 		// Clear Background
-		ctx.clearRect(this._labelWidth, 0, this._buffer.width, this._buffer.height);		
+		ctx.clearRect(chartOffset, 0, viewWidth, viewHeight);		
 		
 		//x += this._labelWidth;		// Adjust to accomodate labels
 		gridStartX = ((colStart + 1) * cellWidth) - x + chartOffset;
 		gridStartY = ((rowStart + 1) * cellHeight) - y;
-		gridWidth = this._buffer.width - chartOffset;
-		gridHeight = this._buffer.height - this._timelineHeight;
+		gridWidth = viewWidth - chartOffset;
+		gridHeight = viewHeight - this._timelineHeight;
 
 		// Draw Grid
 		ctx.strokeStyle = DEFAULT_CELL_SPACE_COLOR;
-		drawGrid(ctx, chartOffset, 0, gridWidth, gridHeight, gridStartX, gridStartY, cellWidth, cellHeight, (gridColEnd - colStart), (rowEnd - colStart));
+		drawGrid(ctx, chartOffset, 0, gridWidth, gridHeight, gridStartX, gridStartY, cellWidth, cellHeight, (~~((x + viewWidth) / cellWidth) - colStart), (rowEnd - colStart));
 		/*			Draw Marks			*/
 
 		timelineCenterX = gridStartX - ~~(cellWidth / 2);
@@ -282,7 +268,7 @@
 			this.drawChart();
 			this.drawLabels();
 		}else{
-			this._viewCtx.clearRect(0, 0, this._view.width, this._view.height);
+			this._view.context.clearRect(0, 0, this._view.canvas.width, this._view.canvas.height);
 		}
 
 		this._visible = boolValue;
@@ -290,6 +276,21 @@
 
 
 	/*				Helper Functions			*/
+	function createCanvasObject(width, height){
+		var canvas, context;
+
+		canvas = document.createElement("canvas");
+		canvas.width = width;
+		canvas.height = height;
+		context = canvas.getContext("2d");
+
+		return {
+			canvas: canvas,
+			context: context
+		};
+	}
+
+
 	function setDisplayOptions(that, options){
 		var d = that._displayOptions;
 
@@ -347,34 +348,29 @@
 
 	function drawMark(ctx, x, y, xEnd, yEnd, chartOffset, col, row, cellWidth, cellHeight){
 		// Cut is the distance of a mark's left/top side to the right/bottom edge of canvas, respectively 
-		var markx, marky, markw, markh, cut;
+		var cellx, celly, cellw, cellh, cut;
 
 		// calculate mark x-axis dimensions
-		markx = (col * cellWidth) - x;
-		if(markx < 0){
-			markw = cellWidth + markx;	// -1 ?
-			markx = 0;
+		cellx = (col * cellWidth) - x;
+		if(cellx < 0){
+			cellw = cellWidth + cellx;	// -1 ?
+			cellx = 0;
 		}else{
-			cut = (xEnd - markx);
-			markw = (cellWidth > cut ? cut : cellWidth);
+			cut = (xEnd - cellx);
+			cellw = (cellWidth > cut ? cut : cellWidth);
 		}
 
 		// calculate mark y-axis dimensions
-		marky = (row * cellHeight) - y;
-		if(marky < 0){
-			markh = cellHeight + marky;
-			marky = 0;
+		celly = (row * cellHeight) - y;
+		if(celly < 0){
+			cellh = cellHeight + celly;
+			celly = 0;
 		}else{
-			cut = (yEnd - marky);
-			markh = (cellHeight > cut ? cut : cellHeight);
+			cut = (yEnd - celly);
+			cellh = (cellHeight > cut ? cut : cellHeight);
 		}
 
-		ctx.fillRect(markx + chartOffset + 0.5, marky + 0.5, markw - CELL_SPACING, markh - CELL_SPACING);
-	}
-
-
-	function drawTime(ctx, time, x, y, chartOffset){
-
+		ctx.fillRect(cellx + chartOffset + 0.5, celly + 0.5, cellw - CELL_SPACING, cellh - CELL_SPACING);
 	}
 
 
