@@ -10,7 +10,7 @@
 		DEFAULT_MARK_HEIGHT = 24,
 		DEFAULT_VIEW_WIDTH = 800,
 		DEFAULT_FONT = "12px sans-serif",
-		DEFAULT_FONT_COLOR,
+		DEFAULT_FONT_COLOR = "#000000",
 		DEFAULT_RUNNING_COLOR = "#333333",
 		DEFAULT_WAITING_COLOR = "#aaaaaa",
 		DEFAULT_CELL_SPACE_COLOR = "#555555";
@@ -114,6 +114,7 @@
 		bufferCtx.textBaseline = "middle";
 		
 		this._displayInitialized = true;
+		this._visible = false;
 
 		return this._view;
 	}
@@ -150,6 +151,7 @@
 			cellHeight = this._markHeight + CELL_SPACING,
 			ctx = this._bufferCtx;
 
+		ctx.fillStyle = DEFAULT_FONT_COLOR;
 		x = PID_LABEL_PAD;
 		y = ~~(cellHeight / 2) + CELL_SPACING;
 		for(i = 0; i < this._pids.length; i++){
@@ -213,7 +215,7 @@
 		// Draw Grid
 		ctx.strokeStyle = DEFAULT_CELL_SPACE_COLOR;
 		ctx.strokeRect(this._chartOffset + 0.5, 0.5, this._buffer.width - this._chartOffset - 1, this._buffer.height - 1);
-		drawGrid(ctx, gridStartX, gridStartY, (gridColEnd - colStart), (rowEnd - colStart), cellWidth, cellHeight, this._buffer.width, this._buffer.height);
+		drawGrid(ctx, gridStartX, gridStartY, chartOffset, (gridColEnd - colStart), (rowEnd - colStart), cellWidth, cellHeight, this._buffer.width, this._buffer.height);
 
 		/*			Draw Marks			*/
 
@@ -249,7 +251,7 @@
 
 
 	GanttChart.prototype.setVisible = function(boolValue){
-		if(!this._displayInitialized){
+		if(!this._displayInitialized || this._visible === boolValue){
 			return;
 		}
 
@@ -259,6 +261,8 @@
 		}else{
 			this._viewCtx.clearRect(0, 0, this._view.width, this._view.height);
 		}
+
+		this._visible = boolValue;
 	}
 
 
@@ -292,7 +296,7 @@
 	}
 
 
-	function drawGrid(ctx, startx, starty, numCols, numRows, markWidth, markHeight, screenWidth, screenHeight){
+	function drawGrid(ctx, startx, starty, chartOffset, numCols, numRows, markWidth, markHeight, screenWidth, screenHeight){
 		// (colStart, colEnd]
 		var i, j
 			x = startx + 0.5, y = starty + 0.5;
@@ -306,7 +310,7 @@
 		}
 
 		for(i = 0; i < numRows; i++){
-			ctx.moveTo(0, y);
+			ctx.moveTo(chartOffset, y);
 			ctx.lineTo(screenWidth, y);
 			y += markHeight;
 		}
