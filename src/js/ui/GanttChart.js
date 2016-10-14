@@ -13,7 +13,8 @@
 		DEFAULT_FONT_COLOR = "#000000",
 		DEFAULT_RUNNING_COLOR = "#333333",
 		DEFAULT_WAITING_COLOR = "#aaaaaa",
-		DEFAULT_CELL_SPACE_COLOR = "#555555";
+		DEFAULT_CELL_SPACE_COLOR = "#555555",
+		DEFAULT_TIMELINE_HEIGHT = 20,
 		AUTO = -1,
 		NO_VALUE = -2,
 		CELL_SPACING = 1,
@@ -48,6 +49,7 @@
 		this._chartWidth = 0;
 		this._chartHeight = 0;
 
+		
 		/*			Canvas Display		*/
 		
 		// Canvas
@@ -59,8 +61,9 @@
 		// Positioning
 		this._x = 0;
 		this._y = 0;
-		this._chartOffset = 0;	// To allow space for PID labels
-		this._drawLine = 0;		// Every mark to the right of the line is not drawn
+		this._labelWidth = 0;		// To allow space for PID labels
+		this._timelineHeight = 0;	
+		this._drawLine = 0;			// Every mark to the right of the line is not drawn
 
 		//	Display options
 		this._markWidth = DEFAULT_MARK_WIDTH;
@@ -86,7 +89,7 @@
 		// Calculate dimensions of chart (full size)
 		this._x = this._y = 0;		// With respect to the chart ONLY (does not include space of labels)
 		this._chartWidth = (this._logs.length * (this._markWidth + CELL_SPACING)) + CELL_SPACING;
-		this._chartHeight = (this._pids.length * (this._markHeight + CELL_SPACING)) + CELL_SPACING;
+		this._chartHeight = ((this._pids.length) * (this._markHeight + CELL_SPACING)) + CELL_SPACING;
 
 		// Create canvas
 		view = document.createElement("canvas");
@@ -97,7 +100,9 @@
 		this._viewCtx = viewCtx;
 
 		// Determine chartOffset by measuring pid string length
-		this._chartOffset = this._viewCtx.measureText("P" + this._pids[this._pids.length - 1]).width + (PID_LABEL_PAD * 2);
+		this._labelWidth = this._viewCtx.measureText("P" + this._pids[this._pids.length - 1]).width + (PID_LABEL_PAD * 2);
+
+		this._timelineHeight = DEFAULT_TIMELINE_HEIGHT;
 
 		buffer = document.createElement("canvas");
 		buffer.width = displayOptions.viewWidth;
@@ -107,7 +112,7 @@
 		this._bufferCtx = bufferCtx;
 
 
-		this._drawLine = viewWidth - this._chartOffset;
+		this._drawLine = viewWidth - this._labelWidth;
 
 		// Initialize contexts
 		bufferCtx.font = DEFAULT_FONT;
@@ -127,14 +132,14 @@
 
 	GanttChart.prototype.flipLabels = function(){
 		var x = y = 0,
-			w = this._chartOffset, h = this._buffer.height;
+			w = this._labelWidth, h = this._buffer.height;
 
 		this._viewCtx.drawImage(this._buffer, x, y, w, h, x, y, w, h);
 	}
 
 
 	GanttChart.prototype.flipChart = function(){
-		var x = this._chartOffset, y = 0, 
+		var x = this._labelWidth, y = 0, 
 			w = this._buffer.width - x, h = this._buffer.height;
 
 		this._viewCtx.drawImage(this._buffer, x, y, w, h, x, y, w, h);
@@ -150,6 +155,7 @@
 			cellHeight = this._markHeight + CELL_SPACING,
 			ctx = this._bufferCtx;
 
+		ctx.textAlign = "left";
 		ctx.fillStyle = DEFAULT_FONT_COLOR;
 		x = PID_LABEL_PAD;
 		y = ~~(cellHeight / 2) + CELL_SPACING;
@@ -175,9 +181,9 @@
 			markHeight = this._markHeight,
 			cellWidth = markWidth + CELL_SPACING,
 			cellHeight = markWidth + CELL_SPACING,
-			chartOffset = this._chartOffset,
+			chartOffset = this._labelWidth,
 			ctx = this._bufferCtx,
-			gridStartX, gridColEnd, gridStartY,
+			gridStartX, gridColEnd, gridStartY, gridWidth, gridHeight,
 			colStart, colEnd, rowStart, rowEnd, i, log, waiting, row, col,
 			markx, marky, markw, markh;
 
@@ -205,17 +211,17 @@
 
 		/*				Drawing				*/
 		// Clear Background
-		ctx.clearRect(this._chartOffset, 0, this._buffer.width, this._buffer.height);		
+		ctx.clearRect(this._labelWidth, 0, this._buffer.width, this._buffer.height);		
 		
-		//x += this._chartOffset;		// Adjust to accomodate labels
+		//x += this._labelWidth;		// Adjust to accomodate labels
 		gridStartX = ((colStart + 1) * cellWidth) - x + chartOffset;
 		gridStartY = ((rowStart + 1) * cellHeight) - y;
+		gridWidth = this._buffer.width - chartOffset;
+		gridHeight = this._buffer.height - this._timelineHeight
 
 		// Draw Grid
 		ctx.strokeStyle = DEFAULT_CELL_SPACE_COLOR;
-		ctx.strokeRect(this._chartOffset + 0.5, 0.5, this._buffer.width - this._chartOffset - 1, this._buffer.height - 1);
-		drawGrid(ctx, gridStartX, gridStartY, chartOffset, (gridColEnd - colStart), (rowEnd - colStart), cellWidth, cellHeight, this._buffer.width, this._buffer.height);
-
+		drawGrid(ctx, chartOffset, 0, gridWidth, gridHeight, gridStartX, gridStartY, cellWidth, cellHeight, (gridColEnd - colStart), (rowEnd - colStart));
 		/*			Draw Marks			*/
 
 		// Draw Running
@@ -243,7 +249,6 @@
 				}
 			}
 		}
-
 
 		this.flipChart();
 	}
@@ -278,7 +283,7 @@
 			d.markHeight = options.markHeight || DEFAULT_MARK_HEIGHT;
 
 			d.viewWidth = options.viewWidth || DEFAULT_VIEW_WIDTH;
-			d.viewHeight = options.viewHeight || ((d.markHeight + CELL_SPACING) * that._pids.length + CELL_SPACING);
+			d.viewHeight = options.viewHeight || ((d.markHeight + CELL_SPACING) * that._pids.length + CELL_SPACING + DEFAULT_TIMELINE_HEIGHT);
 
 			d.runningColor = options.runningColor || DEFAULT_RUNNING_COLOR;
 			d.waitingColor = options.waitingColor || DEFAULT_WAITING_COLOR;
@@ -287,7 +292,7 @@
 			d.markHeight = DEFAULT_MARK_HEIGHT;
 
 			d.viewWidth = DEFAULT_VIEW_WIDTH;
-			d.viewHeight = ((d.markHeight + CELL_SPACING) * that._pids.length + CELL_SPACING);
+			d.viewHeight = ((d.markHeight + CELL_SPACING) * that._pids.length + CELL_SPACING + DEFAULT_TIMELINE_HEIGHT);
 			
 			d.runningColor = DEFAULT_RUNNING_COLOR;
 			d.waitingColor = DEFAULT_WAITING_COLOR;
@@ -295,23 +300,25 @@
 	}
 
 
-	function drawGrid(ctx, startx, starty, chartOffset, numCols, numRows, markWidth, markHeight, screenWidth, screenHeight){
-		// (colStart, colEnd]
+	function drawGrid(ctx, gridx, gridy, gridWidth, gridHeight, startx, starty, cellWidth, cellHeight, numCols, numRows){
+		//drawGrid(ctx, x, y, cellWidth, cellHeight, gridStartX, gridStartY, gridWidth, gridHeight)
 		var i, j
 			x = startx + 0.5, y = starty + 0.5;
+
+		ctx.strokeRect(gridx + 0.5, gridy + 0.5, gridWidth, gridHeight);
 
 		ctx.beginPath();
 
 		for(i = 0; i < numCols + 1; i++){
-			ctx.moveTo(x, 0);
-			ctx.lineTo(x, screenHeight);
-			x += markWidth;
+			ctx.moveTo(x, gridy);
+			ctx.lineTo(x, gridHeight);
+			x += cellWidth;
 		}
 
 		for(i = 0; i < numRows; i++){
-			ctx.moveTo(chartOffset, y);
-			ctx.lineTo(screenWidth, y);
-			y += markHeight;
+			ctx.moveTo(gridx, y);
+			ctx.lineTo(gridWidth, y);
+			y += cellHeight;
 		}
 
 		ctx.closePath();

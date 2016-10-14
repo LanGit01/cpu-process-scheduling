@@ -1,5 +1,10 @@
 <html>
 	<head>
+		<style>
+			canvas{
+				border: 1px dashed black;
+			}
+		</style>
 		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
@@ -7,15 +12,17 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChart.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
 				RRScheduler = CPUscheduling.RRScheduler,
-				TextDisplay = CPUscheduling.TextDisplay;
+				TextDisplay = CPUscheduling.TextDisplay,
+				GanttChart = CPUscheduling.GanttChart;
 
 				var pm = new ProcessManager(),
-					logs, pids, itr;
+					logs, pids, itr, ganttChart;
 
 
 				pm.setScheduler(new RRScheduler(3));
@@ -60,6 +67,8 @@
 				for(i = 0; i < processList.length; i++){
 					pids[i] = processList[i].id;
 				}
+
+				ganttChart = new GanttChart(pids, logs);
 				
 				window.onload = function(){
 					var div;
@@ -67,6 +76,12 @@
 					div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, logs)));
 					div = document.getElementById("table-text");
 					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
+
+					div = document.getElementById("gantt-chart-canvas");
+					div.appendChild(ganttChart.createDisplay());
+					ganttChart.setVisible(true);
+					ganttChart.setVisible(false);
+					ganttChart.setVisible(true);
 				}
 		</script>
 	</head>
@@ -74,6 +89,7 @@
 		<pre>
 			<div id = "gantt-chart-text"></div>
 			<div id = "table-text"></div>
+			<div id = "gantt-chart-canvas"></div>
 		</pre>
 	</body>
 </html>
