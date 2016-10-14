@@ -154,36 +154,30 @@
 
 
 	GanttChart.prototype.drawChart = function(){
-		/*var x = this._x, 
-			y = this._y,
-			xEnd = x + this._view.width,
-			yEnd = y + this._view.height,
-			markWidth = this._markWidth + CELL_SPACING,
-			markHeight = this._markHeight + CELL_SPACING,
-			ctx = this._bufferCtx,
-			colStart, colEnd, rowStart, rowEnd, i, j, log, row, col,
-			markx, marky, markw, markh;
-		*/
 	
 		var x = this._x,
 			y = this._y,
 			xEnd = x + this._view.width,
 			yEnd = y + this._view.height,
-			cellWidth = this._markWidth + CELL_SPACING,
-			cellHeight = this._markWidth + CELL_SPACING
+			markWidth = this._markWidth,
+			markHeight = this._markHeight,
+			cellWidth = markWidth + CELL_SPACING,
+			cellHeight = markWidth + CELL_SPACING,
+			chartOffset = this._chartOffset,
+			ctx = this._bufferCtx,
+			gridStartX, gridStartY,
+			colStart, colEnd, rowStart, rowEnd, i, j, log, row, col,
+			markx, marky, markw, markh;
 
-
-		/*			Calculate drawing range			*/
-		
-		/*
+		/*			Calculate drawing ranges		*/
 		if(xEnd > this._drawLine){
 			xEnd = this._drawLine;
 		}
 
-		colStart = ~~(x / markWidth);
-		colEnd = ~~(xEnd / markWidth);
-		rowStart = ~~(y / markHeight);
-		rowEnd = ~~(yEnd / markHeight);
+		colStart = ~~(x / cellWidth);
+		colEnd = ~~(xEnd / cellWidth);
+		rowStart = ~~(y / cellHeight);
+		rowEnd = ~~(yEnd / cellHeight);
 
 		if(colEnd > this._logs.length - 1){
 			colEnd = this._logs.length - 1;
@@ -194,38 +188,36 @@
 			rowEnd = this._pids.length - 1;
 			yEnd = this._chartHeight;
 		}
-		*/
 
-		/*			Drawing				*/
-		/*
-		x -= this._chartOffset;		// Adjust to accomodate labels
-
+		console.log(x);
+		console.log(this._chartOffset);
+		/*				Drawing				*/
 		// Clear Background
-		ctx.clearRect(0, 0, this._buffer.width, this._buffer.height);
+		ctx.clearRect(this._chartOffset, 0, this._buffer.width, this._buffer.height);		
+		
+		//x += this._chartOffset;		// Adjust to accomodate labels
+		gridStartX = ((colStart + 1) * cellWidth) - x + chartOffset;
+		gridStartY = ((rowStart + 1) * cellHeight) - y;
 
-		ctx.fillStyle = DEFAULT_CELL_SPACE_COLOR;
-		drawGrid(ctx, ((colStart + 1) * markWidth) - x, ((rowStart + 1) * markHeight) - y,
-				(colEnd - colStart), (rowEnd - rowStart), 
-				markWidth, markHeight, this._buffer.width, this._buffer.height);
-		*/
+		// Draw Grid
+		ctx.strokeStyle = DEFAULT_CELL_SPACE_COLOR;
+		ctx.strokeRect(this._chartOffset + 0.5, 0.5, this._buffer.width - this._chartOffset - 1, this._buffer.height - 1);
+		drawGrid(ctx, gridStartX, gridStartY, (colEnd - colStart), (rowEnd - colStart), cellWidth, cellHeight, this._buffer.width, this._buffer.height);
 
 		/*			Draw Marks			*/
-		/*
+		// Draw Running
 		ctx.fillStyle = DEFAULT_RUNNING_COLOR;
-		// Draw running
-		for(col = colStart; col <= colEnd; col++){	
+		for(col = colStart; col <= colEnd; col++){
 			log = this._logs[col];
 			row = log.running && this._rowMapping[log.running.id];
 
-			if(row !== null){
-				drawMark(ctx, x, y, xEnd, yEnd, col, row, markWidth, markHeight);
+			if(row != null){
+				drawMark(ctx, x, y, xEnd, yEnd, chartOffset, col, row, cellWidth, cellHeight);
 			}
-			
-
 		}
 
-		this.flipChart();
-		*/
+
+	this.flipChart();
 	}
 
 
@@ -243,11 +235,11 @@
 	function drawGrid(ctx, startx, starty, numCols, numRows, markWidth, markHeight, screenWidth, screenHeight){
 		// (colStart, colEnd]
 		var i, j
-			x = startx, y = starty;
+			x = startx + 0.5, y = starty + 0.5;
 
 		ctx.beginPath();
 
-		for(i = 0; i < numCols; i++){
+		for(i = 0; i < numCols + 1; i++){
 			ctx.moveTo(x, 0);
 			ctx.lineTo(x, screenHeight);
 			x += markWidth;
@@ -265,31 +257,31 @@
 
 
 
-	function drawMark(ctx, x, y, xEnd, yEnd, col, row, markWidth, markHeight){
+	function drawMark(ctx, x, y, xEnd, yEnd, chartOffset, col, row, cellWidth, cellHeight){
 		// Cut is the distance of a mark's left/top side to the right/bottom edge of canvas, respectively 
 		var markx, marky, markw, markh, cut;
 
 		// calculate mark x-axis dimensions
-		markx = (col * markWidth) - x;
+		markx = (col * cellWidth) - x;
 		if(markx < 0){
-			markw = markWidth + markx;	// -1 ?
+			markw = cellWidth + markx;	// -1 ?
 			markx = 0;
 		}else{
 			cut = (xEnd - markx);
-			markw = (markWidth > cut ? cut : markWidth);
+			markw = (cellWidth > cut ? cut : cellWidth);
 		}
 
 		// calculate mark y-axis dimensions
-		marky = (row * markHeight) - y;
+		marky = (row * cellHeight) - y;
 		if(marky < 0){
-			markh = markHeight + marky;
+			markh = cellHeight + marky;
 			marky = 0;
 		}else{
 			cut = (yEnd - marky);
-			markh = (markHeight > cut ? cut : markHeight);
+			markh = (cellHeight > cut ? cut : cellHeight);
 		}
 
-		ctx.fillRect(markx + CELL_SPACING, marky + CELL_SPACING, markw - CELL_SPACING, markh - CELL_SPACING);
+		ctx.fillRect(markx + chartOffset + 0.5, marky + 0.5, markw - CELL_SPACING, markh - CELL_SPACING);
 	}
 
 
