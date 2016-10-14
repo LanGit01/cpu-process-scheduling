@@ -214,7 +214,7 @@
 
 		// Draw Grid
 		ctx.strokeStyle = DEFAULT_CELL_SPACE_COLOR;
-		drawGrid(ctx, chartOffset, 0, gridWidth, gridHeight, gridStartX, gridStartY, cellWidth, cellHeight, (~~((x + viewWidth) / cellWidth) - colStart), (rowEnd - colStart));
+		drawGrid(ctx, chartOffset, 0, gridWidth, gridHeight, gridStartX, gridStartY, cellWidth, cellHeight);
 		/*			Draw Marks			*/
 
 		timelineCenterX = gridStartX - ~~(cellWidth / 2);
@@ -320,21 +320,25 @@
 	}
 
 
-	function drawGrid(ctx, gridx, gridy, gridWidth, gridHeight, startx, starty, cellWidth, cellHeight, numCols, numRows){
+	function drawGrid(ctx, gridx, gridy, gridWidth, gridHeight, startx, starty, cellWidth, cellHeight){
 		var i, j
 			x = startx + 0.5, y = starty + 0.5;
 
-		ctx.strokeRect(gridx + 0.5, gridy + 0.5, gridWidth, gridHeight);
+		numCols = ~~((gridWidth - startx + gridx) / cellWidth);
+		numRows = ~~((gridHeight - starty + gridy - CELL_SPACING - 1) / cellWidth);
+
+		console.log(numCols);
+
+		ctx.strokeRect(gridx + 0.5, gridy + 0.5, gridWidth - 1, gridHeight - 1);
 
 		ctx.beginPath();
-
-		for(i = 0; i < numCols + 1; i++){
+		for(i = 0; i <= numCols; i++){
 			ctx.moveTo(x, gridy);
 			ctx.lineTo(x, gridy + gridHeight);
 			x += cellWidth;
 		}
 
-		for(i = 0; i < numRows; i++){
+		for(i = 0; i <= numRows; i++){
 			ctx.moveTo(gridx, y);
 			ctx.lineTo(gridx + gridWidth, y);
 			y += cellHeight;
