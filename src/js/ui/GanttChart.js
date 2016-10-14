@@ -135,6 +135,7 @@
 			w = this._labelWidth, h = this._buffer.height;
 
 		this._viewCtx.drawImage(this._buffer, x, y, w, h, x, y, w, h);
+
 	}
 
 
@@ -155,10 +156,14 @@
 			cellHeight = this._markHeight + CELL_SPACING,
 			ctx = this._bufferCtx;
 
+
 		ctx.textAlign = "left";
 		ctx.fillStyle = DEFAULT_FONT_COLOR;
+		ctx.clearRect(0, 0, this._labelWidth, this._buffer.height);
+
 		x = PID_LABEL_PAD;
 		y = ~~(cellHeight / 2) + CELL_SPACING;
+		
 		for(i = 0; i < this._pids.length; i++){
 			ctx.fillText("P" + this._pids[i], x, y);
 			y += cellHeight;
@@ -274,8 +279,8 @@
 		}
 
 		if(boolValue){
-			this.drawLabels();
 			this.drawChart();
+			this.drawLabels();
 		}else{
 			this._viewCtx.clearRect(0, 0, this._view.width, this._view.height);
 		}
