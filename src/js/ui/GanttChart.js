@@ -324,13 +324,13 @@
 
 		for(i = 0; i < numCols + 1; i++){
 			ctx.moveTo(x, gridy);
-			ctx.lineTo(x, gridHeight);
+			ctx.lineTo(x, gridy + gridHeight);
 			x += cellWidth;
 		}
 
 		for(i = 0; i < numRows; i++){
 			ctx.moveTo(gridx, y);
-			ctx.lineTo(gridWidth, y);
+			ctx.lineTo(gridx + gridWidth, y);
 			y += cellHeight;
 		}
 
