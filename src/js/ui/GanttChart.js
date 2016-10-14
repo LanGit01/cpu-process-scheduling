@@ -6,8 +6,8 @@
 		return;
 	}
 
-	var DEFAULT_MARK_WIDTH = 24,
-		DEFAULT_MARK_HEIGHT = 24,
+	var DEFAULT_MARK_WIDTH = 28,
+		DEFAULT_MARK_HEIGHT = 28,
 		DEFAULT_VIEW_WIDTH = 800,
 		DEFAULT_FONT = "12px sans-serif",
 		DEFAULT_FONT_COLOR = "#000000",
@@ -181,6 +181,8 @@
 			markHeight = this._markHeight,
 			cellWidth = markWidth + CELL_SPACING,
 			cellHeight = markWidth + CELL_SPACING,
+			timelineCenterX,
+			timelineCenterY = this._view.height - ~~(this._timelineHeight / 2),
 			chartOffset = this._labelWidth,
 			ctx = this._bufferCtx,
 			gridStartX, gridColEnd, gridStartY, gridWidth, gridHeight,
@@ -217,12 +219,14 @@
 		gridStartX = ((colStart + 1) * cellWidth) - x + chartOffset;
 		gridStartY = ((rowStart + 1) * cellHeight) - y;
 		gridWidth = this._buffer.width - chartOffset;
-		gridHeight = this._buffer.height - this._timelineHeight
+		gridHeight = this._buffer.height - this._timelineHeight;
 
 		// Draw Grid
 		ctx.strokeStyle = DEFAULT_CELL_SPACE_COLOR;
 		drawGrid(ctx, chartOffset, 0, gridWidth, gridHeight, gridStartX, gridStartY, cellWidth, cellHeight, (gridColEnd - colStart), (rowEnd - colStart));
 		/*			Draw Marks			*/
+
+		timelineCenterX = gridStartX - ~~(cellWidth / 2);
 
 		// Draw Running
 		ctx.fillStyle = DEFAULT_RUNNING_COLOR;
@@ -249,6 +253,16 @@
 				}
 			}
 		}
+
+		// Draw timeline
+		ctx.fillStyle = DEFAULT_FONT_COLOR;
+		ctx.textAlign = "center";
+		for(col = colStart; col <= colEnd; col++){
+			// Draw Time
+			ctx.fillText(col, timelineCenterX, timelineCenterY);
+			timelineCenterX += cellWidth;
+		}
+
 
 		this.flipChart();
 	}
@@ -301,7 +315,6 @@
 
 
 	function drawGrid(ctx, gridx, gridy, gridWidth, gridHeight, startx, starty, cellWidth, cellHeight, numCols, numRows){
-		//drawGrid(ctx, x, y, cellWidth, cellHeight, gridStartX, gridStartY, gridWidth, gridHeight)
 		var i, j
 			x = startx + 0.5, y = starty + 0.5;
 
@@ -355,6 +368,9 @@
 	}
 
 
+	function drawTime(ctx, time, x, y, chartOffset){
+
+	}
 
 
 
