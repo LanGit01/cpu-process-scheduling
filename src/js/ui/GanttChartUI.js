@@ -13,8 +13,8 @@
 		DEFAULT_VIEW_WIDTH = 800,
 		DEFAULT_VIEW_HEIGHT = 400,
 
-		DEFAULT_RUNNING_COLOR,
-		DEFAULT_WAITING_COLOR,
+		DEFAULT_RUNNING_COLOR = "#333333",
+		DEFAULT_WAITING_COLOR = "#aaaaaa",
 
 		DEFAULT_FONT_SIZE = 12,
 		DEFAULT_FONT = "sans-serif",
@@ -123,17 +123,22 @@
 
 
 	GanttChartUI.prototype.drawChart = function(){
-		var cvWidth = this._chartArea.w - (CELL_BORDER * 2),			// chart dimensions without border
+		var cvx = this._chartArea.x + CELL_BORDER,
+			cvy = this._chartArea.y + CELL_BORDER,
+			cvWidth = this._chartArea.w - (CELL_BORDER * 2),			// chart dimensions without border
 			cvHeight = this._chartArea.h - (CELL_BORDER * 2),
-			x = this._x,
-			y = this._y,
+			x = this._x + 5,
+			y = this._y + 5,
 			xEnd = x + cvWidth - 1,
 			yEnd = y + cvHeight - 1,
-			cellWidth = this._displayConfig.markWidth + CELL_BORDER,
-			cellHeight = this._displayConfig.markHeight + CELL_BORDER,
+			markWidth = this._displayConfig.markWidth,
+			markHeight = this._displayConfig.markHeight,
+			cellWidth = markWidth + CELL_BORDER,
+			cellHeight = markHeight + CELL_BORDER,
 			ctx = this._buffer.context,
 			colOffset, colEnd, rowOffset, rowEnd,
-			xMarkStart, yMarkStart;
+			xMarkStart, yMarkStart, xMark, yMark,
+			col, row, log;
 
 			/*		Calculate ranges and positions 		*/
 			if(xEnd > this._drawLine){
@@ -145,18 +150,39 @@
 			rowOffset = ~~(y / cellHeight);
 			rowEnd = ~~(yEnd / cellHeight);
 
-			xMarkStart = -(x % cellWidth);
-			yMarkStart = -(y % cellHeight);
+			if(colEnd > this._logs.length - 1){
+				colEnd = this._logs.length - 1;
+			}
+
+			if(rowEnd > this._pids.length - 1){
+				rowEnd = this._pids.length - 1;
+			}
+
+			xMarkStart = -(x % cellWidth) + CELL_BORDER;
+			yMarkStart = -(y % cellHeight) + CELL_BORDER;
 
 			ctx.clearRect(this._chartArea.x, this._chartArea.y, this._chartArea.w, this._chartArea.h);
-			/*		Draw Grid		*/
+
+			//	Draw Grid
 			drawGrid(ctx, this._chartArea.x, this._chartArea.y, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight, this._chartArea.w, this._chartArea.h);
 
+			// Draw running marks
+			ctx.fillStyle = DEFAULT_RUNNING_COLOR;
+			xMark = xMarkStart;
+			for(col = colOffset; col < colEnd + 1; col++){
+				log = this._logs[col];
+				row = log.running && this._rowMapping[log.running.id];
 
+				if(row !== null){
+					yMark = yMarkStart + ((row - rowOffset) * cellHeight);
+					drawMark(ctx, cvx, cvy, xMark, yMark, markWidth, markHeight, xEnd, yEnd);
+				}
+
+				xMark += cellWidth;
+			}
 
 			this.flipChart();
 	}
-
 
 	/*			Helper Functions		*/
 	function createRect(x, y, w, h){
@@ -246,12 +272,29 @@
 
 		ctx.closePath();
 		ctx.stroke();
-
 	}
 
 
-	function drawMark(){
+	function drawMark(ctx, cx, cy, markx, marky, markWidth, markHeight, xDrawEnd, yDrawEnd){
+		var cut, markw, markh;
 
+		if(markx < 0){
+			markw = markWidth + markx;
+			markx = 0;
+		}else{
+			cut = xDrawEnd - markx;
+			markw = (markWidth > cut ? cut : markWidth);
+		}
+
+		if(marky < 0){
+			markh = markHeight + marky;
+			marky = 0;
+		}else{
+			cut = yDrawEnd - marky;
+			markh = (markHeight > cut ? cut : markHeight);
+		}
+
+		ctx.fillRect(cx + markx, cy + marky, markw, markh);
 	}
 
 
