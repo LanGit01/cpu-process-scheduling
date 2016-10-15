@@ -1,5 +1,10 @@
 <html>
 	<head>
+		<style>
+			canvas{
+				border: 1px dashed red;
+			}
+		</style>
 		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
@@ -7,14 +12,14 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
-		<script type = "text/javascript" src = "../src/js/ui/GanttChart.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChartUI.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
 				FCFSScheduler = CPUscheduling.FCFSScheduler,
 				TextDisplay = CPUscheduling.TextDisplay,
-				GanttChart = CPUscheduling.GanttChart;
+				GanttChartUI = CPUscheduling.GanttChartUI;
 
 
 			var pm = new ProcessManager(),
@@ -52,7 +57,7 @@
 			}
 
 
-			ganttChart = new GanttChart(pids, logs);
+			ganttChart = new GanttChartUI(pids, logs);
 
 
 				
@@ -65,10 +70,8 @@
 				div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(processList)));
 
 				div = document.getElementById("gantt-chart-canvas");
-				div.appendChild(ganttChart.createDisplay());
-				ganttChart.setVisible(true);
-				ganttChart.setVisible(false);
-				ganttChart.setVisible(true);
+				div.appendChild(ganttChart.initDisplay());
+				ganttChart.drawChart();
 			}
 
 

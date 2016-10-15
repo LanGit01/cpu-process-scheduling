@@ -2,7 +2,7 @@
 	<head>
 		<style>
 			canvas{
-				/*border: 1px dashed black;*/
+				border: 1px dashed red;
 			}
 		</style>
 		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
@@ -69,7 +69,7 @@
 				}
 
 				ganttChart = new GanttChartUI(pids, logs);
-				ganttChart.initDisplay();
+
 				
 				window.onload = function(){
 					var div;
@@ -79,6 +79,8 @@
 					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
 					div = document.getElementById("gantt-chart-canvas");
+					div.appendChild(ganttChart.initDisplay());
+					ganttChart.drawChart();
 				}
 		</script>
 	</head>
