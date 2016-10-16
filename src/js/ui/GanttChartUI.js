@@ -138,7 +138,7 @@
 			ctx = this._buffer.context,
 			colOffset, colEnd, rowOffset, rowEnd,
 			xMarkStart, yMarkStart, xMark, yMark,
-			col, row, log;
+			col, row, log, i, waiting;
 
 			/*		Calculate ranges and positions 		*/
 			if(xEnd > this._drawLine){
@@ -176,6 +176,25 @@
 				if(row !== null){
 					yMark = yMarkStart + ((row - rowOffset) * cellHeight);
 					drawMark(ctx, cvx, cvy, xMark, yMark, markWidth, markHeight, xEnd, yEnd);
+				}
+
+				xMark += cellWidth;
+			}
+
+			// Draw waiting marks
+			ctx.fillStyle = DEFAULT_WAITING_COLOR;
+			xMark = xMarkStart;
+			for(col = colOffset; col < colEnd + 1; col++){
+				log = this._logs[col];
+				waiting = log.waiting;
+
+				for(i = 0; i < waiting.length; i++){
+					row = this._rowMapping[waiting[i].id];
+
+					if(row !== null){
+						yMark = yMarkStart + ((row - rowOffset) * cellHeight);
+						drawMark(ctx, cvx, cvy, xMark, yMark, markWidth, markHeight, xEnd, yEnd);
+					}
 				}
 
 				xMark += cellWidth;
