@@ -173,11 +173,17 @@
 		this._view.context.drawImage(this._buffer.canvas, x, y, w, h, x, y, w, h);
 	}
 
+
 	GanttChartUI.prototype.flipChart = function(){
 		var x = this._chartArea.x, y = this._chartArea.y,
 			w = this._chartArea.w, h = this._chartArea.h + this._timelineArea.h;
 
 		this._view.context.drawImage(this._buffer.canvas, x, y, w, h, x, y, w, h);
+	}
+
+
+	GanttChartUI.prototype.flip = function(){
+		this._view.context.drawImage(this._buffer.canvas, 0, 0);
 	}
 
 
@@ -300,6 +306,18 @@
 			this.flipChart();
 	}
 
+
+	GanttChartUI.prototype.draw = function(){
+		var ctx = this._buffer.context,
+			cellWidth = this._displayConfig.markWidth + CELL_BORDER,
+			cellHeight = this._displayConfig.markHeight + CELL_BORDER;
+
+		drawLabels(ctx, this._pids, this._rowOffset, this._rowEnd, this._y, cellHeight);
+
+		this.flip();
+	}
+
+
 	/*			Helper Functions		*/
 	function createRect(x, y, w, h){
 		return{
@@ -355,6 +373,23 @@
 			canvas: canvas,
 			context: context
 		};
+	}
+
+
+	function drawLabels(ctx, labels, rowStart, rowEnd, y, cellHeight){
+		var labelx, labely, row;
+
+		labelx = LABEL_MARGIN;
+		labely = -(y % cellHeight) + CELL_BORDER + ~~(cellHeight / 2);
+
+		ctx.textAlign = "left";
+		ctx.fillStyle = DEFAULT_FONT_COLOR;
+
+		for(row = rowStart; row < rowEnd + 1; row++){
+			ctx.fillText("P" + labels[row], labelx, labely);
+			labely += cellHeight;
+		}
+
 	}
 
 
