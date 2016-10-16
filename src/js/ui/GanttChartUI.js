@@ -145,6 +145,8 @@
 		labelx = LABEL_MARGIN;
 		labely = -(this._y % cellHeight) + CELL_BORDER + ~~(cellHeight / 2);
 
+		ctx.clearRect(this._labelArea.x, this._labelArea.y, this._labelArea.w, this._labelArea.h + this._timelineArea.h);
+
 		ctx.textAlign = "left";
 		ctx.fillStyle = DEFAULT_FONT_COLOR;
 		for(i = rowStart; i < rowEnd + 1; i++){
