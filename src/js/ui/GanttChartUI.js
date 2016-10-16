@@ -115,6 +115,13 @@
 	}
 
 
+	GanttChartUI.prototype.flipLabels = function(){
+		var x = this._labelArea.x, y = this._labelArea.y,
+			w = this._labelArea.w, h = this._labelArea.h;
+
+		this._view.context.drawImage(this._buffer.canvas, x, y, w, h, x, y, w, h);
+	}
+
 	GanttChartUI.prototype.flipChart = function(){
 		var x = this._chartArea.x, y = this._chartArea.y,
 			w = this._chartArea.w, h = this._chartArea.h + this._timelineArea.h;
@@ -123,7 +130,30 @@
 	}
 
 
-	
+	GanttChartUI.prototype.drawLabels = function(){
+		var labelx, labely, rowStart, rowEnd, i,
+			cellHeight = this._displayConfig.markWidth + CELL_BORDER,
+			ctx = this._buffer.context;
+
+		rowStart = ~~((this._y - CELL_BORDER) / cellHeight);
+		rowEnd = ~~((this._y + this._labelArea.h - CELL_BORDER) / cellHeight);
+
+		if(rowEnd > this._pids.length - 1){
+			rowEnd = this._pids.length - 1;
+		}
+
+		labelx = LABEL_MARGIN;
+		labely = -(this._y % cellHeight) + CELL_BORDER + ~~(cellHeight / 2);
+
+		ctx.textAlign = "left";
+		ctx.fillStyle = DEFAULT_FONT_COLOR;
+		for(i = rowStart; i < rowEnd + 1; i++){
+			ctx.fillText("P" + this._pids[i], labelx, labely);
+			labely += cellHeight;
+		}
+
+		this.flipLabels();
+	}
 
 
 	GanttChartUI.prototype.drawChart = function(){
@@ -131,8 +161,8 @@
 			cvy = this._chartArea.y + CELL_BORDER,
 			cvWidth = this._chartArea.w - (CELL_BORDER * 2),			// chart dimensions without border
 			cvHeight = this._chartArea.h - (CELL_BORDER * 2),
-			x = this._x + 5,
-			y = this._y + 5,
+			x = this._x,
+			y = this._y,
 			xEnd = x + cvWidth - 1,
 			yEnd = y + cvHeight - 1,
 			markWidth = this._displayConfig.markWidth,
