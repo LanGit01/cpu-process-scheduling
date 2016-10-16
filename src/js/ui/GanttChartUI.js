@@ -46,6 +46,13 @@
 		this._y = 0;
 		this._drawLine = 0;
 
+		this._colOffset = 0;
+		this._colEnd = 0;
+		this._rowOffset = 0;
+		this._rowEnd = 0;
+		this._xDrawEnd = 0;
+		this._yDrawEnd = 0;
+
 		/*			Canvas Display		*/
 		
 		// Canvas
@@ -112,6 +119,50 @@
 		this._displayInitialized = true;
 
 		return this._view.canvas;
+	}
+
+
+	GanttChartUI.prototype.setPosition = function(x, y){
+		/*
+		 *	Calculates:
+		 *		- column and row offset and end
+		 *		- drawing rect bounds
+		 */
+		 var colOffset, rowOffset,
+		 	 colEnd, rowEnd,
+		 	 xDrawEnd, yDrawEnd,
+		 	 cellWidth = this._displayConfig.markWidth + CELL_BORDER,
+		 	 cellHeight = this._displayConfig.markHeight + CELL_BORDER;
+
+		xDrawEnd = x + this._chartArea.w - (CELL_BORDER * 2) - 1;
+		yDrawEnd = y + this._chartArea.h - (CELL_BORDER * 2) - 1;
+
+
+		if(xDrawEnd > this._drawLine){
+			xDrawEnd = this._drawLine;
+		}
+
+		colOffset = ~~(x / cellWidth);
+		colEnd = ~~(xDrawEnd / cellWidth);
+		rowOffset = ~~(y / cellHeight);
+		rowEnd = ~~(yDrawEnd / cellHeight);
+
+		if(colEnd > this._logs.length - 1){
+			colEnd = this._logs.length - 1;
+		}
+
+		if(rowEnd > this._pids.length - 1){
+			rowEnd = this._pids.length - 1;
+		}
+
+
+		// Set values
+		this._colOffset = colOffset;
+		this._colEnd = colEnd;
+		this._rowOffset = rowOffset;
+		this._rowEnd = rowEnd;
+		this._xDrawEnd = xDrawEnd;
+		this._yDrawEnd = yDrawEnd;
 	}
 
 
