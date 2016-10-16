@@ -192,13 +192,13 @@
 				rowEnd = this._pids.length - 1;
 			}
 
-			xMarkStart = -(x % cellWidth) + CELL_BORDER;
-			yMarkStart = -(y % cellHeight) + CELL_BORDER;
+			xMarkStart = -(x % cellWidth);
+			yMarkStart = -(y % cellHeight);
 
 			ctx.clearRect(this._chartArea.x, this._chartArea.y, this._chartArea.w, this._chartArea.h);
 
 			//	Draw Grid
-			drawGrid(ctx, this._chartArea.x, this._chartArea.y, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight, this._chartArea.w, this._chartArea.h);
+			drawGrid(ctx, cvx - CELL_BORDER, cvy - CELL_BORDER, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight, this._chartArea.w, this._chartArea.h);
 
 			// Draw running marks
 			ctx.fillStyle = DEFAULT_RUNNING_COLOR;
@@ -345,7 +345,7 @@
 			markw = markWidth + markx;
 			markx = 0;
 		}else{
-			cut = xDrawEnd - markx;
+			cut = xDrawEnd - markx + 1;
 			markw = (markWidth > cut ? cut : markWidth);
 		}
 
@@ -353,7 +353,7 @@
 			markh = markHeight + marky;
 			marky = 0;
 		}else{
-			cut = yDrawEnd - marky;
+			cut = yDrawEnd - marky + 1;
 			markh = (markHeight > cut ? cut : markHeight);
 		}
 
