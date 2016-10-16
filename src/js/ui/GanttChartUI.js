@@ -18,6 +18,7 @@
 
 		DEFAULT_FONT_SIZE = 12,
 		DEFAULT_FONT = "sans-serif",
+		DEFAULT_FONT_COLOR = "#000000",
 
 		LABEL_MARGIN = 10,
 		CELL_BORDER = 1,
@@ -116,10 +117,13 @@
 
 	GanttChartUI.prototype.flipChart = function(){
 		var x = this._chartArea.x, y = this._chartArea.y,
-			w = this._chartArea.w, h = this._chartArea.h;
+			w = this._chartArea.w, h = this._chartArea.h + this._timelineArea.h;
 
 		this._view.context.drawImage(this._buffer.canvas, x, y, w, h, x, y, w, h);
 	}
+
+
+	
 
 
 	GanttChartUI.prototype.drawChart = function(){
@@ -197,6 +201,16 @@
 					}
 				}
 
+				xMark += cellWidth;
+			}
+
+			// Draw Timeline
+			ctx.fillStyle = DEFAULT_FONT_COLOR;
+			ctx.textAlign = "center";
+			xMark = cvx + xMarkStart + ~~(cellWidth / 2);
+			yMark = cvy + cvHeight + ~~(cellHeight / 2);
+			for(col = colOffset; col < colEnd + 1; col++){
+				ctx.fillText(col, xMark, yMark);
 				xMark += cellWidth;
 			}
 
