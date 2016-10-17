@@ -115,8 +115,8 @@
 		this._chartArea = createRect(this._labelArea.w, 0, this._timelineArea.w, config.viewHeight - config.markHeight);
 		
 		this._boundaryRect = {
-			w: (this._logs.length * (config.markWidth + CELL_BORDER)) - CELL_BORDER, 
-			h: (this._pids.length * (config.markHeight + CELL_BORDER)) - CELL_BORDER
+			w: (this._logs.length * (config.markWidth + CELL_BORDER)), 
+			h: (this._pids.length * (config.markHeight + CELL_BORDER))
 		};
 
 		this._drawLine = this._boundaryRect.w;
@@ -157,7 +157,6 @@
 		if(y > yMax){
 			y = yMax;
 		}
-
 
 		xDrawEnd = x + this._chartArea.w - (CELL_BORDER * 2) - 1;
 		yDrawEnd = y + this._chartArea.h - (CELL_BORDER * 2) - 1;
