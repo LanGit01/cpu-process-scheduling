@@ -134,6 +134,8 @@
 		 	 cellWidth = this._displayConfig.markWidth + CELL_BORDER,
 		 	 cellHeight = this._displayConfig.markHeight + CELL_BORDER;
 
+		// Add bound correction in the future
+
 		xDrawEnd = x + this._chartArea.w - (CELL_BORDER * 2) - 1;
 		yDrawEnd = y + this._chartArea.h - (CELL_BORDER * 2) - 1;
 
@@ -157,6 +159,8 @@
 
 
 		// Set values
+		this._x = x;
+		this._y = y;
 		this._colOffset = colOffset;
 		this._colEnd = colEnd;
 		this._rowOffset = rowOffset;
@@ -187,132 +191,16 @@
 	}
 
 
-	GanttChartUI.prototype.drawLabels = function(){
-		var labelx, labely, rowStart, rowEnd, i,
-			cellHeight = this._displayConfig.markWidth + CELL_BORDER,
-			ctx = this._buffer.context;
-
-		rowStart = ~~((this._y - CELL_BORDER) / cellHeight);
-		rowEnd = ~~((this._y + this._labelArea.h - CELL_BORDER) / cellHeight);
-
-		if(rowEnd > this._pids.length - 1){
-			rowEnd = this._pids.length - 1;
-		}
-
-		labelx = LABEL_MARGIN;
-		labely = -(this._y % cellHeight) + CELL_BORDER + ~~(cellHeight / 2);
-
-		ctx.clearRect(this._labelArea.x, this._labelArea.y, this._labelArea.w, this._labelArea.h + this._timelineArea.h);
-
-		ctx.textAlign = "left";
-		ctx.fillStyle = DEFAULT_FONT_COLOR;
-		for(i = rowStart; i < rowEnd + 1; i++){
-			ctx.fillText("P" + this._pids[i], labelx, labely);
-			labely += cellHeight;
-		}
-
-		this.flipLabels();
-	}
-
-
-	GanttChartUI.prototype.drawChart = function(){
-		var cvx = this._chartArea.x + CELL_BORDER,
-			cvy = this._chartArea.y + CELL_BORDER,
-			cvWidth = this._chartArea.w - (CELL_BORDER * 2),			// chart dimensions without border
-			cvHeight = this._chartArea.h - (CELL_BORDER * 2),
-			x = this._x,
-			y = this._y,
-			xEnd = x + cvWidth - 1,
-			yEnd = y + cvHeight - 1,
-			markWidth = this._displayConfig.markWidth,
-			markHeight = this._displayConfig.markHeight,
-			cellWidth = markWidth + CELL_BORDER,
-			cellHeight = markHeight + CELL_BORDER,
-			ctx = this._buffer.context,
-			colOffset, colEnd, rowOffset, rowEnd,
-			xMarkStart, yMarkStart, xMark, yMark,
-			col, row, log, i, waiting;
-
-			/*		Calculate ranges and positions 		*/
-			if(xEnd > this._drawLine){
-				xEnd = this._drawLine;
-			}
-
-			colOffset = ~~(x / cellWidth);
-			colEnd = ~~(xEnd / cellWidth);
-			rowOffset = ~~(y / cellHeight);
-			rowEnd = ~~(yEnd / cellHeight);
-
-			if(colEnd > this._logs.length - 1){
-				colEnd = this._logs.length - 1;
-			}
-
-			if(rowEnd > this._pids.length - 1){
-				rowEnd = this._pids.length - 1;
-			}
-
-			xMarkStart = -(x % cellWidth);
-			yMarkStart = -(y % cellHeight);
-
-			ctx.clearRect(this._chartArea.x, this._chartArea.y, this._chartArea.w, this._chartArea.h);
-
-			//	Draw Grid
-			drawGrid(ctx, cvx - CELL_BORDER, cvy - CELL_BORDER, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight, this._chartArea.w, this._chartArea.h);
-
-			// Draw running marks
-			ctx.fillStyle = DEFAULT_RUNNING_COLOR;
-			xMark = xMarkStart;
-			for(col = colOffset; col < colEnd + 1; col++){
-				log = this._logs[col];
-				row = log.running && this._rowMapping[log.running.id];
-
-				if(row !== null){
-					yMark = yMarkStart + ((row - rowOffset) * cellHeight);
-					drawMark(ctx, cvx, cvy, xMark, yMark, markWidth, markHeight, xEnd, yEnd);
-				}
-
-				xMark += cellWidth;
-			}
-
-			// Draw waiting marks
-			ctx.fillStyle = DEFAULT_WAITING_COLOR;
-			xMark = xMarkStart;
-			for(col = colOffset; col < colEnd + 1; col++){
-				log = this._logs[col];
-				waiting = log.waiting;
-
-				for(i = 0; i < waiting.length; i++){
-					row = this._rowMapping[waiting[i].id];
-
-					if(row !== null){
-						yMark = yMarkStart + ((row - rowOffset) * cellHeight);
-						drawMark(ctx, cvx, cvy, xMark, yMark, markWidth, markHeight, xEnd, yEnd);
-					}
-				}
-
-				xMark += cellWidth;
-			}
-
-			// Draw Timeline
-			ctx.fillStyle = DEFAULT_FONT_COLOR;
-			ctx.textAlign = "center";
-			xMark = cvx + xMarkStart + ~~(cellWidth / 2);
-			yMark = cvy + cvHeight + ~~(cellHeight / 2);
-			for(col = colOffset; col < colEnd + 1; col++){
-				ctx.fillText(col, xMark, yMark);
-				xMark += cellWidth;
-			}
-
-			this.flipChart();
-	}
-
-
 	GanttChartUI.prototype.draw = function(){
 		var ctx = this._buffer.context,
 			cellWidth = this._displayConfig.markWidth + CELL_BORDER,
 			cellHeight = this._displayConfig.markHeight + CELL_BORDER;
 
 		drawLabels(ctx, this._pids, this._rowOffset, this._rowEnd, this._y, cellHeight);
+
+		drawChart(ctx, this._x, this._y, cellWidth, cellHeight, this._chartArea, this._colOffset, this._colEnd,
+				  this._rowOffset, this._rowEnd, this._xDrawEnd, this._yDrawEnd, this._logs, this._rowMapping);
+		
 
 		this.flip();
 	}
@@ -389,7 +277,66 @@
 			ctx.fillText("P" + labels[row], labelx, labely);
 			labely += cellHeight;
 		}
+	}
 
+
+	function drawChart(ctx, x, y, cellWidth, cellHeight, chartArea, colOffset, colEnd, rowOffset, rowEnd, xDrawEnd, yDrawEnd, logs, rowMap){
+		var xMark, yMark, col, row, i,
+			xMarkOffset = chartArea.x + CELL_BORDER,
+			yMarkOffset = chartArea.y + CELL_BORDER,
+			markWidth = cellWidth - CELL_BORDER,
+			markHeight = cellHeight - CELL_BORDER;
+
+
+		xMarkStart = -(x % cellWidth);
+		yMarkStart = -(y % cellHeight);
+			
+		//	Draw Grid
+		drawGrid(ctx, chartArea.x, chartArea.y, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight, chartArea.w, chartArea.h);
+			
+		// Draw running marks
+		ctx.fillStyle = DEFAULT_RUNNING_COLOR;
+		xMark =  xMarkStart;
+		for(col = colOffset; col < colEnd + 1; col++){
+			log = logs[col];
+			row = log.running && rowMap[log.running.id];
+
+			if(row !== null){
+				yMark = yMarkStart + ((row - rowOffset) * cellHeight);
+				drawMark(ctx, xMarkOffset, yMarkOffset, xMark, yMark, markWidth, markHeight, xDrawEnd, yDrawEnd);
+			}
+
+			xMark += cellWidth;
+		}
+
+		// Draw waiting marks
+		ctx.fillStyle = DEFAULT_WAITING_COLOR;
+		xMark = xMarkStart;
+		for(col = colOffset; col < colEnd + 1; col++){
+			log = logs[col];
+			waiting = log.waiting;3
+
+			for(i = 0; i < waiting.length; i++){
+				row = rowMap[waiting[i].id];
+
+				if(row !== null){
+					yMark = yMarkStart + ((row - rowOffset) * cellHeight);
+					drawMark(ctx, xMarkOffset, yMarkOffset, xMark, yMark, markWidth, markHeight, xDrawEnd, yDrawEnd);
+				}
+			}
+
+			xMark += cellWidth;
+		}
+
+		// Draw Timeline
+		ctx.fillStyle = DEFAULT_FONT_COLOR;
+		ctx.textAlign = "center";
+		xMark = xMarkOffset + xMarkStart + ~~(cellWidth / 2);
+		yMark = yMarkOffset + chartArea.h + ~~(cellHeight / 2);
+		for(col = colOffset; col < colEnd + 1; col++){
+			ctx.fillText(col, xMark, yMark);
+			xMark += cellWidth;
+		}
 	}
 
 
