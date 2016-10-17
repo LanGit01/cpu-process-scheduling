@@ -114,7 +114,12 @@
 		this._timelineArea = createRect(this._labelArea.w, config.viewHeight - config.markHeight, config.viewWidth - this._labelArea.w, config.markHeight);
 		this._chartArea = createRect(this._labelArea.w, 0, this._timelineArea.w, config.viewHeight - config.markHeight);
 		
-		this._drawLine = this._chartArea.w;
+		this._boundaryRect = {
+			w: (this._logs.length * (config.markWidth + CELL_BORDER)) - CELL_BORDER, 
+			h: (this._pids.length * (config.markHeight + CELL_BORDER)) - CELL_BORDER
+		};
+
+		this._drawLine = this._boundaryRect.w;
 
 		this._displayInitialized = true;
 
@@ -132,12 +137,31 @@
 		 	 colEnd, rowEnd,
 		 	 xDrawEnd, yDrawEnd,
 		 	 cellWidth = this._displayConfig.markWidth + CELL_BORDER,
-		 	 cellHeight = this._displayConfig.markHeight + CELL_BORDER;
+		 	 cellHeight = this._displayConfig.markHeight + CELL_BORDER,
+		 	 xMax, yMax;
 
-		// Add bound correction in the future
+
+		xMax = this._boundaryRect.w - this._chartArea.w;
+		yMax = this._boundaryRect.h - this._chartArea.h;
+
+		if(x < 0 || xMax < 0){
+			x = 0;
+		}else
+		if(x > xMax){
+			x = xMax;
+		}
+
+		if(y < 0 || yMax < 0){
+			y = 0;
+		}else
+		if(y > yMax){
+			y = yMax;
+		}
+
 
 		xDrawEnd = x + this._chartArea.w - (CELL_BORDER * 2) - 1;
 		yDrawEnd = y + this._chartArea.h - (CELL_BORDER * 2) - 1;
+
 
 
 		if(xDrawEnd > this._drawLine){
