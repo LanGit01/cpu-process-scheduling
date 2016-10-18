@@ -8,7 +8,9 @@
 
 	var DEFAULT_FPS = 12,
 		DEFAULT_VELOCITY = 2,
-		DEFAULT_VELOCITY_MULTIPLIER = 3
+		DEFAULT_VELOCITY_MULTIPLIER = 3,
+		DEFAULT_TIMES_ACCEL_LIMIT = 1,	// Limit on the number of times acceleration will happen
+		DEFAULT_FRAMES_TO_ACCEL = DEFAULT_FPS * 2,		// Number of frames before acceleration kicks in
 
 		LEFT = 1,
 		UP = 2,
@@ -33,6 +35,10 @@
 		this._fps = fps || DEFAULT_FPS;
 		this._timePerFrame = Math.floor(1000 / this._fps);
 		this._lastTime = 0;
+
+		// Acceleration
+		this._lastDirection = null;
+		this._timeKeyHeld = 0;
 	}
 
 
@@ -50,6 +56,16 @@
 			case DOWN: 	dy = this._velocity; break;
 			default: return false;
 		}
+
+		// Acceleration
+		if(this._lastDirection === direction){
+			this._timeKeyHeld += (now - this._lastTime);
+			console.log(this._timeKeyHeld);
+		}else{
+			this._timeKeyHeld = 0;
+		}
+
+		this._lastDirection = direction;
 
 		position = this._ganttChartUI.getPosition();
 		this._ganttChartUI.setPosition(position.x + dx, position.y + dy);
@@ -74,11 +90,15 @@
 			if(KeyToDirectionMap[e.key]){
 				that.move(KeyToDirectionMap[e.key]);
 				e.preventDefault();
+			}else{
+				that._lastDirection = null;
+				that._timeKeyHeld = 0;
 			}
 		});
 
 		target.addEventListener("keyup", function(e){
-			console.log("keyup");
+			that._lastDirection = null;
+			that._timeKeyHeld = 0;
 		});
 
 	}
