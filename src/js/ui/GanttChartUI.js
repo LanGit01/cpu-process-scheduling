@@ -193,6 +193,13 @@
 	}
 
 
+	GanttChartUI.prototype.getPosition = function(){
+		return{
+			x: this._x,
+			y: this._y
+		};
+	}
+
 	GanttChartUI.prototype.flipLabels = function(){
 		var x = this._labelArea.x, y = this._labelArea.y,
 			w = this._labelArea.w, h = this._labelArea.h;
@@ -210,7 +217,9 @@
 
 
 	GanttChartUI.prototype.flip = function(){
+		this._view.context.clearRect(0, 0, this._view.canvas.width, this._view.canvas.height);
 		this._view.context.drawImage(this._buffer.canvas, 0, 0);
+		this._buffer.context.clearRect(0, 0, this._buffer.canvas.width, this._buffer.canvas.height);
 	}
 
 
@@ -219,6 +228,7 @@
 			cellWidth = this._displayConfig.markWidth + CELL_BORDER,
 			cellHeight = this._displayConfig.markHeight + CELL_BORDER;
 
+
 		drawLabels(ctx, this._pids, this._rowOffset, this._rowEnd, this._y, cellHeight);
 
 		drawChart(ctx, this._x, this._y, cellWidth, cellHeight, this._chartArea, this._colOffset, this._colEnd,
@@ -226,6 +236,11 @@
 		
 
 		this.flip();
+	}
+
+
+	GanttChartUI.prototype.getCanvas = function(){
+		return this._view.canvas;
 	}
 
 
