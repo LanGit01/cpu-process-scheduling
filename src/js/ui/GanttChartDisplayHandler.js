@@ -9,9 +9,9 @@
 	var DEFAULT_FPS = 12,
 		BASE_VELOCITY = 1,
 		ADD_VELOCITY = 2,
-		VELOCITY_MULTIPLIER = 1.1,
+		VELOCITY_MULTIPLIER = 1.15,
 		MAX_ADD_VELOCITY = 20,		// Limit on additional velocity
-		TIME_TO_ACCEL = 600,		// Time before acceleration kicks in
+		TIME_TO_ACCEL = 400,		// Time before acceleration kicks in
 
 		LEFT = 1,
 		UP = 2,
@@ -33,6 +33,7 @@
 		this._x = 0;
 		this._y = 0;
 		this._addVelocity = ADD_VELOCITY;
+		this._bounds = ganttChartUI.getBounds();
 
 		// Timing
 		this._fps = fps || DEFAULT_FPS;
@@ -46,7 +47,7 @@
 
 
 	GanttChartDisplayHandler.prototype.move = function(direction){
-		var vx, vy, velocity, now = Date.now();
+		var vx, vy, velocity, newPosition, now = Date.now();
 
 		if(now < (this._lastTime + this._timePerFrame)){
 			return;
@@ -74,19 +75,14 @@
 		this._addVelocity = velocity;
 
 		velocity += BASE_VELOCITY;
-		// Determine vectors
-		switch(direction){
-			case LEFT:	this._x -= velocity; break;
-			case UP:	this._y -= velocity; break;
-			case RIGHT:	this._x += velocity; break;
-			case DOWN: 	this._y += velocity; break;
-			default: return false;
-		}
+
+		// Determine new position
+		this.calculateNewPosition(direction, velocity);
 
 		vx = ~~(this._x);
 		vy = ~~(this._y);
 
-		console.log(velocity);
+		//console.log(velocity);
 
 		this._ganttChartUI.setPosition(vx, vy);
 		
@@ -98,6 +94,38 @@
 		this._lastTime = now;
 
 		return true;
+	}
+
+
+	GanttChartDisplayHandler.prototype.calculateNewPosition = function(direction, velocity){
+		var x = this._x, y = this._y,
+			bounds = this._bounds;
+
+		switch(direction){
+			case LEFT:	x -= velocity; break;
+			case UP:	y -= velocity; break;
+			case RIGHT:	x += velocity; break;
+			case DOWN: 	y += velocity; break;
+			default: return null;
+		}
+
+		if(x < bounds.x){
+			x = bounds.x;
+		}else
+		if(x > bounds.x + bounds.w - 1){
+			x = bounds.x + bounds.w - 1;
+		}
+
+		if(y < bounds.y){
+			y = bounds.y
+		}else
+		if(y > bounds.y + bounds.h - 1){
+			y = bounds.y + bounds.h - 1;
+		}
+
+		this._x = x;
+		this._y = y;
+
 	}
 
 
@@ -125,8 +153,8 @@
 			that._lastDirection = null;
 			that._timeKeyHeld = 0;
 		});
-
 	}
+
 
 
 	global.CPUscheduling.GanttChartDisplayHandler = GanttChartDisplayHandler;

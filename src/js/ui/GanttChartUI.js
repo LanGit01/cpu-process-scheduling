@@ -200,6 +200,17 @@
 		};
 	}
 
+
+	GanttChartUI.prototype.getBounds = function(){
+		return {
+			x: 0,
+			y: 0,
+			w: this._boundaryRect.w,
+			h: this._boundaryRect.h
+		};
+	}
+
+
 	GanttChartUI.prototype.flipLabels = function(){
 		var x = this._labelArea.x, y = this._labelArea.y,
 			w = this._labelArea.w, h = this._labelArea.h;
