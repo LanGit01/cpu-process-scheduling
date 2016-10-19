@@ -7,10 +7,11 @@
 	}
 
 	var DEFAULT_FPS = 12,
-		DEFAULT_VELOCITY = 2,
-		DEFAULT_VELOCITY_MULTIPLIER = 3,
-		DEFAULT_TIMES_ACCEL_LIMIT = 1,	// Limit on the number of times acceleration will happen
-		DEFAULT_FRAMES_TO_ACCEL = DEFAULT_FPS * 2,		// Number of frames before acceleration kicks in
+		BASE_VELOCITY = 1,
+		ADD_VELOCITY = 2,
+		VELOCITY_MULTIPLIER = 1.1,
+		MAX_ADD_VELOCITY = 20,		// Limit on additional velocity
+		TIME_TO_ACCEL = 600,		// Time before acceleration kicks in
 
 		LEFT = 1,
 		UP = 2,
@@ -29,7 +30,9 @@
 		this._ganttChartUI = ganttChartUI;
 
 		// Movement
-		this._velocity = DEFAULT_VELOCITY;
+		this._x = 0;
+		this._y = 0;
+		this._addVelocity = ADD_VELOCITY;
 
 		// Timing
 		this._fps = fps || DEFAULT_FPS;
@@ -43,32 +46,49 @@
 
 
 	GanttChartDisplayHandler.prototype.move = function(direction){
-		var dx = dy = 0, position, now = Date.now();
+		var vx, vy, velocity, now = Date.now();
 
 		if(now < (this._lastTime + this._timePerFrame)){
 			return;
 		}
 
-		switch(direction){
-			case LEFT:	dx = -this._velocity; break;
-			case UP:	dy = -this._velocity; break;
-			case RIGHT:	dx = this._velocity; break;
-			case DOWN: 	dy = this._velocity; break;
-			default: return false;
-		}
-
 		// Acceleration
+		velocity = this._addVelocity;
+
 		if(this._lastDirection === direction){
 			this._timeKeyHeld += (now - this._lastTime);
-			console.log(this._timeKeyHeld);
+
+			if(this._timeKeyHeld > TIME_TO_ACCEL){
+				velocity *= VELOCITY_MULTIPLIER;
+
+				if(velocity > MAX_ADD_VELOCITY){
+					velocity = MAX_ADD_VELOCITY;
+				}
+			}
 		}else{
 			this._timeKeyHeld = 0;
+			velocity = ADD_VELOCITY;
 		}
 
 		this._lastDirection = direction;
+		this._addVelocity = velocity;
 
-		position = this._ganttChartUI.getPosition();
-		this._ganttChartUI.setPosition(position.x + dx, position.y + dy);
+		velocity += BASE_VELOCITY;
+		// Determine vectors
+		switch(direction){
+			case LEFT:	this._x -= velocity; break;
+			case UP:	this._y -= velocity; break;
+			case RIGHT:	this._x += velocity; break;
+			case DOWN: 	this._y += velocity; break;
+			default: return false;
+		}
+
+		vx = ~~(this._x);
+		vy = ~~(this._y);
+
+		console.log(velocity);
+
+		this._ganttChartUI.setPosition(vx, vy);
 		
 		// Redraw
 		this._ganttChartUI.draw();
@@ -82,9 +102,14 @@
 
 
 	GanttChartDisplayHandler.prototype.initialize = function(){
-		var that = this, target = this._ganttChartUI.getCanvas();
+		var that = this, target = this._ganttChartUI.getCanvas(),
+			position = this._ganttChartUI.getPosition();
 
 		target.tabIndex = 0;
+
+		// Set initial position
+		this._x = position.x;
+		this._y = position.y;
 
 		target.addEventListener("keydown", function(e){
 			if(KeyToDirectionMap[e.key]){
