@@ -15,6 +15,7 @@
 
 		DEFAULT_RUNNING_COLOR = "#333333",
 		DEFAULT_WAITING_COLOR = "#aaaaaa",
+		DEFAULT_BG_COLOR = "#ffffff",
 
 		DEFAULT_FONT_SIZE = 12,
 		DEFAULT_FONT = "sans-serif",
@@ -25,7 +26,9 @@
 		DEFAULT_BORDER_COLOR = "#555555";
 
 
-
+	/**
+	 * A Graphical User Interface for displaying the gantt chart of a scheduling algorithm simulation
+	 */
 	function GanttChartUI(pids, logs){
 		var i, itr;
 
@@ -80,7 +83,20 @@
 
 	}
 
-
+	/**
+	 *	Creates and initializes the display. This must be called first after creating an instance.
+	 * 
+	 *	The `options` argument and it's properties are optional. Default values will be used if values are not
+	 *	provided.
+	 *
+	 *	@param options.markWidth - width of the mark of a process
+	 *	@param options.markHeight - height of the mark of a process
+	 *	@param options.viewWidth - width of the canvas display
+	 *	@param options.viewHeight - height of the canvas display
+	 *	@param options.runningColor - color of the mark of a running process
+	 *	@param options.waitingColor -  color of the mark of a waiting process
+	 *	
+	 */
 	GanttChartUI.prototype.initDisplay = function(options){
 		var chartWidth = chartHeight = 0,
 			config, i, n, maxLabelWidth, ctx;
@@ -128,12 +144,7 @@
 
 
 	GanttChartUI.prototype.setPosition = function(x, y){
-		/*
-		 *	Calculates:
-		 *		- column and row offset and end
-		 *		- drawing rect bounds
-		 */
-		 var colOffset, rowOffset,
+		var colOffset, rowOffset,
 		 	 colEnd, rowEnd,
 		 	 xDrawEnd, yDrawEnd,
 		 	 cellWidth = this._displayConfig.markWidth + CELL_BORDER,
@@ -210,7 +221,9 @@
 		};
 	}
 
-
+	/**
+	 *	Draw only the label area from the buffer into the main canvas
+	 */
 	GanttChartUI.prototype.flipLabels = function(){
 		var x = this._labelArea.x, y = this._labelArea.y,
 			w = this._labelArea.w, h = this._labelArea.h;
@@ -218,7 +231,9 @@
 		this._view.context.drawImage(this._buffer.canvas, x, y, w, h, x, y, w, h);
 	}
 
-
+	/**
+	 *	Draw only the chart area from the buffer into the main canvas
+	 */
 	GanttChartUI.prototype.flipChart = function(){
 		var x = this._chartArea.x, y = this._chartArea.y,
 			w = this._chartArea.w, h = this._chartArea.h + this._timelineArea.h;
@@ -226,14 +241,18 @@
 		this._view.context.drawImage(this._buffer.canvas, x, y, w, h, x, y, w, h);
 	}
 
-
+	/**
+	 *	Draw the buffer into the main canvas
+	 */
 	GanttChartUI.prototype.flip = function(){
 		this._view.context.clearRect(0, 0, this._view.canvas.width, this._view.canvas.height);
 		this._view.context.drawImage(this._buffer.canvas, 0, 0);
 		this._buffer.context.clearRect(0, 0, this._buffer.canvas.width, this._buffer.canvas.height);
 	}
 
-
+	/**
+	 *	Draws the whole Gantt chart
+	 */
 	GanttChartUI.prototype.draw = function(){
 		var ctx = this._buffer.context,
 			cellWidth = this._displayConfig.markWidth + CELL_BORDER,
@@ -249,7 +268,9 @@
 		this.flip();
 	}
 
-
+	/**
+	 *	Returns the main(visible) canvas
+	 */
 	GanttChartUI.prototype.getCanvas = function(){
 		return this._view.canvas;
 	}
@@ -363,7 +384,7 @@
 		xMark = xMarkStart;
 		for(col = colOffset; col < colEnd + 1; col++){
 			log = logs[col];
-			waiting = log.waiting;3
+			waiting = log.waiting;
 
 			for(i = 0; i < waiting.length; i++){
 				row = rowMap[waiting[i].id];
