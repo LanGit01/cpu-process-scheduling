@@ -63,6 +63,8 @@
 		this._buffer = null;
 		this._viewWidth = 0;
 		this._viewHeight = 0;
+
+		this._boundaryRect = null;
 		
 		//	Display
 		this._displayConfig = {};
@@ -130,13 +132,21 @@
 		this._timelineArea = createRect(this._labelArea.w, config.viewHeight - config.markHeight, config.viewWidth - this._labelArea.w, config.markHeight);
 		this._chartArea = createRect(this._labelArea.w, 0, this._timelineArea.w, config.viewHeight - config.markHeight);
 		
+
+		// Calculate position boundaries
 		this._boundaryRect = {
-			w: (this._logs.length * (config.markWidth + CELL_BORDER)), 
-			h: (this._pids.length * (config.markHeight + CELL_BORDER))
+			x: 0,
+			y: 0,
+			w: (this._logs.length * (config.markWidth + CELL_BORDER)) - this._chartArea.w - 1, 
+			h: (this._pids.length * (config.markHeight + CELL_BORDER)) - this._chartArea.h - 1,
 		};
 
-		this._drawLine = this._boundaryRect.w;
+		this._boundaryRect.w = (this._boundaryRect.w < 0 ? 0 : this._boundaryRect.w);
+		this._boundaryRect.h = (this._boundaryRect.h < 0 ? 0 : this._boundaryRect.h);
 
+	
+		this._drawLine = this._boundaryRect.w;
+		
 		this._displayInitialized = true;
 
 		return this._view.canvas;
@@ -152,8 +162,9 @@
 		 	 xMax, yMax;
 
 
-		xMax = this._boundaryRect.w - this._chartArea.w;
-		yMax = this._boundaryRect.h - this._chartArea.h;
+		xMax = this._boundaryRect.w + this._boundaryRect.x;
+		yMax = this._boundaryRect.h + this._boundaryRect.y;
+
 
 		if(x < 0 || xMax < 0){
 			x = 0;
@@ -161,6 +172,7 @@
 		if(x > xMax){
 			x = xMax;
 		}
+
 
 		if(y < 0 || yMax < 0){
 			y = 0;
@@ -212,10 +224,10 @@
 	}
 
 
-	GanttChartUI.prototype.getBounds = function(){
+	GanttChartUI.prototype.getPositionBoundsRect = function(){
 		return {
-			x: 0,
-			y: 0,
+			x: this._boundaryRect.x,
+			y: this._boundaryRect.y,
 			w: this._boundaryRect.w,
 			h: this._boundaryRect.h
 		};
@@ -258,7 +270,6 @@
 			cellWidth = this._displayConfig.markWidth + CELL_BORDER,
 			cellHeight = this._displayConfig.markHeight + CELL_BORDER;
 
-
 		drawLabels(ctx, this._pids, this._rowOffset, this._rowEnd, this._y, cellHeight);
 
 		drawChart(ctx, this._x, this._y, cellWidth, cellHeight, this._chartArea, this._colOffset, this._colEnd,
@@ -294,10 +305,11 @@
 	 */
 	function createDisplayConfig(options, rows){
 		var config = {};
-		// ((d.markHeight + CELL_SPACING) * that._pids.length + CELL_SPACING + DEFAULT_TIMELINE_HEIGHT);
+		
+
 		if(typeof options === "object"){
 			config.markWidth = options.markWidth || DEFAULT_MARK_WIDTH;
-			config.markHeight = options.markHeight || DEFAULT_VIEW_HEIGHT;
+			config.markHeight = options.markHeight || DEFAULT_MARK_HEIGHT;
 
 			config.viewWidth = options.viewWidth || DEFAULT_VIEW_WIDTH;
 			config.viewHeight = options.viewHeight || ((config.markHeight + CELL_BORDER) * rows) + CELL_BORDER + config.markHeight;
@@ -314,6 +326,7 @@
 			config.runningColor = DEFAULT_RUNNING_COLOR;
 			config.waitingColor = DEFAULT_WAITING_COLOR;
 		}
+
 
 		return config;	
 	}
@@ -407,6 +420,7 @@
 			ctx.fillText(col, xMark, yMark);
 			xMark += cellWidth;
 		}
+
 	}
 
 
@@ -445,6 +459,7 @@
 
 	function drawMark(ctx, cx, cy, markx, marky, markWidth, markHeight, xDrawEnd, yDrawEnd){
 		var cut, markw, markh;
+
 
 		if(markx < 0){
 			markw = markWidth + markx;

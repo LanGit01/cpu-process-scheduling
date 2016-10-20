@@ -13,18 +13,16 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/GanttChartUI.js"></script>
-		<script type = "text/javascript" src = "../src/js/ui/GanttChartDisplayHandler.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
 				RRScheduler = CPUscheduling.RRScheduler,
 				TextDisplay = CPUscheduling.TextDisplay,
-				GanttChartUI = CPUscheduling.GanttChartUI,
-				GanttChartDisplayHandler = CPUscheduling.GanttChartDisplayHandler;
+				GanttChartUI = CPUscheduling.GanttChartUI;
 
 				var pm = new ProcessManager(),
-					logs, pids, itr, ganttChart, ganttChartDisplayHandler;
+					logs, pids, itr, ganttChart;
 
 
 				pm.setScheduler(new RRScheduler(3));
@@ -83,10 +81,7 @@
 					div = document.getElementById("gantt-chart-canvas");
 					div.appendChild(ganttChart.initDisplay());
 					
-					ganttChartDisplayHandler = new GanttChartDisplayHandler(ganttChart);
-					ganttChartDisplayHandler.initialize();
-
-					ganttChart.setPosition(0, 0);
+					ganttChart.setPosition(900, 0);	// xMax = 1010
 					ganttChart.draw();
 				}
 		</script>
