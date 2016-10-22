@@ -137,15 +137,15 @@
 		this._boundaryRect = {
 			x: 0,
 			y: 0,
-			w: (this._logs.length * (config.markWidth + CELL_BORDER)) - this._chartArea.w - 1, 
-			h: (this._pids.length * (config.markHeight + CELL_BORDER)) - this._chartArea.h - 1,
+			w: (this._logs.length * (config.markWidth + CELL_BORDER)) - this._chartArea.w, 
+			h: (this._pids.length * (config.markHeight + CELL_BORDER)) - this._chartArea.h,
 		};
 
 		this._boundaryRect.w = (this._boundaryRect.w < 0 ? 0 : this._boundaryRect.w);
 		this._boundaryRect.h = (this._boundaryRect.h < 0 ? 0 : this._boundaryRect.h);
 
 	
-		this._drawLine = this._boundaryRect.w;
+		this._drawLine = this._boundaryRect.w + this._chartArea.w;
 		
 		this._displayInitialized = true;
 
@@ -155,11 +155,11 @@
 
 	GanttChartUI.prototype.setPosition = function(x, y){
 		var colOffset, rowOffset,
-		 	 colEnd, rowEnd,
-		 	 xDrawEnd, yDrawEnd,
-		 	 cellWidth = this._displayConfig.markWidth + CELL_BORDER,
-		 	 cellHeight = this._displayConfig.markHeight + CELL_BORDER,
-		 	 xMax, yMax;
+		 	colEnd, rowEnd,
+		 	xEnd, yEnd,
+		 	cellWidth = this._displayConfig.markWidth + CELL_BORDER,
+		 	cellHeight = this._displayConfig.markHeight + CELL_BORDER,
+		 	xMax, yMax;
 
 
 		xMax = this._boundaryRect.w + this._boundaryRect.x;
@@ -181,19 +181,20 @@
 			y = yMax;
 		}
 
-		xDrawEnd = x + this._chartArea.w - (CELL_BORDER * 2) - 1;
-		yDrawEnd = y + this._chartArea.h - (CELL_BORDER * 2) - 1;
+		xEnd = x + this._chartArea.w - 1;
+		yEnd = y + this._chartArea.h - 1;
 
-
-
-		if(xDrawEnd > this._drawLine){
-			xDrawEnd = this._drawLine;
+		if(xEnd > this._drawLine){
+			xEnd = this._drawLine;
 		}
 
+
 		colOffset = ~~(x / cellWidth);
-		colEnd = ~~(xDrawEnd / cellWidth);
+		colEnd = ~~(xEnd / cellWidth);
 		rowOffset = ~~(y / cellHeight);
-		rowEnd = ~~(yDrawEnd / cellHeight);
+		rowEnd = ~~(yEnd / cellHeight);
+
+		console.log(xEnd % cellWidth);
 
 		if(colEnd > this._logs.length - 1){
 			colEnd = this._logs.length - 1;
@@ -211,8 +212,8 @@
 		this._colEnd = colEnd;
 		this._rowOffset = rowOffset;
 		this._rowEnd = rowEnd;
-		this._xDrawEnd = xDrawEnd;
-		this._yDrawEnd = yDrawEnd;
+		this._xDrawEnd = xEnd - CELL_BORDER - 1;
+		this._yDrawEnd = yEnd - CELL_BORDER - 1;
 	}
 
 
@@ -298,35 +299,57 @@
 	}
 
 	/*
-	 * Config Options:
-	 *	- process mark dimensions
-	 *	- view dimensions
-	 *	- running and waiting process colors
+	 *	Config options
+	 *		- process mark dimensions
+	 *		- view dimensions (min, max, exact) - priority: exact -> max/min
+	 *		- running and waiting process colors
 	 */
 	function createDisplayConfig(options, rows){
-		var config = {};
-		
+		options = options || {};
 
-		if(typeof options === "object"){
-			config.markWidth = options.markWidth || DEFAULT_MARK_WIDTH;
-			config.markHeight = options.markHeight || DEFAULT_MARK_HEIGHT;
+		var config = {},
+			viewWidth, viewHeight, minViewWidth, minViewHeight, maxViewWidth, maxViewHeight;
 
-			config.viewWidth = options.viewWidth || DEFAULT_VIEW_WIDTH;
-			config.viewHeight = options.viewHeight || ((config.markHeight + CELL_BORDER) * rows) + CELL_BORDER + config.markHeight;
 
-			config.runningColor = options.runningColor || DEFAULT_RUNNING_COLOR;
-			config.waitingColor = options.waitingColor || DEFAULT_WAITING_COLOR;
-		}else{
-			config.markWidth = DEFAULT_MARK_WIDTH;
-			config.markHeight = DEFAULT_MARK_HEIGHT;
+		// Mark dimensions
+		config.markWidth = options.markWidth || DEFAULT_MARK_WIDTH;
+		config.markHeight = options.markHeight || DEFAULT_MARK_HEIGHT;
 
-			config.viewWidth = DEFAULT_VIEW_WIDTH;
-			config.viewHeight = ((config.markHeight + CELL_BORDER) * rows) + CELL_BORDER + config.markHeight;
+		// Mark colors
+		config.runningColor = options.runningColor || DEFAULT_RUNNING_COLOR;
+		config.waitingColor = options.waitingColor || DEFAULT_WAITING_COLOR;
 
-			config.runningColor = DEFAULT_RUNNING_COLOR;
-			config.waitingColor = DEFAULT_WAITING_COLOR;
+
+		// Canvas dimensions
+		viewWidth = options.viewWidth || DEFAULT_VIEW_WIDTH;
+		viewHeight = options.viewHeight || ((config.markWidth + CELL_BORDER) * rows) + CELL_BORDER;
+
+		minViewWidth = options.minViewWidth;
+		minViewHeight = options.minViewHeight;
+		maxViewWidth = options.maxViewWidth;
+		maxViewHeight = options.maxViewHeight;
+
+		// View width bounds
+		if(minViewWidth && minViewWidth > viewWidth){
+			viewWidth = minViewWidth;
+		}
+		if(maxViewWidth && maxViewWidth < viewWidth){
+			viewWidth = maxViewWidth;
 		}
 
+		config.viewWidth = viewWidth;
+		
+		// View height bounds
+		if(minViewHeight && minViewHeight > viewHeight){
+			viewHeight = minViewHeight;
+		}
+		if(maxViewHeight && maxViewHeight < viewHeight){
+			viewHeight = maxViewHeight;
+		}
+
+		config.viewHeight = viewHeight;
+
+		console.log(config);
 
 		return config;	
 	}

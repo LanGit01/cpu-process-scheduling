@@ -2,7 +2,7 @@
 	<head>
 		<style>
 			canvas{
-				border: 1px dashed red;
+				
 			}
 		</style>
 		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
@@ -79,9 +79,11 @@
 					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
 					div = document.getElementById("gantt-chart-canvas");
-					div.appendChild(ganttChart.initDisplay());
+					div.appendChild(ganttChart.initDisplay({
+						
+					}));
 					
-					ganttChart.setPosition(900, 0);	// xMax = 1010
+					ganttChart.setPosition(1010, 0);	// xMax = 1010
 					ganttChart.draw();
 				}
 		</script>
