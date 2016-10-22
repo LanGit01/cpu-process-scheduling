@@ -128,24 +128,30 @@
 			}
 		}
 		
-		this._labelArea = createRect(0, 0, maxLabelWidth + (LABEL_MARGIN * 2), config.viewHeight);
-		this._timelineArea = createRect(this._labelArea.w, config.viewHeight - config.markHeight, config.viewWidth - this._labelArea.w, config.markHeight);
-		this._chartArea = createRect(this._labelArea.w, 0, this._timelineArea.w, config.viewHeight - config.markHeight);
+		this._labelViewArea = createRect(0, 0, maxLabelWidth + (LABEL_MARGIN * 2), config.viewHeight);
+		this._timelineViewArea = createRect(this._labelViewArea.w, config.viewHeight - config.markHeight, config.viewWidth - this._labelViewArea.w, config.markHeight);
+		this._chartViewArea = createRect(this._labelViewArea.w, 0, this._timelineViewArea.w, config.viewHeight - config.markHeight);
 		
+		// Area of the complete chart, minus the edge borders
+		this._fullChartDimensions = createRect(0, 0, 
+									(this._logs.length * (config.markWidth + CELL_BORDER)) - CELL_BORDER, 
+									(this._pids.length * (config.markHeight + CELL_BORDER)) - CELL_BORDER);
 
 		// Calculate position boundaries
-		this._boundaryRect = {
-			x: 0,
-			y: 0,
-			w: (this._logs.length * (config.markWidth + CELL_BORDER)) - this._chartArea.w, 
-			h: (this._pids.length * (config.markHeight + CELL_BORDER)) - this._chartArea.h,
-		};
+		this._positionBounds = createRect(0, 0, 
+								this._fullChartDimensions.w - (this._chartViewArea.w - (CELL_BORDER * 2)), 
+								this._fullChartDimensions.h - (this._chartViewArea.h - (CELL_BORDER * 2)));
 
-		this._boundaryRect.w = (this._boundaryRect.w < 0 ? 0 : this._boundaryRect.w);
-		this._boundaryRect.h = (this._boundaryRect.h < 0 ? 0 : this._boundaryRect.h);
+		
+		if(this._positionBounds.w < 0){
+			this._positionBounds.w = 0;
+		}
 
-	
-		this._drawLine = this._boundaryRect.w + this._chartArea.w;
+		if(this._positionBounds.h < 0){
+			this._positionBounds.h = 0;
+		}
+
+		this._drawLine = this._fullChartDimensions.w;
 		
 		this._displayInitialized = true;
 
@@ -348,8 +354,6 @@
 		}
 
 		config.viewHeight = viewHeight;
-
-		console.log(config);
 
 		return config;	
 	}
