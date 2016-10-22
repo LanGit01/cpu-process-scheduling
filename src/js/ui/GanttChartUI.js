@@ -276,9 +276,9 @@
 			cellWidth = this._displayConfig.markWidth + CELL_BORDER,
 			cellHeight = this._displayConfig.markHeight + CELL_BORDER;
 
-		drawLabels(ctx, this._pids, this._rowOffset, this._rowEnd, this._y, cellHeight);
+		//drawLabels(ctx, this._pids, this._rowOffset, this._rowEnd, this._y, cellHeight);
 
-		drawChart(ctx, this._x, this._y, cellWidth, cellHeight, this._chartArea, this._colOffset, this._colEnd,
+		drawChart(ctx, this._x, this._y, cellWidth, cellHeight, this._chartViewArea, this._colOffset, this._colEnd,
 				  this._rowOffset, this._rowEnd, this._xDrawEnd, this._yDrawEnd, this._logs, this._rowMapping);
 		
 
@@ -389,10 +389,10 @@
 	}
 
 
-	function drawChart(ctx, x, y, cellWidth, cellHeight, chartArea, colOffset, colEnd, rowOffset, rowEnd, xDrawEnd, yDrawEnd, logs, rowMap){
+	function drawChart(ctx, x, y, cellWidth, cellHeight, chartView, colOffset, colEnd, rowOffset, rowEnd, xDrawEnd, yDrawEnd, logs, rowMap){
 		var xMark, yMark, col, row, i,
-			xMarkOffset = chartArea.x + CELL_BORDER,
-			yMarkOffset = chartArea.y + CELL_BORDER,
+			xMarkOffset = chartView.x + CELL_BORDER,
+			yMarkOffset = chartView.y + CELL_BORDER,
 			markWidth = cellWidth - CELL_BORDER,
 			markHeight = cellHeight - CELL_BORDER;
 
@@ -401,8 +401,9 @@
 		yMarkStart = -(y % cellHeight);
 			
 		//	Draw Grid
-		drawGrid(ctx, chartArea.x, chartArea.y, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight, chartArea.w, chartArea.h);
-			
+		drawGrid(ctx, chartView, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight);
+		
+		/*	
 		// Draw running marks
 		ctx.fillStyle = DEFAULT_RUNNING_COLOR;
 		xMark =  xMarkStart;
@@ -446,37 +447,36 @@
 			ctx.fillText(col, xMark, yMark);
 			xMark += cellWidth;
 		}
+		*/
 
 	}
 
 
-	function drawGrid(ctx, cx, cy, startx, starty, cellWidth, cellHeight, gridWidth, gridHeight){
-		var x = startx + 0.5, y = starty + 0.5,
-			i;
+	function drawGrid(ctx, chartViewArea, startx, starty, cellWidth, cellHeight){
+		var cx = chartViewArea.x, cy = chartViewArea.y,
+			cw = chartViewArea.w, ch = chartViewArea.h,
+			x = cx + startx + 0.5,
+			y = cy + starty + 0.5,
+			xLineEnd = cx + cw - 1,
+			yLineEnd = cy + ch - 1;
 
 
-		ctx.strokeStyle = DEFAULT_BORDER_COLOR;
-		// Draw grid borders
-		ctx.strokeRect(cx + 0.5, cy + 0.5, gridWidth - 1, gridHeight - 1);
-
-		x += cx;
-		y += cy;
-		gridWidth += cx;
-		gridHeight += cy;
-
+		ctx.strokestyle = DEFAULT_BORDER_COLOR;
+		// Draw edge borders
+		ctx.strokeRect(cx + 0.5, cy + 0.5, cw - 1, ch - 1);
+		// Draw grid
 		ctx.beginPath();
-		while(x < gridWidth){
+		while(x < xLineEnd){
 			ctx.moveTo(x, cy);
-			ctx.lineTo(x, cy + gridHeight - 1);
+			ctx.lineTo(x, yLineEnd);
 			x += cellWidth;
 		}
 
-		while(y < gridHeight){
+		while(y < yLineEnd){
 			ctx.moveTo(cx, y);
-			ctx.lineTo(cx + gridWidth - 1, y);
+			ctx.lineTo(xLineEnd, y);
 			y += cellHeight;
 		}
-
 
 		ctx.closePath();
 		ctx.stroke();
