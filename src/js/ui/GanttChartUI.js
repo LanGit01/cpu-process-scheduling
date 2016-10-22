@@ -142,7 +142,7 @@
 								this._fullChartDimensions.w - (this._chartViewArea.w - (CELL_BORDER * 2)), 
 								this._fullChartDimensions.h - (this._chartViewArea.h - (CELL_BORDER * 2)));
 
-		
+
 		if(this._positionBounds.w < 0){
 			this._positionBounds.w = 0;
 		}
@@ -160,17 +160,21 @@
 
 
 	GanttChartUI.prototype.setPosition = function(x, y){
+		/*
+		 *	Position is relative to the full chart, and ignores edge borders,
+		 *	i.e., position is the coordinates inside the edge borders (not including the bordes)
+		 */
 		var colOffset, rowOffset,
 		 	colEnd, rowEnd,
 		 	xEnd, yEnd,
 		 	cellWidth = this._displayConfig.markWidth + CELL_BORDER,
 		 	cellHeight = this._displayConfig.markHeight + CELL_BORDER,
+		 	edgeBorderSize = CELL_BORDER * 2,
 		 	xMax, yMax;
 
 
-		xMax = this._boundaryRect.w + this._boundaryRect.x;
-		yMax = this._boundaryRect.h + this._boundaryRect.y;
-
+		xMax = this._positionBounds.w;
+		yMax = this._positionBounds.h;
 
 		if(x < 0 || xMax < 0){
 			x = 0;
@@ -179,28 +183,24 @@
 			x = xMax;
 		}
 
-
 		if(y < 0 || yMax < 0){
 			y = 0;
 		}else
 		if(y > yMax){
 			y = yMax;
 		}
+		
+		xEnd = x + this._chartViewArea.w - edgeBorderSize - 1;
+		yEnd = x + this._chartViewArea.h - edgeBorderSize - 1;
 
-		xEnd = x + this._chartArea.w - 1;
-		yEnd = y + this._chartArea.h - 1;
-
-		if(xEnd > this._drawLine){
-			xEnd = this._drawLine;
+		if(xEnd > this._drawLine - 1){
+			xEnd = this._drawLine - 1;
 		}
-
 
 		colOffset = ~~(x / cellWidth);
 		colEnd = ~~(xEnd / cellWidth);
 		rowOffset = ~~(y / cellHeight);
 		rowEnd = ~~(yEnd / cellHeight);
-
-		console.log(xEnd % cellWidth);
 
 		if(colEnd > this._logs.length - 1){
 			colEnd = this._logs.length - 1;
@@ -210,7 +210,6 @@
 			rowEnd = this._pids.length - 1;
 		}
 
-
 		// Set values
 		this._x = x;
 		this._y = y;
@@ -218,8 +217,8 @@
 		this._colEnd = colEnd;
 		this._rowOffset = rowOffset;
 		this._rowEnd = rowEnd;
-		this._xDrawEnd = xEnd - CELL_BORDER - 1;
-		this._yDrawEnd = yEnd - CELL_BORDER - 1;
+		this._xDrawEnd = xEnd;
+		this._yDrawEnd = yEnd;
 	}
 
 
