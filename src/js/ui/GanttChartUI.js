@@ -27,7 +27,7 @@
 
 
 	/**
-	 * A Graphical User Interface for displaying the gantt chart of a scheduling algorithm simulation
+	 * A Graphical User Interface for displaying the gantt chart of a scheduling algorithm simulation.
 	 */
 	function GanttChartUI(pids, logs){
 		var i, itr;
@@ -159,6 +159,9 @@
 	}
 
 
+	/**
+	 *	Sets the world coordinates
+	 */
 	GanttChartUI.prototype.setPosition = function(x, y){
 		/*
 		 *	Position is relative to the full chart, and ignores edge borders,
@@ -223,6 +226,9 @@
 	}
 
 
+	/**
+	 *	Gets the world coordinates
+	 */
 	GanttChartUI.prototype.getPosition = function(){
 		return{
 			x: this._x,
@@ -233,10 +239,10 @@
 
 	GanttChartUI.prototype.getPositionBoundsRect = function(){
 		return {
-			x: this._boundaryRect.x,
-			y: this._boundaryRect.y,
-			w: this._boundaryRect.w,
-			h: this._boundaryRect.h
+			x: this._positionBounds.x,
+			y: this._positionBounds.y,
+			w: this._positionBounds.w,
+			h: this._positionBounds.h
 		};
 	}
 
