@@ -131,7 +131,7 @@
 		this._labelViewArea = createRect(0, 0, maxLabelWidth + (LABEL_MARGIN * 2), config.viewHeight);
 		this._timelineViewArea = createRect(this._labelViewArea.w, config.viewHeight - config.markHeight - CELL_BORDER, config.viewWidth - this._labelViewArea.w, config.markHeight + CELL_BORDER);
 		this._chartViewArea = createRect(this._labelViewArea.w, 0, this._timelineViewArea.w, config.viewHeight - config.markHeight - CELL_BORDER);
-		
+
 		// Area of the complete chart, minus the edge borders
 		this._fullChartDimensions = createRect(0, 0, 
 									(this._logs.length * (config.markWidth + CELL_BORDER)) - CELL_BORDER, 
@@ -328,7 +328,7 @@
 
 		// Canvas dimensions
 		viewWidth = options.viewWidth || DEFAULT_VIEW_WIDTH;
-		viewHeight = options.viewHeight || ((config.markWidth + CELL_BORDER) * rows) + CELL_BORDER;
+		viewHeight = options.viewHeight || ((config.markWidth + CELL_BORDER) * (rows + 1)) + CELL_BORDER;
 
 		minViewWidth = options.minViewWidth;
 		minViewHeight = options.minViewHeight;
