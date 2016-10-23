@@ -129,8 +129,8 @@
 		}
 		
 		this._labelViewArea = createRect(0, 0, maxLabelWidth + (LABEL_MARGIN * 2), config.viewHeight);
-		this._timelineViewArea = createRect(this._labelViewArea.w, config.viewHeight - config.markHeight, config.viewWidth - this._labelViewArea.w, config.markHeight);
-		this._chartViewArea = createRect(this._labelViewArea.w, 0, this._timelineViewArea.w, config.viewHeight - config.markHeight);
+		this._timelineViewArea = createRect(this._labelViewArea.w, config.viewHeight - config.markHeight - CELL_BORDER, config.viewWidth - this._labelViewArea.w, config.markHeight);
+		this._chartViewArea = createRect(this._labelViewArea.w, 0, this._timelineViewArea.w, config.viewHeight - config.markHeight - CELL_BORDER);
 		
 		// Area of the complete chart, minus the edge borders
 		this._fullChartDimensions = createRect(0, 0, 
@@ -276,7 +276,7 @@
 			cellWidth = this._displayConfig.markWidth + CELL_BORDER,
 			cellHeight = this._displayConfig.markHeight + CELL_BORDER;
 
-		//drawLabels(ctx, this._pids, this._rowOffset, this._rowEnd, this._y, cellHeight);
+		drawLabels(ctx, this._pids, this._rowOffset, this._rowEnd, this._y, cellHeight);
 
 		drawChart(ctx, this._x, this._y, cellWidth, cellHeight, this._chartViewArea, this._colOffset, this._colEnd,
 				  this._rowOffset, this._rowEnd, this._xDrawEnd, this._yDrawEnd, this._logs, this._rowMapping);
@@ -402,8 +402,8 @@
 			
 		//	Draw Grid
 		drawGrid(ctx, chartView, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight);
-		
-		/*	
+			
+
 		// Draw running marks
 		ctx.fillStyle = DEFAULT_RUNNING_COLOR;
 		xMark =  xMarkStart;
@@ -418,6 +418,7 @@
 
 			xMark += cellWidth;
 		}
+
 
 		// Draw waiting marks
 		ctx.fillStyle = DEFAULT_WAITING_COLOR;
@@ -438,20 +439,30 @@
 			xMark += cellWidth;
 		}
 
+		
 		// Draw Timeline
 		ctx.fillStyle = DEFAULT_FONT_COLOR;
 		ctx.textAlign = "center";
 		xMark = xMarkOffset + xMarkStart + ~~(cellWidth / 2);
-		yMark = yMarkOffset + chartArea.h + ~~(cellHeight / 2);
+		yMark = yMarkOffset + chartView.h + ~~(cellHeight / 2);
 		for(col = colOffset; col < colEnd + 1; col++){
 			ctx.fillText(col, xMark, yMark);
 			xMark += cellWidth;
 		}
-		*/
 
 	}
 
-
+	/**
+	 *	Draws a grid on the specified rectangular area `chartViewArea.`The first grid lines will be drawn
+	 *	based on the values of `startx` and `starty`.
+	 *	
+	 *	@param ctx - CanvasRenderingContext
+	 *	@param chartViewArea - rectangular area to draw grid
+	 *	@param startx - x offset to start drawing vertical grid lines
+	 *	@param starty - y offset to start drawing horizontal grid lines
+	 *	@param cellWidth
+	 *	@param cellHeight 
+	 */
 	function drawGrid(ctx, chartViewArea, startx, starty, cellWidth, cellHeight){
 		var cx = chartViewArea.x, cy = chartViewArea.y,
 			cw = chartViewArea.w, ch = chartViewArea.h,
@@ -482,10 +493,13 @@
 		ctx.stroke();
 	}
 
-
+	/**
+	 *	@param ctx - CanvasRenderingContext
+	 *	@param cx - x offset
+	 *	@param cy - y offset
+	 */
 	function drawMark(ctx, cx, cy, markx, marky, markWidth, markHeight, xDrawEnd, yDrawEnd){
 		var cut, markw, markh;
-
 
 		if(markx < 0){
 			markw = markWidth + markx;
