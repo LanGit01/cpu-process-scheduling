@@ -80,10 +80,11 @@
 
 					div = document.getElementById("gantt-chart-canvas");
 					div.appendChild(ganttChart.initDisplay({
-						
+						viewWidth: 700,
+						viewHeight: 200
 					}));
 					
-					ganttChart.setPosition(1000, 0);	// xMax = 1010
+					ganttChart.setPosition(1200, 100);	// xMax = 1010
 					ganttChart.draw();
 				}
 		</script>

@@ -282,7 +282,6 @@
 		drawChart(ctx, this._x, this._y, cellWidth, cellHeight, this._chartViewArea, this._colOffset, this._colEnd,
 				  this._rowOffset, this._rowEnd, this._xDrawEnd, this._yDrawEnd, this._logs, this._rowMapping);
 		
-
 		this.flip();
 	}
 
@@ -400,6 +399,9 @@
 
 		xMarkStart = -(x % cellWidth);
 		yMarkStart = -(y % cellHeight);
+
+		xDrawEnd -= x;
+		yDrawEnd -= y;
 			
 		//	Draw Grid
 		drawGrid(ctx, chartView, xMarkStart + cellWidth, yMarkStart + cellHeight, cellWidth, cellHeight);
@@ -412,14 +414,13 @@
 			log = logs[col];
 			row = log.running && rowMap[log.running.id];
 
-			if(row !== null){
+			if(row !== null && row > -1 && row < rowEnd + 1){
 				yMark = yMarkStart + ((row - rowOffset) * cellHeight);
 				drawMark(ctx, xMarkOffset, yMarkOffset, xMark, yMark, markWidth, markHeight, xDrawEnd, yDrawEnd);
 			}
 
 			xMark += cellWidth;
 		}
-
 
 		// Draw waiting marks
 		ctx.fillStyle = DEFAULT_WAITING_COLOR;
@@ -431,7 +432,7 @@
 			for(i = 0; i < waiting.length; i++){
 				row = rowMap[waiting[i].id];
 
-				if(row !== null){
+				if(row !== null && row > -1 && row < rowEnd + 1){
 					yMark = yMarkStart + ((row - rowOffset) * cellHeight);
 					drawMark(ctx, xMarkOffset, yMarkOffset, xMark, yMark, markWidth, markHeight, xDrawEnd, yDrawEnd);
 				}
