@@ -13,13 +13,15 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/GanttChartUI.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChartUIControl.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
 				RRScheduler = CPUscheduling.RRScheduler,
 				TextDisplay = CPUscheduling.TextDisplay,
-				GanttChartUI = CPUscheduling.GanttChartUI;
+				GanttChartUI = CPUscheduling.GanttChartUI,
+				GanttChartUIControl = CPUscheduling.GanttChartUIControl;
 
 				var pm = new ProcessManager(),
 					logs, pids, itr, ganttChart;
@@ -86,6 +88,10 @@
 					
 					ganttChart.setPosition(0, 0);	// xMax = 1010
 					ganttChart.draw();
+
+					control = new GanttChartUIControl(ganttChart);
+					control.initialize();
+
 				}
 		</script>
 	</head>
