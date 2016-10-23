@@ -129,7 +129,7 @@
 		}
 		
 		this._labelViewArea = createRect(0, 0, maxLabelWidth + (LABEL_MARGIN * 2), config.viewHeight);
-		this._timelineViewArea = createRect(this._labelViewArea.w, config.viewHeight - config.markHeight - CELL_BORDER, config.viewWidth - this._labelViewArea.w, config.markHeight);
+		this._timelineViewArea = createRect(this._labelViewArea.w, config.viewHeight - config.markHeight - CELL_BORDER, config.viewWidth - this._labelViewArea.w, config.markHeight + CELL_BORDER);
 		this._chartViewArea = createRect(this._labelViewArea.w, 0, this._timelineViewArea.w, config.viewHeight - config.markHeight - CELL_BORDER);
 		
 		// Area of the complete chart, minus the edge borders
@@ -191,7 +191,7 @@
 		}
 		
 		xEnd = x + this._chartViewArea.w - edgeBorderSize - 1;
-		yEnd = x + this._chartViewArea.h - edgeBorderSize - 1;
+		yEnd = y + this._chartViewArea.h - edgeBorderSize - 1;
 
 		if(xEnd > this._drawLine - 1){
 			xEnd = this._drawLine - 1;
@@ -201,6 +201,7 @@
 		colEnd = ~~(xEnd / cellWidth);
 		rowOffset = ~~(y / cellHeight);
 		rowEnd = ~~(yEnd / cellHeight);
+
 
 		if(colEnd > this._logs.length - 1){
 			colEnd = this._logs.length - 1;
