@@ -39,7 +39,7 @@
 
 		// Timing
 		this._moveUpdateDelay = moveUpdateDelay || DEFAULT_MOVE_UPDATE_DELAY;
-		this._lastTime = 0;
+		this._lastTime = Date.now();
 
 		// Keypress and direction
 		this._pressedDirection = null;
@@ -63,28 +63,27 @@
 
 	function onKeyDown(e){
 		// Should be bounded to a GanttChartUIControl instance
-		var direction = KeyToDirection[e.key];
+		var direction = KeyToDirection[e.key], now;
 
+		// Ignore keypress if not a direction key
 		if(direction){
+			now = Date.now();
+
+			// Register the time a new direction was pressed
 			if(direction !== this._pressedDirection){
-				console.log("new direction");
 				this._pressedDirection = direction;
-				this._timeKeyDown = Date.now();
+				this._timeKeyDown = now;
 			}
 
-			console.log(Date.now() - this._timeKeyDown);
+			if(now > this._lastTime + this._moveUpdateDelay){
+				console.log(now - this._lastTime);
+				this._lastTime = now;
+
+				// Insert update code here
+			}
 
 			e.preventDefault();
 		}
-
-		/*
-		if(direction){
-			
-			e.preventDefault();
-		}else{
-			console.log("none");
-		}
-		*/
 	}
 
 
