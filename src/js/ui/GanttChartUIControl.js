@@ -12,7 +12,7 @@
 		MAX_SPEED = 20,
 		ACCEL_TIME_TRESHOLD = 1000,
 
-		DEFAULT_MOVE_UPDATE_DELAY = 100;
+		DEFAULT_FPS = 24;
 
 
 	var KeyToDirection = {
@@ -23,7 +23,7 @@
 	};
 
 
-	function GanttChartUIControl(ganttChart, moveUpdateDelay){
+	function GanttChartUIControl(ganttChart, fps){
 		this._ganttChart = ganttChart;
 		// Movement
 		this._x;
@@ -38,8 +38,10 @@
 		this._addSpeed = ADD_SPEED;
 
 		// Timing
-		this._moveUpdateDelay = moveUpdateDelay || DEFAULT_MOVE_UPDATE_DELAY;
-		this._lastTime = Date.now();
+		this._fps = fps;
+		this._timePerFrame = Math.floor(1000 / fps);
+		this._lastTime = 0;
+		this._running = false;
 
 		// Keypress and direction
 		this._pressedDirection = null;
@@ -47,14 +49,20 @@
 	}
 
 
-	function move(that, direction){
-		var now = Date.now(), speed = that._currentSpeed;
+	GanttChartUIControl.prototype.step = function(){
 
-		if(now < that._lastTime + that._timePerFrame){
+		if(!running){
 			return;
 		}
 
-		that._lastTime = now;
+		if(now < this._lastTime + this._timePerFrame){
+			requestAnimationFrame(this.step);
+			return;
+		}
+	}
+
+	function move(that, direction){
+
 	}
 
 
@@ -76,7 +84,6 @@
 			}
 
 			if(now > this._lastTime + this._moveUpdateDelay){
-				console.log(now - this._lastTime);
 				this._lastTime = now;
 
 				// Insert update code here
