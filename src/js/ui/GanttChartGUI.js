@@ -32,10 +32,6 @@
 		this._cellWidth = DEFAULT_CELL_WIDTH;
 		this._cellHeight = DEFAULT_CELL_HEIGHT;
 
-		this._gridCellSize;
-		this._idCellSize;
-		this._timeCellSize;
-
 		// Areas
 		this._displayArea = null;	// Actual size of the GUI Area (including borders)
 		this._idArea = null;
@@ -106,43 +102,52 @@
 
 		gcSize = new Dimensions(tlSize.w, idSize.h);
 
-		// Augment 'this'
-		this._timeCellSize = tlSize;
-		this._idCellSize = idSize;
-		this._gridCellSize = gcSize;
-	
 
-		// Areas
+
+		/*------------------ Areas ------------------------*/
+
+		// Full Grid Area
 		fgArea = new Dimensions(
 			this._logs.getLength() * gcSize.w - MAIN_BORDER_SIZE,
 			this._ids.length * gcSize.h - MAIN_BORDER_SIZE
 		);
 
+		// Display Area
 		dArea = new Box(0, 0,
 			Math.min(this._config.canvasWidth, fgArea.w + idSize.w + (3 * MAIN_BORDER_SIZE)),
 			Math.min(this._config.canvasHeight, fgArea.h + tlSize.h + (3 * MAIN_BORDER_SIZE))
 		);
 
-		idArea = new Box(
+		// ID Area
+		idArea = new UIArea(
 			MAIN_BORDER_SIZE,
 			MAIN_BORDER_SIZE,
 			idSize.w,
-			dArea.h - (2 * MAIN_BORDER_SIZE)
+			dArea.h - (2 * MAIN_BORDER_SIZE),
+			idSize.w,
+			idSize.h
 		);
 
-		tArea = new Box(
+		// Time Area
+		tArea = new UIArea(
 			idArea.w + (2 * MAIN_BORDER_SIZE),
 			dArea.h - tlSize.h - MAIN_BORDER_SIZE,
 			dArea.w - idArea.w - (3 * MAIN_BORDER_SIZE),
+			tlSize.h,
+			tlSize.w,
 			tlSize.h
 		);
 
-		gArea = new Box(
+		// Grid Area
+		gArea = new UIArea(
 			idArea.w + (2 * MAIN_BORDER_SIZE),
 			MAIN_BORDER_SIZE,
 			dArea.w - idArea.w - (3 * MAIN_BORDER_SIZE),
-			dArea.h - tArea.h - (3 * MAIN_BORDER_SIZE)
+			dArea.h - tArea.h - (3 * MAIN_BORDER_SIZE),
+			gcSize.w,
+			gcSize.h
 		);
+
 
 		// Augment 'this'
 		this._fullGridArea = fgArea;
@@ -198,6 +203,13 @@
 		this.ctx = this.canvas.getContext("2d");
 	}
 
+
+	function UIArea(x, y, w, h, cellWidth, cellHeight){
+		var box = new Box(x, y, w, h);
+		box.cellWidth = cellWidth;
+		box.cellHeight = cellHeight;
+		return box;
+	}
 
 
 	/*-----------------------------------------------*\
