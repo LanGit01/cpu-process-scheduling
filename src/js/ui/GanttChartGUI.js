@@ -231,6 +231,10 @@
 		rowStart = ~~(y / ch);
 		rowEnd = rowStart + ~~((gArea.h - yOffset - 1) / cw) + 1;
 
+		if(rowEnd > maxRows){
+			rowEnd = maxRows;
+		}
+
 		
 		drawGridLines(ctx, gArea, xOffset + cw, yOffset + ch);
 		
