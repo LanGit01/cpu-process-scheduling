@@ -193,18 +193,19 @@
 		buffer.ctx.clearRect(0 ,0, buffer.canvas.width, buffer.canvas.height);
 		display.ctx.clearRect(0, 0, display.canvas.width, display.canvas.height);
 
+		/*			TEMPORARY			*/
 		ctx.fillStyle = "#DDDDDD";
 		ctx.fillRect(0, 0, this._displayArea.w, this._displayArea.h);
 		
-		ctx.fillStyle = "#AA0000";
+		ctx.fillStyle = "#EE5555";
 		ctx.fillRect(this._idArea.x, this._idArea.y, this._idArea.w, this._idArea.h);
 
-		ctx.fillStyle = "#00AA00";
+		ctx.fillStyle = "#55EE55";
 		ctx.fillRect(this._timeArea.x, this._timeArea.y, this._timeArea.w, this._timeArea.h);
 
-		ctx.fillStyle = "#0000AA";
+		ctx.fillStyle = "#5555EE";
 		ctx.fillRect(this._gridArea.x, this._gridArea.y, this._gridArea.w, this._gridArea.h);
-
+		/*------------------------------*/
 
 		drawGridArea(buffer.ctx, this._gridArea, this._x, this._y, this._ids.length, this._logs.getLength());
 	

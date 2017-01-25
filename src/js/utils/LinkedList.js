@@ -180,6 +180,18 @@
 	}
 
 
+	LinkedList.prototype.toArray = function(){
+		var ar = [], 
+			itr = this.getIterator();
+
+		while(itr.hasNext()){
+			ar[ar.length] = itr.getNext();
+		}
+
+		return ar;
+	}
+
+
 
 
 
