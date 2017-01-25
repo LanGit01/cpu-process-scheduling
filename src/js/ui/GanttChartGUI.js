@@ -39,6 +39,11 @@
 		this._gridArea = null;
 		this._fullGridArea = null;
 
+		// Grid chart position
+		this._x = 0;
+		this._y = 0;
+		this._positionBounds = null;
+
 		// Canvas
 		this._displayCanvas = null;
 		this._bufferCanvas = null;
@@ -65,9 +70,13 @@
 		container.appendChild(this._displayCanvas.canvas);
 
 
-		// Basic dimensions
-
 		this.computeDimensions();
+
+		drawGridArea(this._bufferCanvas.ctx, this._gridArea, 0, 0, 71, 10);
+
+
+		// Debugging
+		this._displayCanvas.ctx.drawImage(this._bufferCanvas.canvas, 0, 0);
 
 	}
 
@@ -149,6 +158,9 @@
 		);
 
 
+		this._positionBounds = new Dimensions(fgArea.w - gArea.w, fgArea.h - gArea.h);
+		
+
 		// Augment 'this'
 		this._fullGridArea = fgArea;
 		this._displayArea = dArea;
@@ -169,14 +181,86 @@
 
 		ctx.fillStyle = "#0000AA";
 		ctx.fillRect(gArea.x, gArea.y, gArea.w, gArea.h);
-	
-
-
-
-		this._displayCanvas.ctx.drawImage(this._bufferCanvas.canvas, 0, 0);
 	}
 
 
+
+	GanttChartGUI.prototype.draw = function(){
+
+	}
+
+
+	/*-----------------------------------------------*\
+					Private Functions
+	\*-----------------------------------------------*/
+
+
+	function createConfig(config){
+		var configObj = {};
+
+		config = config || {};
+
+		configObj.canvasWidth = config.canvasWidth || DEFAULT_CANVAS_WIDTH;
+		configObj.canvasHeight = config.canvasHeight || DEFAULT_CANVAS_HEIGHT;
+
+		configObj.cellWidth = config.cellWidth || DEFAULT_CELL_WIDTH;
+		configObj.cellHeight = config.cellHeight || DEFAULT_CELL_HEIGHT;
+
+		return configObj;
+	}
+
+
+	function drawGridArea(ctx, gArea, x, y, maxRows, maxCols){
+		var cw = gArea.cellWidth,
+			ch = gArea.cellHeight;
+
+		var xOffset, yOffset,
+			colStart, colEnd;
+
+		// Column calculations
+		xOffset = -(x % cw);
+		colStart = ~~(x / cw);
+		colEnd = colStart + ~~((gArea.w - xOffset - 1) / cw) + 1; // zero-indexed + width (note: this is 1 more than the last column)
+
+		if(colEnd > maxCols){
+			colEnd = maxCols;
+		}
+
+		// Row calculations
+		yOffset = -(y % ch);
+		rowStart = ~~(y / ch);
+		rowEnd = rowStart + ~~((gArea.h - yOffset - 1) / cw) + 1;
+
+		
+		drawGridLines(ctx, gArea, xOffset + cw, yOffset + ch);
+		
+	}
+
+	
+	function drawGridLines(ctx, area, xOffset, yOffset){
+		var xLine = area.x + xOffset + 0.5,
+			yLine = area.y + yOffset + 0.5,
+			xAreaEnd = area.x + area.w,
+			yAreaEnd = area.y + area.h,
+			cw = area.cellWidth,
+			ch = area.cellHeight;
+
+		ctx.beginPath();
+		while(xLine < xAreaEnd){
+			ctx.moveTo(xLine, area.y);
+			ctx.lineTo(xLine, yAreaEnd - 1);
+			xLine += cw;
+		}
+
+		while(yLine < yAreaEnd){
+			ctx.moveTo(area.x, yLine);
+			ctx.lineTo(xAreaEnd - 1, yLine);
+			yLine += ch;
+		}
+
+		ctx.closePath();
+		ctx.stroke();
+	}
 
 	/*-----------------------------------------------*\
 					Auxillary Classes
@@ -252,19 +336,7 @@
 	}
 
 
-	function createConfig(config){
-		var configObj = {};
-
-		config = config || {};
-
-		configObj.canvasWidth = config.canvasWidth || DEFAULT_CANVAS_WIDTH;
-		configObj.canvasHeight = config.canvasHeight || DEFAULT_CANVAS_HEIGHT;
-
-		configObj.cellWidth = config.cellWidth || DEFAULT_CELL_WIDTH;
-		configObj.cellHeight = config.cellHeight || DEFAULT_CELL_HEIGHT;
-
-		return configObj;
-	}
+	
 
 
 
