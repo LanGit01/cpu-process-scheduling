@@ -1,5 +1,10 @@
 (function(global){
 
+
+	// Load classes
+	var ChartGridArea = global.CPUscheduling.ChartGridArea;
+
+
 	// Defaults
 	var DEFAULT_CANVAS_WIDTH = 800,
 		DEFAULT_CANVAS_HEIGHT = 300,
@@ -17,8 +22,12 @@
 		DEFAULT_FONT_SIZE = 12;
 
 
+
 	/*
 	 * GanttChartGUI class
+	 *
+	 *	@param ids [array]
+	 *	@param logs [array]
 	 */
 	function GanttChartGUI(ids, logs){
 		// Data
@@ -33,6 +42,8 @@
 		this._cellHeight = DEFAULT_CELL_HEIGHT;
 
 		// Areas
+		this._chartGridArea = null;
+
 		this._displayArea = null;	// Actual size of the GUI Area (including borders)
 		this._idArea = null;
 		this._timeArea = null;
@@ -72,10 +83,6 @@
 
 		this.computeDimensions();
 
-		drawGridArea(this._bufferCanvas.ctx, this._gridArea, 0, 0, 71, 10);
-
-
-		// Debugging
 	}
 
 
@@ -98,7 +105,7 @@
 
 		// Basic Dimensions
 		tlSize = new Dimensions(
-			Math.max(dCellWidth, totalPadding + getAdjustedStringWidth(ctx, (this._logs.getLength() - 1).toString())),
+			Math.max(dCellWidth, totalPadding + getAdjustedStringWidth(ctx, (this._logs.length - 1).toString())),
 			totalPadding + DEFAULT_FONT_SIZE
 		);
 
@@ -115,7 +122,7 @@
 
 		// Full Grid Area
 		fgArea = new Dimensions(
-			this._logs.getLength() * gcSize.w - MAIN_BORDER_SIZE,
+			this._logs.length * gcSize.w - MAIN_BORDER_SIZE,
 			this._ids.length * gcSize.h - MAIN_BORDER_SIZE
 		);
 
@@ -155,17 +162,21 @@
 			gcSize.h
 		);
 
+		this._chartGridArea = new ChartGridArea({
+			fullGridDimensions: fgArea,
+			viewArea: gArea,
+			cellDimensions: gcSize,
+			ids: this._ids,
+			logs: this._logs
+		});
 
 		this._positionBounds = new Dimensions(fgArea.w - gArea.w, fgArea.h - gArea.h);
 		
 
 		// Augment 'this'
-		this._fullGridArea = fgArea;
 		this._displayArea = dArea;
 		this._idArea = idArea;
 		this._timeArea = tArea;
-		this._gridArea = gArea;
-
 	}
 
 
@@ -203,11 +214,9 @@
 		ctx.fillStyle = "#55EE55";
 		ctx.fillRect(this._timeArea.x, this._timeArea.y, this._timeArea.w, this._timeArea.h);
 
-		ctx.fillStyle = "#5555EE";
-		ctx.fillRect(this._gridArea.x, this._gridArea.y, this._gridArea.w, this._gridArea.h);
 		/*------------------------------*/
 
-		drawGridArea(buffer.ctx, this._gridArea, this._x, this._y, this._ids.length, this._logs.getLength());
+		this._chartGridArea.draw(buffer.ctx, this._x, this._y);
 	
 		// Flip
 		display.ctx.drawImage(buffer.canvas, 0, 0);
@@ -234,61 +243,8 @@
 	}
 
 
-	function drawGridArea(ctx, gArea, x, y, maxRows, maxCols){
-		var cw = gArea.cellWidth,
-			ch = gArea.cellHeight;
-
-		var xOffset, yOffset,
-			colStart, colEnd;
-
-		// Column calculations
-		xOffset = -(x % cw);
-		colStart = ~~(x / cw);
-		colEnd = colStart + ~~((gArea.w - xOffset - 1) / cw) + 1; // zero-indexed + width (note: this is 1 more than the last column)
-
-		if(colEnd > maxCols){
-			colEnd = maxCols;
-		}
-
-		// Row calculations
-		yOffset = -(y % ch);
-		rowStart = ~~(y / ch);
-		rowEnd = rowStart + ~~((gArea.h - yOffset - 1) / cw) + 1;
-
-		if(rowEnd > maxRows){
-			rowEnd = maxRows;
-		}
-
-		drawGridLines(ctx, gArea, xOffset + cw - 1, yOffset + ch - 1);
-		
-	}
-
 	
-	function drawGridLines(ctx, area, xOffset, yOffset){
-		var xLine = area.x + xOffset + 0.5,
-			yLine = area.y + yOffset + 0.5,
-			xAreaEnd = area.x + area.w,
-			yAreaEnd = area.y + area.h,
-			cw = area.cellWidth,
-			ch = area.cellHeight;
 
-		ctx.beginPath();
-
-		while(xLine < xAreaEnd){
-			ctx.moveTo(xLine, area.y);
-			ctx.lineTo(xLine, yAreaEnd - 1);
-			xLine += cw;
-		}
-
-		while(yLine < yAreaEnd){
-			ctx.moveTo(area.x, yLine);
-			ctx.lineTo(xAreaEnd - 1, yLine);
-			yLine += ch;
-		}
-
-		ctx.closePath();
-		ctx.stroke();
-	}
 
 	/*-----------------------------------------------*\
 					Auxillary Classes

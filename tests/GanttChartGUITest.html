@@ -14,6 +14,8 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUIElements.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/ChartGridArea.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUI.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
@@ -70,7 +72,7 @@
 					pids[i] = processList[i].id;
 				}
 
-				ganttChart = new GanttChartGUI(pids, logs);
+				ganttChart = new GanttChartGUI(pids, logs.toArray());
 
 				
 				window.onload = function(){
