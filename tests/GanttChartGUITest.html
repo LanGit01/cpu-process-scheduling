@@ -81,6 +81,9 @@
 					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
 					ganttChart.initialize(document.getElementById("gantt-chart-canvas"));
+					ganttChart.draw();
+					ganttChart.setPosition(1000, 100);
+					ganttChart.draw();
 				}
 		</script>
 	</head>

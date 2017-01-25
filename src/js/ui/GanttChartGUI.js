@@ -76,8 +76,6 @@
 
 
 		// Debugging
-		this._displayCanvas.ctx.drawImage(this._bufferCanvas.canvas, 0, 0);
-
 	}
 
 
@@ -168,25 +166,50 @@
 		this._timeArea = tArea;
 		this._gridArea = gArea;
 
-
-
-		ctx.fillStyle = "#DDDDDD";
-		ctx.fillRect(0, 0, dArea.w, dArea.h);
-		
-		ctx.fillStyle = "#AA0000";
-		ctx.fillRect(idArea.x, idArea.y, idArea.w, idArea.h);
-
-		ctx.fillStyle = "#00AA00";
-		ctx.fillRect(tArea.x, tArea.y, tArea.w, tArea.h);
-
-		ctx.fillStyle = "#0000AA";
-		ctx.fillRect(gArea.x, gArea.y, gArea.w, gArea.h);
 	}
 
 
+	GanttChartGUI.prototype.setPosition = function(x, y){
+		if(x < 0 || y < 0){
+			return false;
+		}
+
+		this._x = Math.min(x, this._positionBounds.w);
+		this._y = Math.min(y, this._positionBounds.h);
+
+		console.log("Position set to: (" + this._x + ", " + this._y + ")");
+
+		return true;
+	}
+
 
 	GanttChartGUI.prototype.draw = function(){
+		var ctx = this._bufferCanvas.ctx;
 
+		var buffer = this._bufferCanvas,
+			display = this._displayCanvas;
+
+		// Clear
+		buffer.ctx.clearRect(0 ,0, buffer.canvas.width, buffer.canvas.height);
+		display.ctx.clearRect(0, 0, display.canvas.width, display.canvas.height);
+
+		ctx.fillStyle = "#DDDDDD";
+		ctx.fillRect(0, 0, this._displayArea.w, this._displayArea.h);
+		
+		ctx.fillStyle = "#AA0000";
+		ctx.fillRect(this._idArea.x, this._idArea.y, this._idArea.w, this._idArea.h);
+
+		ctx.fillStyle = "#00AA00";
+		ctx.fillRect(this._timeArea.x, this._timeArea.y, this._timeArea.w, this._timeArea.h);
+
+		ctx.fillStyle = "#0000AA";
+		ctx.fillRect(this._gridArea.x, this._gridArea.y, this._gridArea.w, this._gridArea.h);
+
+
+		drawGridArea(buffer.ctx, this._gridArea, this._x, this._y, this._ids.length, this._logs.getLength());
+	
+		// Flip
+		display.ctx.drawImage(buffer.canvas, 0, 0);
 	}
 
 
@@ -235,8 +258,7 @@
 			rowEnd = maxRows;
 		}
 
-		
-		drawGridLines(ctx, gArea, xOffset + cw, yOffset + ch);
+		drawGridLines(ctx, gArea, xOffset + cw - 1, yOffset + ch - 1);
 		
 	}
 
@@ -250,6 +272,7 @@
 			ch = area.cellHeight;
 
 		ctx.beginPath();
+
 		while(xLine < xAreaEnd){
 			ctx.moveTo(xLine, area.y);
 			ctx.lineTo(xLine, yAreaEnd - 1);
