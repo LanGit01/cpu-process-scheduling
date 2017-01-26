@@ -111,7 +111,7 @@
 				if(row >= rowStart && row < rowEnd){
 					y = yOffset + ((row - rowStart) * ch);
 
-					console.log(col + ": " + x + " " + y);
+					console.log(col + ": " + x + "[" + col + "], " + y + "[" + row + "]");
 					drawMark(ctx, x, y, cw, ch, this._viewArea, this._imagesheet, 0);
 				}
 			}
@@ -154,25 +154,25 @@
 
 
 	function drawMark(ctx, x, y, cw, ch, area, img, imgIndex){
-		var w = cw, h = ch;
+		var w = cw - 1, h = ch - 1;
 
 		if(x < 0){
 			w += x;
 			x = 0;
 		}else
-		if(x > area.w + cw - 1){
-			w = cw - (area.w - x);
+		if(x + cw > area.w){
+			w = area.w - x;
 		}
 
 		if(y < 0){
 			h += y;
 			y = 0;
 		}else
-		if(y > area.h + h - 1){
-			h = h - (areah - y);
+		if(y > area.h + ch - 1){
+			h = area.h - y;
 		}
 
-		ctx.drawImage(img, (cw - 1) * imgIndex, 0, w - 1, h - 1, area.x + x, area.y + y, w - 1, h - 1);
+		ctx.drawImage(img, (cw - 1) * imgIndex, 0, w, h, area.x + x, area.y + y, w, h);
 	}
 
 
