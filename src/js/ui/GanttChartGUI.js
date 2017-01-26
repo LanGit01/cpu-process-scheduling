@@ -61,6 +61,7 @@
 	}
 
 
+
 	GanttChartGUI.prototype.initialize = function(container, config){
 		/*
 		 *	Config:

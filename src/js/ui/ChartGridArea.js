@@ -4,6 +4,9 @@
 	var Box = global.CPUscheduling.Box,
 		Dimensions = global.CPUscheduling.Dimensions;
 
+	// Defaults
+	var DEFAULT_RUNNING_COLOR = "#333333",
+		DEFAULT_WAITING_COLOR = "#999999";
 
 	/**
 	 *	ChartGridArea class
@@ -39,6 +42,7 @@
 		this._viewArea = values.viewArea;
 		this._cellDimensions = values.cellDimensions;
 
+		this._imagesheet = createMarkImagesheet(this._cellDimensions.w - 1, this._cellDimensions.h - 1);
 	}
 
 
@@ -77,12 +81,45 @@
 			/*				TEMPORARY				*/
 			ctx.fillStyle = "#5555EE";
 			ctx.fillRect(this._viewArea.x, this._viewArea.y, this._viewArea.w, this._viewArea.h);
-		
-
 			/*--------------------------------------*/
+
+
 			drawGridLines(ctx, this._viewArea, xOffset + cw - 1, yOffset + ch - 1);
+
+			this._drawMarks(ctx, xOffset, colStart, colEnd, yOffset, rowStart, rowEnd);
+
+			// Draw marks
+
 	}
 
+
+	ChartGridArea.prototype._drawMarks = function(ctx, xOffset, colStart, colEnd, yOffset, rowStart, rowEnd){
+		var log,
+			col = colStart, row,
+			x = xOffset, y,
+			cw = this._cellDimensions.w,
+			ch = this._cellDimensions.h;
+
+		while(col < colEnd){
+			log = this._logs[col];
+
+			// Draw running (if there is)
+			if(log && log.running){
+				row = this._idRowMap[log.running.id];
+
+				// If visible
+				if(row >= rowStart && row < rowEnd){
+					y = yOffset + ((row - rowStart) * ch);
+
+					console.log(col + ": " + x + " " + y);
+					drawMark(ctx, x, y, cw, ch, this._viewArea, this._imagesheet, 0);
+				}
+			}
+
+			col++;
+			x += cw;
+		}
+	}
 
 	/*-----------------------------------------------*\
 					Private Functions
@@ -113,6 +150,71 @@
 		ctx.closePath();
 		ctx.stroke();
 	}
+
+
+
+	function drawMark(ctx, x, y, cw, ch, area, img, imgIndex){
+		var w = cw, h = ch;
+
+		if(x < 0){
+			w += x;
+			x = 0;
+		}else
+		if(x > area.w + cw - 1){
+			w = cw - (area.w - x);
+		}
+
+		if(y < 0){
+			h += y;
+			y = 0;
+		}else
+		if(y > area.h + h - 1){
+			h = h - (areah - y);
+		}
+
+		ctx.drawImage(img, (cw - 1) * imgIndex, 0, w - 1, h - 1, area.x + x, area.y + y, w - 1, h - 1);
+	}
+
+
+	function computeMarkBox(x, y, w, h, areaw, areah){
+		if(x < 0){
+			w += x;
+			x = 0;
+		}else
+		if(x > areaw + w - 1){
+			w = w - (areaw - x);
+		}
+
+		if(y < 0){
+			h += y;
+			y = 0;
+		}else
+		if(y > areah + h - 1){
+			h = h - (areah - y);
+		}
+
+		return new Box(x, y, w, h);
+	}
+
+
+	function createMarkImagesheet(cw, ch){
+		var img = new Image(),
+			tempCanvas = document.createElement("canvas"),
+			ctx = tempCanvas.getContext("2d");
+
+		tempCanvas.width = cw * 2;
+		tempCanvas.height = ch;
+
+		ctx.fillStyle = DEFAULT_RUNNING_COLOR;
+		ctx.fillRect(0, 0, cw, ch);
+		ctx.fillStyle = DEFAULT_WAITING_COLOR;
+		ctx.fillRect(cw, 0, cw, ch);
+
+		img.src = tempCanvas.toDataURL();
+
+		return img;
+	}
+
 
 
 	global.CPUscheduling.ChartGridArea = ChartGridArea;
