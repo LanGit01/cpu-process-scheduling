@@ -2,12 +2,13 @@
 
 
 	// Load classes
-	var ChartGridArea = global.CPUscheduling.ChartGridArea;
+	var ChartGridArea = global.CPUscheduling.ChartGridArea,
+		LabelStrip = global.CPUscheduling.LabelStrip;
 
 
 	// Defaults
 	var DEFAULT_CANVAS_WIDTH = 800,
-		DEFAULT_CANVAS_HEIGHT = 300,
+		DEFAULT_CANVAS_HEIGHT = 200,
 		DEFAULT_CELL_WIDTH = 24,
 		DEFAULT_CELL_HEIGHT = 24,
 		ID_LABEL_WIDTH = 24,
@@ -18,8 +19,8 @@
 
 		CELL_PADDING = 4,
 		
-		DEFAULT_FONT = "sans-serif",
-		DEFAULT_FONT_SIZE = 12;
+		DEFAULT_FONT = "monospace",
+		DEFAULT_FONT_SIZE = 14;
 
 
 
@@ -43,6 +44,8 @@
 
 		// Areas
 		this._chartGridArea = null;
+		this._idLabelStrip = null;
+		this._timeLabelStrip = null;
 
 		this._displayArea = null;	// Actual size of the GUI Area (including borders)
 		this._idArea = null;
@@ -70,7 +73,7 @@
 		 *
 		 */
 		 var timeLabelWidth, timeLabelHeight,
-		 	 idLabelWidth, idLabelHeight;
+		 	 idLabelWidth, idLabelHeight, time, timeArr = [];
 
 
 		this._config = createConfig(config);
@@ -81,9 +84,17 @@
 		this._bufferCanvas = new CanvasWrapper(this._config.canvasWidth, this._config.canvasHeight);
 		container.appendChild(this._displayCanvas.canvas);
 
-
 		this.computeDimensions();
 
+
+
+		// Initialize label strips
+		this._idLabelStrip.initializeStripImage(this._ids, DEFAULT_FONT_SIZE + "px " + DEFAULT_FONT);
+		
+		for(time = 0; time < this._logs.length; time++){
+			timeArr[time] = time;
+		}
+		this._timeLabelStrip.initializeStripImage(timeArr, DEFAULT_FONT_SIZE + "px " + DEFAULT_FONT);
 	}
 
 
@@ -92,8 +103,7 @@
 			fgArea, dArea, idArea, tArea, gArea,
 			dCellWidth = this._config.cellWidth,
 			dCellHeight = this._config.cellHeight,
-			ctx = this._bufferCanvas.ctx,
-			totalPadding = 2 * CELL_PADDING;
+			ctx = this._bufferCanvas.ctx;
 
 
 		/*
@@ -106,13 +116,13 @@
 
 		// Basic Dimensions
 		tlSize = new Dimensions(
-			Math.max(dCellWidth, totalPadding + getAdjustedStringWidth(ctx, (this._logs.length - 1).toString())),
-			totalPadding + DEFAULT_FONT_SIZE
+			Math.max(dCellWidth, DEFAULT_FONT_SIZE + getAdjustedStringWidth(ctx, (this._logs.length - 1).toString())),
+			~~(1.5 * DEFAULT_FONT_SIZE)
 		);
 
 		idSize = new Dimensions(
-			totalPadding + getAdjustedStringWidth(ctx, getLargestNumber(this._ids).toString()),
-			Math.max(dCellHeight, totalPadding + DEFAULT_FONT_SIZE)
+			DEFAULT_FONT_SIZE + getAdjustedStringWidth(ctx, getLargestNumber(this._ids).toString()),
+			Math.max(dCellHeight, 2 * DEFAULT_FONT_SIZE)
 		);
 
 		gcSize = new Dimensions(tlSize.w, idSize.h);
@@ -134,31 +144,34 @@
 		);
 
 		// ID Area
-		idArea = new UIArea(
+		idLabelStrip = new LabelStrip(
 			MAIN_BORDER_SIZE,
 			MAIN_BORDER_SIZE,
 			idSize.w,
-			dArea.h - (2 * MAIN_BORDER_SIZE),
+			dArea.h - tlSize.h - (3 * MAIN_BORDER_SIZE),
 			idSize.w,
-			idSize.h
+			idSize.h,
+			false
 		);
 
 		// Time Area
-		tArea = new UIArea(
-			idArea.w + (2 * MAIN_BORDER_SIZE),
+		timeLabelStrip = new LabelStrip(
+			idLabelStrip.w + (2 * MAIN_BORDER_SIZE),
 			dArea.h - tlSize.h - MAIN_BORDER_SIZE,
-			dArea.w - idArea.w - (3 * MAIN_BORDER_SIZE),
+			dArea.w - idLabelStrip.w - (3 * MAIN_BORDER_SIZE),
 			tlSize.h,
 			tlSize.w,
-			tlSize.h
+			tlSize.h,
+			true
 		);
+
 
 		// Grid Area
 		gArea = new UIArea(
-			idArea.w + (2 * MAIN_BORDER_SIZE),
+			idLabelStrip.w + (2 * MAIN_BORDER_SIZE),
 			MAIN_BORDER_SIZE,
-			dArea.w - idArea.w - (3 * MAIN_BORDER_SIZE),
-			dArea.h - tArea.h - (3 * MAIN_BORDER_SIZE),
+			dArea.w - idLabelStrip.w - (3 * MAIN_BORDER_SIZE),
+			dArea.h - timeLabelStrip.h - (3 * MAIN_BORDER_SIZE),
 			gcSize.w,
 			gcSize.h
 		);
@@ -176,8 +189,8 @@
 
 		// Augment 'this'
 		this._displayArea = dArea;
-		this._idArea = idArea;
-		this._timeArea = tArea;
+		this._idLabelStrip = idLabelStrip;
+		this._timeLabelStrip = timeLabelStrip;
 	}
 
 
@@ -210,15 +223,35 @@
 		ctx.fillRect(0, 0, this._displayArea.w, this._displayArea.h);
 		
 		ctx.fillStyle = "#EE5555";
-		ctx.fillRect(this._idArea.x, this._idArea.y, this._idArea.w, this._idArea.h);
+		ctx.fillRect(this._idLabelStrip.x, this._idLabelStrip.y, this._idLabelStrip.w, this._idLabelStrip.h);
 
 		ctx.fillStyle = "#55EE55";
-		ctx.fillRect(this._timeArea.x, this._timeArea.y, this._timeArea.w, this._timeArea.h);
-
+		ctx.fillRect(this._timeLabelStrip.x, this._timeLabelStrip.y, this._timeLabelStrip.w, this._timeLabelStrip.h);
+		
 		/*------------------------------*/
 
+		// Draw Areas
+		this._idLabelStrip.draw(buffer.ctx, this._y);
+		this._timeLabelStrip.draw(buffer.ctx, this._x);
 		this._chartGridArea.draw(buffer.ctx, this._x, this._y);
-	
+
+		// Draw Borers
+		/*
+		ctx.strokeRect(this._displayArea.x, this._displayArea.y, this._displayArea.w, this._displayArea.h);
+		
+		ctx.beginPath();
+
+		ctx.moveTo(this._idLabelStrip.x, this._timeLabelStrip.y);
+		ctx.lineTo(this._chartGridArea.x + this._chartGridArea.w, this._timeLabelStrip.y);
+		
+		console.log(this._chartGridArea.x);
+
+		ctx.moveTo(this._chartGridArea.x, this._chartGridArea.y);
+		ctx.lineTo(this._chartGridArea.x, this._chartGridArea.y + this._chartGridArea.h);
+		
+		ctx.closePath();
+		ctx.stroke();*/
+
 		// Flip
 		display.ctx.drawImage(buffer.canvas, 0, 0);
 	}

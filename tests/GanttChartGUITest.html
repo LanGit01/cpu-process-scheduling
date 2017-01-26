@@ -14,6 +14,7 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/LabelStrip.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUIElements.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/ChartGridArea.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUI.js"></script>
@@ -83,7 +84,7 @@
 					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
 					ganttChart.initialize(document.getElementById("gantt-chart-canvas"));
-					ganttChart.setPosition(0, 0);
+					ganttChart.setPosition(200, 0);
 					ganttChart.draw();
 				}
 		</script>

@@ -79,8 +79,10 @@
 			}
 
 			/*				TEMPORARY				*/
+			
 			ctx.fillStyle = "#5555EE";
 			ctx.fillRect(this._viewArea.x, this._viewArea.y, this._viewArea.w, this._viewArea.h);
+			
 			/*--------------------------------------*/
 
 			this._drawGridLines(ctx, this._viewArea, xOffset + cw - 1, yOffset + ch - 1);
@@ -119,7 +121,7 @@
 
 
 	ChartGridArea.prototype._drawMarks = function(ctx, xOffset, colStart, colEnd, yOffset, rowStart, rowEnd){
-		var log,
+		var log, waiting, i,
 			col = colStart, row,
 			x = xOffset, y,
 			cw = this._cellDimensions.w,
@@ -135,9 +137,24 @@
 				// If visible
 				if(row >= rowStart && row < rowEnd){
 					y = yOffset + ((row - rowStart) * ch);
-
-					console.log(col + ": " + x + "[" + col + "], " + y + "[" + row + "]");
 					drawMark(ctx, x, y, cw, ch, this._viewArea, this._imagesheet, 0);
+				}
+			}
+
+			// Draw waiting (if there is)
+			// Note: Deciding if i should move this inside log.running if-conditional
+			//		 because technically there shouldn't be waiting processes if there is no running process
+			if(log && log.waiting){
+				waiting = log.waiting;
+
+				for(i = 0; i < waiting.length; i++){
+					row = this._idRowMap[waiting[i].id];
+
+					// If visible
+					if(row >= rowStart && row < rowEnd){
+						y = yOffset + ((row - rowStart) * ch);
+						drawMark(ctx, x, y, cw, ch, this._viewArea, this._imagesheet, 1);
+					}
 				}
 			}
 
