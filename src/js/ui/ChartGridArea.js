@@ -83,13 +83,38 @@
 			ctx.fillRect(this._viewArea.x, this._viewArea.y, this._viewArea.w, this._viewArea.h);
 			/*--------------------------------------*/
 
-
-			drawGridLines(ctx, this._viewArea, xOffset + cw - 1, yOffset + ch - 1);
-
+			this._drawGridLines(ctx, this._viewArea, xOffset + cw - 1, yOffset + ch - 1);
 			this._drawMarks(ctx, xOffset, colStart, colEnd, yOffset, rowStart, rowEnd);
 
 			// Draw marks
 
+	}
+
+
+	ChartGridArea.prototype._drawGridLines = function(ctx, area, xOffset, yOffset){
+		var xLine = area.x + xOffset + 0.5,
+			yLine = area.y + yOffset + 0.5,
+			xAreaEnd = area.x + area.w,
+			yAreaEnd = area.y + area.h,
+			cw = area.cellWidth,
+			ch = area.cellHeight;
+
+		ctx.beginPath();
+
+		while(xLine < xAreaEnd){
+			ctx.moveTo(xLine, area.y);
+			ctx.lineTo(xLine, yAreaEnd - 1);
+			xLine += cw;
+		}
+
+		while(yLine < yAreaEnd){
+			ctx.moveTo(area.x, yLine);
+			ctx.lineTo(xAreaEnd - 1, yLine);
+			yLine += ch;
+		}
+
+		ctx.closePath();
+		ctx.stroke();
 	}
 
 
@@ -124,33 +149,6 @@
 	/*-----------------------------------------------*\
 					Private Functions
 	\*-----------------------------------------------*/
-
-	function drawGridLines(ctx, area, xOffset, yOffset){
-		var xLine = area.x + xOffset + 0.5,
-			yLine = area.y + yOffset + 0.5,
-			xAreaEnd = area.x + area.w,
-			yAreaEnd = area.y + area.h,
-			cw = area.cellWidth,
-			ch = area.cellHeight;
-
-		ctx.beginPath();
-
-		while(xLine < xAreaEnd){
-			ctx.moveTo(xLine, area.y);
-			ctx.lineTo(xLine, yAreaEnd - 1);
-			xLine += cw;
-		}
-
-		while(yLine < yAreaEnd){
-			ctx.moveTo(area.x, yLine);
-			ctx.lineTo(xAreaEnd - 1, yLine);
-			yLine += ch;
-		}
-
-		ctx.closePath();
-		ctx.stroke();
-	}
-
 
 
 	function drawMark(ctx, x, y, cw, ch, area, img, imgIndex){
