@@ -96,13 +96,13 @@
 
 		while(xLine < xAreaEnd){
 			ctx.moveTo(xLine, area.y);
-			ctx.lineTo(xLine, yAreaEnd - 1);
+			ctx.lineTo(xLine, yAreaEnd);
 			xLine += cw;
 		}
 
 		while(yLine < yAreaEnd){
 			ctx.moveTo(area.x, yLine);
-			ctx.lineTo(xAreaEnd - 1, yLine);
+			ctx.lineTo(xAreaEnd, yLine);
 			yLine += ch;
 		}
 
