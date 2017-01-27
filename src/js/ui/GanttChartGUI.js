@@ -48,10 +48,6 @@
 		this._timeLabelStrip = null;
 
 		this._displayArea = null;	// Actual size of the GUI Area (including borders)
-		this._idArea = null;
-		this._timeArea = null;
-		this._gridArea = null;
-		this._fullGridArea = null;
 
 		// Grid chart position
 		this._x = 0;
@@ -236,6 +232,7 @@
 		this._chartGridArea.draw(buffer.ctx, this._x, this._y);
 
 		// Draw Borers
+		drawBorders(buffer.ctx, this._displayArea, this._idLabelStrip);
 		/*
 		ctx.strokeRect(this._displayArea.x, this._displayArea.y, this._displayArea.w, this._displayArea.h);
 		
@@ -260,6 +257,28 @@
 	/*-----------------------------------------------*\
 					Private Functions
 	\*-----------------------------------------------*/
+
+	function drawBorders(ctx, displayArea, idArea){
+		var leftEdge = displayArea.x,
+			rightEdge = displayArea.x + displayArea.w - 1,
+			topEdge = displayArea.y,
+			bottomEdge = displayArea.y + displayArea.h - 1,
+			vSeparator = idArea.x + idArea.w + 0.5,
+			hSeparator = idArea.y + idArea.h + 0.5;
+
+		ctx.strokeRect(displayArea.x, displayArea.y, displayArea.w, displayArea.h);
+
+		ctx.beginPath();
+		
+		ctx.moveTo(vSeparator, topEdge);
+		ctx.lineTo(vSeparator, bottomEdge);
+
+		ctx.moveTo(leftEdge, hSeparator);
+		ctx.lineTo(rightEdge, hSeparator);
+
+		ctx.closePath();
+		ctx.stroke();
+	}
 
 
 	function createConfig(config){
