@@ -8,7 +8,7 @@
 
 	// Defaults
 	var DEFAULT_CANVAS_WIDTH = 800,
-		DEFAULT_CANVAS_HEIGHT = 200,
+		DEFAULT_CANVAS_HEIGHT = 500,
 		DEFAULT_CELL_WIDTH = 24,
 		DEFAULT_CELL_HEIGHT = 24,
 		ID_LABEL_WIDTH = 24,
@@ -132,10 +132,7 @@
 		);
 
 		// Display Area
-		dArea = new Box(0, 0,
-			Math.min(this._config.canvasWidth, fgArea.w + idSize.w + (3 * MAIN_BORDER_SIZE)),
-			Math.min(this._config.canvasHeight, fgArea.h + tlSize.h + (3 * MAIN_BORDER_SIZE))
-		);
+		dArea = new Box(0, 0, this._displayCanvas.canvas.width,	this._displayCanvas.canvas.height);
 
 		// ID Area
 		idLabelStrip = new LabelStrip(
@@ -178,7 +175,12 @@
 			logs: this._logs
 		});
 
-		this._positionBounds = new Dimensions(fgArea.w - gArea.w, fgArea.h - gArea.h);
+		this._positionBounds = new Dimensions(
+			Math.max(0, fgArea.w - gArea.w), 
+			Math.max(0, fgArea.h - gArea.h)
+		);
+
+
 		
 
 		// Augment 'this'
