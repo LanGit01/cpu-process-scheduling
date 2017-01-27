@@ -23,6 +23,7 @@
 		DEFAULT_FONT_SIZE = 14;
 
 
+	// #EE5555	#55EE55
 
 	/*
 	 * GanttChartGUI class
@@ -74,15 +75,12 @@
 
 		this._config = createConfig(config);
 
-
 		// Create canvas and buffer
 		this._displayCanvas = new CanvasWrapper(this._config.canvasWidth, this._config.canvasHeight);
 		this._bufferCanvas = new CanvasWrapper(this._config.canvasWidth, this._config.canvasHeight);
 		container.appendChild(this._displayCanvas.canvas);
 
 		this.computeDimensions();
-
-
 
 		// Initialize label strips
 		this._idLabelStrip.initializeStripImage(this._ids, DEFAULT_FONT_SIZE + "px " + DEFAULT_FONT);
@@ -213,16 +211,6 @@
 		// Clear
 		buffer.ctx.clearRect(0 ,0, buffer.canvas.width, buffer.canvas.height);
 		display.ctx.clearRect(0, 0, display.canvas.width, display.canvas.height);
-
-		/*			TEMPORARY			*/
-		ctx.fillStyle = "#DDDDDD";
-		ctx.fillRect(0, 0, this._displayArea.w, this._displayArea.h);
-		
-		ctx.fillStyle = "#EE5555";
-		ctx.fillRect(this._idLabelStrip.x, this._idLabelStrip.y, this._idLabelStrip.w, this._idLabelStrip.h);
-
-		ctx.fillStyle = "#55EE55";
-		ctx.fillRect(this._timeLabelStrip.x, this._timeLabelStrip.y, this._timeLabelStrip.w, this._timeLabelStrip.h);
 		
 		/*------------------------------*/
 
@@ -233,21 +221,6 @@
 
 		// Draw Borers
 		drawBorders(buffer.ctx, this._displayArea, this._idLabelStrip);
-		/*
-		ctx.strokeRect(this._displayArea.x, this._displayArea.y, this._displayArea.w, this._displayArea.h);
-		
-		ctx.beginPath();
-
-		ctx.moveTo(this._idLabelStrip.x, this._timeLabelStrip.y);
-		ctx.lineTo(this._chartGridArea.x + this._chartGridArea.w, this._timeLabelStrip.y);
-		
-		console.log(this._chartGridArea.x);
-
-		ctx.moveTo(this._chartGridArea.x, this._chartGridArea.y);
-		ctx.lineTo(this._chartGridArea.x, this._chartGridArea.y + this._chartGridArea.h);
-		
-		ctx.closePath();
-		ctx.stroke();*/
 
 		// Flip
 		display.ctx.drawImage(buffer.canvas, 0, 0);
