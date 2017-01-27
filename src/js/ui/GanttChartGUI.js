@@ -8,7 +8,7 @@
 
 	// Defaults
 	var DEFAULT_CANVAS_WIDTH = 800,
-		DEFAULT_CANVAS_HEIGHT = 500,
+		DEFAULT_CANVAS_HEIGHT = 480,
 		DEFAULT_CELL_WIDTH = 24,
 		DEFAULT_CELL_HEIGHT = 24,
 		ID_LABEL_WIDTH = 24,
@@ -245,7 +245,6 @@
 			hSeparator = idArea.y + idArea.h + 0.5;
 
 		ctx.strokeRect(displayArea.x + 0.5, displayArea.y + 0.5, displayArea.w - 1, displayArea.h - 1);
-
 		ctx.beginPath();
 		
 		ctx.moveTo(vSeparator, topEdge);
