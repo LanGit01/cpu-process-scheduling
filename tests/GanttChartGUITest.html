@@ -2,7 +2,7 @@
 	<head>
 		<style>
 			canvas {
-				border: 1px solid black;
+				border: 1px solid red;
 			}
 
 
@@ -84,7 +84,7 @@
 					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
 					ganttChart.initialize(document.getElementById("gantt-chart-canvas"));
-					ganttChart.setPosition(2000, 0);
+					ganttChart.setPosition(0, 0);
 					ganttChart.draw();
 				}
 		</script>

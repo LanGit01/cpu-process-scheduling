@@ -82,6 +82,9 @@
 
 		this.computeDimensions();
 
+		this._bufferCanvas.ctx.fillStyle = "#000000";
+		this._bufferCanvas.ctx.strokeStyle = "#000000";
+
 		// Initialize label strips
 		this._idLabelStrip.initializeStripImage(this._ids, DEFAULT_FONT_SIZE + "px " + DEFAULT_FONT);
 		
@@ -234,14 +237,14 @@
 	\*-----------------------------------------------*/
 
 	function drawBorders(ctx, displayArea, idArea){
-		var leftEdge = displayArea.x,
+		var leftEdge = displayArea.x + MAIN_BORDER_SIZE,
 			rightEdge = displayArea.x + displayArea.w - 1,
-			topEdge = displayArea.y,
+			topEdge = displayArea.y + MAIN_BORDER_SIZE,
 			bottomEdge = displayArea.y + displayArea.h - 1,
 			vSeparator = idArea.x + idArea.w + 0.5,
 			hSeparator = idArea.y + idArea.h + 0.5;
 
-		ctx.strokeRect(displayArea.x, displayArea.y, displayArea.w, displayArea.h);
+		ctx.strokeRect(displayArea.x + 0.5, displayArea.y + 0.5, displayArea.w - 1, displayArea.h - 1);
 
 		ctx.beginPath();
 		
