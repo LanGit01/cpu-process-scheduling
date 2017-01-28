@@ -7,15 +7,21 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/PriorityScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/DataTransformer.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/ChartGridArea.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/LabelStrip.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUI.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
 				PriorityScheduler = CPUscheduling.PriorityScheduler,
-				TextDisplay = CPUscheduling.TextDisplay;
+				TextDisplay = CPUscheduling.TextDisplay,
+				DataTransformer = CPUscheduling.DataTransformer,
+				GanttChartGUI = CPUscheduling.GanttChartGUI;
 
 				var pm = new ProcessManager(),
-					logs, pids, processList;
+					logs, pids, processList, ganttChart, data;
 
 
 				pm.setScheduler(new PriorityScheduler(false));
@@ -56,6 +62,8 @@
 					}
 				});
 
+				data = DataTransformer.transform(record);
+
 				
 				window.onload = function(){
 					var div;
@@ -65,7 +73,10 @@
 					div = document.getElementById("table-text");
 					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
-					//div = document.getElementById("gantt-chart-canvas");
+					div = document.getElementById("gantt-chart-canvas");
+					ganttChart = new GanttChartGUI(data.rowids, data.logs);
+					ganttChart.init(div, null);
+					ganttChart.draw();
 					//div.appendChild(ganttChart.initDisplay());
 					//ganttChart.setPosition(495, 0);
 					//ganttChart.draw();
@@ -78,6 +89,7 @@
 		<pre>
 			<div id = "gantt-chart-text"></div>
 			<div id = "table-text"></div>
+			<div id = "gantt-chart-canvas"></div>
 		</pre>
 	</body>
 </html>

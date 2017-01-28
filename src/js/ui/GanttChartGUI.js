@@ -31,10 +31,11 @@
 	 *	@param ids [array]
 	 *	@param logs [array]
 	 */
-	function GanttChartGUI(ids, logs){
+	function GanttChartGUI(rowids, logs){
 		// Data
-		this._ids = ids;
+		this._rowids = rowids;
 		this._logs = logs;
+
 
 		this._config = null;
 
@@ -62,7 +63,7 @@
 
 
 
-	GanttChartGUI.prototype.initialize = function(container, config){
+	GanttChartGUI.prototype.init = function(container, config){
 		/*
 		 *	Config:
 		 *		- Canvas Dimensions
@@ -86,7 +87,7 @@
 		this._bufferCanvas.ctx.strokeStyle = "#000000";
 
 		// Initialize label strips
-		this._idLabelStrip.initializeStripImage(this._ids, DEFAULT_FONT_SIZE + "px " + DEFAULT_FONT);
+		this._idLabelStrip.initializeStripImage(this._rowids, DEFAULT_FONT_SIZE + "px " + DEFAULT_FONT);
 		
 		for(time = 0; time < this._logs.length; time++){
 			timeArr[time] = time;
@@ -118,7 +119,7 @@
 		);
 
 		idSize = new Dimensions(
-			DEFAULT_FONT_SIZE + getAdjustedStringWidth(ctx, getLargestNumber(this._ids).toString()),
+			DEFAULT_FONT_SIZE + getAdjustedStringWidth(ctx, getLargestNumber(this._rowids).toString()),
 			Math.max(dCellHeight, 2 * DEFAULT_FONT_SIZE)
 		);
 
@@ -131,7 +132,7 @@
 		// Full Grid Area
 		fgArea = new Dimensions(
 			this._logs.length * gcSize.w - MAIN_BORDER_SIZE,
-			this._ids.length * gcSize.h - MAIN_BORDER_SIZE
+			this._rowids.length * gcSize.h - MAIN_BORDER_SIZE
 		);
 
 		// Display Area
@@ -174,7 +175,7 @@
 			fullGridDimensions: fgArea,
 			viewArea: gArea,
 			cellDimensions: gcSize,
-			ids: this._ids,
+			rowids: this._rowids,
 			logs: this._logs
 		});
 

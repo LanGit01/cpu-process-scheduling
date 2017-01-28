@@ -24,13 +24,14 @@
 		//this._mainGUI = mainGUI;
 
 		// Data
-		this._ids = values.ids;
+		this._rowids = values.rowids;
 		this._logs = values.logs;
-		this._idRowMap = (function(){
-			var i, len = values.ids.length, map = {};
+
+		this._rowMapping = (function(){
+			var i, len = values.rowids.length, map = {};
 
 			for(i = 0; i < len; i++){
-				map[values.ids[i]] = i;
+				map[values.rowids[i]] = i;
 			}
 
 			return map;
@@ -74,8 +75,8 @@
 		rowStart = ~~(y / ch);
 		rowEnd = rowStart + ~~((this._viewArea.h - yOffset - 1) / cw) + 1;
 
-		if(rowEnd > this._ids.length){
-			rowEnd = this._ids.length;
+		if(rowEnd > this._rowids.length){
+			rowEnd = this._rowids.length;
 		}
 
 
@@ -123,7 +124,7 @@
 
 			// Draw running (if there is)
 			if(log && log.running){
-				row = this._idRowMap[log.running.id];
+				row = this._rowMapping[log.running.rowid];
 
 				// If visible
 				if(row >= rowStart && row < rowEnd){
@@ -139,7 +140,7 @@
 				waiting = log.waiting;
 
 				for(i = 0; i < waiting.length; i++){
-					row = this._idRowMap[waiting[i].id];
+					row = this._rowMapping[waiting[i].rowid];
 
 					// If visible
 					if(row >= rowStart && row < rowEnd){

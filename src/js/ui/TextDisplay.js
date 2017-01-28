@@ -96,7 +96,7 @@
 
 			waiting = log.waiting;
 			for(i = 0; i < waiting.length; i++){
-				id = waiting[i].id;
+				id = waiting[i].process.id;
 
 				if(processLines[id] || processLines[id] === ""){
 					processLines[id] += leftPad + "W" + rightPad;
