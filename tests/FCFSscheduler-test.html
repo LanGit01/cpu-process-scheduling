@@ -12,14 +12,16 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
-		<script type = "text/javascript" src = "../src/js/ui/GanttChartUI.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/DataTransformer.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUI.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
 				FCFSScheduler = CPUscheduling.FCFSScheduler,
 				TextDisplay = CPUscheduling.TextDisplay,
-				GanttChartUI = CPUscheduling.GanttChartUI;
+				DataTransformer = CPUscheduling.DataTransformer,
+				GanttChartGUI = CPUscheduling.GanttChartGUI;
 
 
 			var pm = new ProcessManager(),
@@ -56,7 +58,8 @@
 				div = document.getElementById("table-text");
 				div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
-				//div = document.getElementById("gantt-chart-canvas");
+				div = document.getElementById("gantt-chart-canvas");
+				console.log(DataTransformer.transform(record));
 				//div.appendChild(ganttChart.initDisplay());
 				//ganttChart.setPosition(495, 0);
 				//ganttChart.draw();
