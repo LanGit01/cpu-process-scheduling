@@ -7,7 +7,7 @@
 
 			var rowids, rowidPrefix,
 				log, logItr, i,
-				waiting, newWaiting = [], newLogs = [],
+				waiting, newWaiting, newLogs = [],
 				transformFunc;
 
 
@@ -33,6 +33,7 @@
 
 				// transform each waiting
 				waiting = log.waiting;
+				newWaiting = [];
 				for(i = 0; i < waiting.length; i++){
 					newWaiting[i] = transformFunc(waiting[i]);
 				}
