@@ -29,6 +29,11 @@
 	}
 
 
+	FCFSScheduler.prototype.isMultilevel = function(){
+		return false;
+	}
+
+
 	FCFSScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}

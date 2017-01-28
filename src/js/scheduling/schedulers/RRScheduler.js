@@ -32,6 +32,11 @@
 		}
 	}
 
+	RRScheduler.prototype.isMultilevel = function(){
+		return false;
+	}
+
+
 	RRScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}

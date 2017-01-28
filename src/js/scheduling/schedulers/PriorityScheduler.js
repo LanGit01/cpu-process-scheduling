@@ -33,6 +33,11 @@
 	}
 
 
+	PriorityScheduler.prototype.isMultilevel = function(){
+		return false;
+	}
+
+
 	PriorityScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}

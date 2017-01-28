@@ -29,6 +29,11 @@
 	}
 
 
+	SJFScheduler.prototype.isMultilevel = function(){
+		return false;
+	}
+
+
 	SJFScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}
