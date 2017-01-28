@@ -49,6 +49,17 @@
 	}
 
 
+	SJFScheduler.prototype.getProcesses = function(){
+		var processes = this._waitingProcesses.toArray();;
+
+		if(this._runningProcess){
+			processes[processes.length] = this._runningProcess;
+		}
+
+		return processes;
+	}
+
+
 	SJFScheduler.prototype.setLogger = function(logger){
 		this._logger = logger;
 	}
