@@ -32,10 +32,16 @@
 
 
 	Record.prototype.log = function(runningProcess, waitingProcesses){
-		var i, waiting = [], itr = waitingProcesses.getIterator();
+		/*var i, waiting = [], itr = waitingProcesses.getIterator();
 
 		while(itr.hasNext()){
 			waiting[waiting.length] = this._createProcessLog(itr.getNext());
+		}*/
+
+		var i, waiting = [];
+
+		for(i = 0; i < waitingProcesses.length; i++){
+			waiting[waiting.length] = this._createProcessLog(waitingProcesses[i]);
 		}
 
 		this._logs.insert({

@@ -31,6 +31,10 @@
 			priority = Process.NO_VALUE;
 		}
 
+		if(typeof level === "undefined"){
+			level = null;
+		}
+
 		this._processData.insert({
 			insertLevel: level,
 			process: new Process(id, burstTime, arrivalTime, priority)
