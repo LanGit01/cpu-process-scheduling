@@ -17,7 +17,7 @@
 	}
 
 
-	Record.prototype.getLevels = function(){
+	Record.prototype.getNumLevels = function(){
 		return this._levels;
 	}
 
@@ -35,7 +35,7 @@
 		var i, waiting = [], itr = waitingProcesses.getIterator();
 
 		while(itr.hasNext()){
-			waiting[waiting.length] = itr.getNext();
+			waiting[waiting.length] = this._createProcessLog(itr.getNext());
 		}
 
 		this._logs.insert({
@@ -71,7 +71,7 @@
 
 	function singlelevelCreateProcessLog(d){
 		if(!d){
-			return d;
+			return null;
 		}
 
 		return {
