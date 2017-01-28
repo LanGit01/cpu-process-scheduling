@@ -8,7 +8,7 @@
 
 	var Process = global.CPUscheduling.Process,
 		LinkedList = global.CPUscheduling.LinkedList,
-		SchedulerLog = global.CPUscheduling.SchedulerLog;
+		Record = global.CPUscheduling.Record;
 
 
 
@@ -22,7 +22,6 @@
 		// compareArrivalTime ensures list is sorted in ascending arrival time
 		this._processData = new LinkedList(compareArrivalTime, getProcessID);
 		this._scheduler = null;
-		this._logger = new SchedulerLog();
 	}
 
 
@@ -73,16 +72,36 @@
 	}
 
 
+	ProcessManager.prototype.getProcessIDs = function(){
+		var itr = this._processData.getIterator(),
+			ids = [];
+
+		while(itr.hasNext()){
+			ids[ids.length] = itr.getNext().process.id;
+		}
+
+		return ids;
+	}
+
+
 	ProcessManager.prototype.run = function(){
 		var processDataItr = this._processData.getIterator(),
 			time = 0, 
 			running, nextArrivalTime, process,
-			nextProcess = null, arrivedProcess = null;
+			nextProcess = null, arrivedProcess = null,
+			record;
 		
+
 		if(!processDataItr.hasNext()){
 			return;
-		}	
+		}
 
+		if(this._scheduler.isMultilevel()){
+			record = new Record(this.getProcessIDs(), this._scheduler.getNumLevels());
+		}else{
+			record = new Record(this.getProcessIDs());	
+		}
+		
 		running = true;
 		nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
 
@@ -117,12 +136,12 @@
 			if(!processDataItr.hasNext() && !this._scheduler.hasRunningProcess()){
 				running = false;
 			}else{
-				this._logger.log(this._scheduler.getRunningProcess(), this._scheduler.getWaitingProcesses());
+				record.log(this._scheduler.getRunningProcess(), this._scheduler.getWaitingProcesses());
 				time++;
 			}
 		}
 
-		return this._logger.getLogs();
+		return record;
 	}
 
 

@@ -22,7 +22,7 @@
 			case "PID": value = process.id; break;
 			case "BT": value = process.burstTime; break;
 			case "AT": value = process.arrivalTime; break;
-			case "Priority": value = process.priority !== Process.NO_VALUE || TEXT_NONE; break;
+			case "Priority": value = (process.priority === Process.NO_VALUE ? TEXT_NONE : process.priority); break;
 			case "ST": value = process.startTime; break;
 			case "ET": value = process.endTime; break;
 			case "WT": value = process.getWaitTime(); break;
@@ -84,7 +84,7 @@
 
 			// Place marks on active processes (running or waiting processes)
 			if(log.running){
-				id = log.running.id;
+				id = log.running.process.id;
 
 				// Note: "" converts to false
 				if(processLines[id] || processLines[id] === ""){
@@ -146,8 +146,9 @@
 			header = headers[i];
 
 			maxWidth = header.length;
+
 			for(j = 0; j < processes.length; j++){
-				width = ('' + getProcessData(header, processes[j])).length;
+				width = ('' + getProcessData(header, processes[j].process)).length;
 
 				if(width > maxWidth){
 					maxWidth = width;
@@ -170,7 +171,7 @@
 		tableText += "\n" + hr + "\n";
 		
 		for(i = 0; i < processes.length; i++){
-			process = processes[i];
+			process = processes[i].process;
 
 			tableText += "|";
 			for(j = 0; j < headers.length; j++){

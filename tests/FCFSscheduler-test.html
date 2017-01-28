@@ -8,7 +8,7 @@
 		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
-		<script type = "text/javascript" src = "../src/js/scheduling/SchedulerLog.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Record.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
@@ -24,7 +24,7 @@
 
 			var pm = new ProcessManager(),
 				itr, p,
-				log, logs, logsItr, time, text,
+				log, logsItr, time, text,
 				ganttChart;
 
 
@@ -35,13 +35,8 @@
 			pm.addProcess(4, 5, 15);
 
 
-			logs = pm.run();
-			pids = [];
-
-			processList = selectionSort(pm.getProcesses(), function(p1, p2){
-				var id1 = p1.id,
-					id2 = p2.id;
-
+			record = pm.run();
+			pids = selectionSort(record.getPIDs(), function(id1, id2){
 				if(id1 > id2){
 					return 1;
 				}else
@@ -52,27 +47,19 @@
 				}
 			});
 
-			for(i = 0; i < processList.length; i++){
-				pids[i] = processList[i].id;
-			}
-
-
-			ganttChart = new GanttChartUI(pids, logs);
-
-
 				
 			window.onload = function(){
 				var div;
 				div = document.getElementById("gantt-chart-text");
-				div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, logs)));
+				div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, record.getLogs())));
 				
 				div = document.getElementById("table-text");
-				div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(processList)));
+				div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
-				div = document.getElementById("gantt-chart-canvas");
-				div.appendChild(ganttChart.initDisplay());
-				ganttChart.setPosition(495, 0);
-				ganttChart.draw();
+				//div = document.getElementById("gantt-chart-canvas");
+				//div.appendChild(ganttChart.initDisplay());
+				//ganttChart.setPosition(495, 0);
+				//ganttChart.draw();
 				//ganttChart.drawChart();
 				//ganttChart.drawLabels();
 			}
