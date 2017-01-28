@@ -20,21 +20,27 @@
 	 */
 	function ProcessManager(){
 		// compareArrivalTime ensures list is sorted in ascending arrival time
-		this._processes = new LinkedList(compareArrivalTime, getProcessID);
+		this._processData = new LinkedList(compareArrivalTime, getProcessID);
 		this._scheduler = null;
 		this._logger = new SchedulerLog();
 	}
 
 
-	ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime, priority){
+	ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime, priority, level){
 		// Add  argument validation later
-		priority = priority || Process.NO_VALUE;
-		this._processes.insert(new Process(id, burstTime, arrivalTime, priority));
+		if(typeof priority === "undefined"){
+			priority = Process.NO_VALUE;
+		}
+
+		this._processData.insert({
+			insertLevel: level,
+			process: new Process(id, burstTime, arrivalTime, priority)
+		});
 	}
 
 
 	ProcessManager.prototype.removeProcess = function(id){
-		return this._processes.remove(id);
+		return this._processData.remove(id);
 	}
 
 
@@ -57,7 +63,7 @@
 	 */
 	ProcessManager.prototype.getProcesses = function(){
 		var processList = [],
-			itr = this._processes.getIterator();
+			itr = this._processData.getIterator();
 
 		while(itr.hasNext()){
 			processList[processList.length] = itr.getNext();
@@ -68,28 +74,28 @@
 
 
 	ProcessManager.prototype.run = function(){
-		var processItr = this._processes.getIterator(),
+		var processDataItr = this._processData.getIterator(),
 			time = 0, 
 			running, nextArrivalTime, process,
 			nextProcess = null, arrivedProcess = null;
-
 		
-		if(!processItr.hasNext()){
+		if(!processDataItr.hasNext()){
 			return;
 		}	
 
 		running = true;
-		nextArrivalTime = processItr.peekNext().arrivalTime;
+		nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
 
 		while(running){
-			if(processItr.hasNext() && time === nextArrivalTime){
+			if(processDataItr.hasNext() && time === nextArrivalTime){
 				// add process to scheduler
 				do{
-					this._scheduler.newArrivingProcess(processItr.getNext());
-				}while(processItr.hasNext() && processItr.peekNext().arrivalTime === time);
+					nextProcessData = processDataItr.getNext();
+					this._scheduler.newArrivingProcess(nextProcessData.process, nextProcessData.level);
+				}while(processDataItr.hasNext() && processDataItr.peekNext().process.arrivalTime === time);
 
-				if(processItr.hasNext()){
-					nextArrivalTime = processItr.peekNext().arrivalTime;
+				if(processDataItr.hasNext()){
+					nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
 				}
 			}
 
@@ -108,7 +114,7 @@
 			}
 
 			// check if still running
-			if(!processItr.hasNext() && !this._scheduler.hasRunningProcess()){
+			if(!processDataItr.hasNext() && !this._scheduler.hasRunningProcess()){
 				running = false;
 			}else{
 				this._logger.log(this._scheduler.getRunningProcess(), this._scheduler.getWaitingProcesses());
@@ -116,17 +122,23 @@
 			}
 		}
 
-
 		return this._logger.getLogs();
 	}
 
 
 
-
-	/*		Auxillary functions		*/
+	/* -------------------------------------------------------- *\
+						Auxillary Functions
+	\* -------------------------------------------------------- */
+	
+	/*
+	 *	Data structure:
+	 *		- level
+	 *		- process	
+	 */
 	function compareArrivalTime(p1, p2){
-		var at1 = p1.arrivalTime,
-			at2 = p2.arrivalTime;
+		var at1 = p1.process.arrivalTime,
+			at2 = p2.process.arrivalTime;
 
 		if(at1 > at2){
 			return 1;
@@ -139,9 +151,10 @@
 	}
 
 
-	function getProcessID(process){
-		return process.id;
+	function getProcessID(p){
+		return p.process.id;
 	}
+
 
 	global.CPUscheduling.ProcessManager = ProcessManager;
 
