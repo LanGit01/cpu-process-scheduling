@@ -51,42 +51,90 @@
 	}
 
 
+
 	Record.prototype.getLogs = function(){
 		return this._logs;
+	}
+
+
+	Record.prototype.log = function(runningProcess, waitingProcesses){
+		/**
+		 *	Single Level: {
+		 *		running: process,
+		 *		waiting: Array[process]
+		 *	}
+		 *
+		 *	Multi level: {
+		 *		running: process,
+		 *		waiting: processes: Array[process]
+		 *	}
+		 */
+		 var i, waiting = [];
+
+		 if(this.isMultilevel()){
+
+		 }
+	}
+
+
+	function multilevelLog(runningProcess, waitingLevels){
+		var i, j, running, waiting = [], level, waitingProcesses;
+
+		if(runningProcess){
+			running = createProcessData(runningProcess.process, runningProcess.level);
+		}
+
+		for(i = 0; i < waitingLevels.length; i++){
+			level = waitingLevels[i].level
+			waitingProcesses = waitingLevels[i].process;
+
+			for(j = 0; j < waitingProcesses.length; j++){
+				waiting[waiting.length] = createProcessData(waitingProcesses[j], level);
+			}
+		}
+
+		return {
+			running: running,
+			waiting: waiting
+		};
+	}
+
+
+	function singlelevelLog(runningProcess, waitingProcesses){
+		var i, waiting = [];
+
+		for(i = 0; i < waitingProcesses.length; i++){
+			waiting[waiting.length] = createProcessData(waitingProcesses[i]);
+		}
+
+		return {
+			running: createProcessData(runningProcess),
+			waiting: waiting
+		}
+	}
+
+
+	function createProcessData(p, level){
+		if(!p){
+			return null;
+		}
+
+		var pData = {
+			id: p.id,
+			remainingTime: p.remainingTime
+		};
+
+		if(level){
+			pData.level = level;
+		}
+
+		return pData;
 	}
 
 
 	/*---------------------------------------------*\
 					Private Functions
 	\*---------------------------------------------*/
-	
-	function multilevelCreateProcessLog(d){
-		if(!d){
-			return null;
-		}
-
-		return {
-			level: d.level,
-			process: {
-				id: d.process.id,
-				remainingTime: d.process.remainingTime
-			}
-		};
-	}
-
-
-	function singlelevelCreateProcessLog(d){
-		if(!d){
-			return null;
-		}
-
-		return {
-			process: {
-				id: d.id,
-				remainingTime: d.remainingTime
-			}
-		};
-	}
 
 
 	global.CPUscheduling.Record = Record;
