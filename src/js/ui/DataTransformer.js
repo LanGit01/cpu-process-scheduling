@@ -12,43 +12,34 @@
 		 *	markData = {rowid, pid}
 		 */
 		transform: function(record){
-			var logsItr = record.getLogs().getIterator(), newLogs = [],
-				transformRunning, transformWaiting,
-				i, numLevels, rowids;
-
+			var transformLog, rowids, logs, logsItr,
+				log, numLevels, i;
 
 			if(record.isMultilevel()){
-				transformRunning = transformMultilevelRunning;
-				transformWaiting = transformMultilevelWaiting;
-				
+				transformLog = transformLogMultilevel;
+
 				numLevels = record.getNumLevels();
 				i = 0;
 				rowids = [];
 				while(i < numLevels){
 					rowids[i] = i++;
 				}
+
 			}else{
-				transformRunning = transformSinglelevelRunning;
-				transformWaiting = transformSinglelevelWaiting;
-					
-				rowids =  record.getPIDs();
+				transformLog = transformLogSimple;
+				rowids = record.getPIDs();
 			}
 
-
-			logIndex = 0;
+			logs = [];
+			logsItr = record.getLogs().getIterator();
 			while(logsItr.hasNext()){
-				log = logsItr.getNext();
-
-				newLogs[logIndex++] = {
-					running: transformRunning(log.running),
-					waiting: transformWaiting(log.waiting)
-				}
+				logs[logs.length] = transformLog(logsItr.getNext());
 			}
 
 			return {
 				rowids: rowids,
-				logs: newLogs
-			};
+				logs: logs
+			}
 		}
 
 	}
@@ -57,6 +48,62 @@
 	/*---------------------------------------------*\
 					Private Functions
 	\*---------------------------------------------*/
+
+
+
+	function transformLogSimple(log){
+		var newLog = {}, newWaiting = [], i,
+			running = log.running,
+			waiting = log.waiting;
+
+		if(running){
+			newLog.running = {
+				rowid: running.id,
+				pid: running.id
+			};
+		}
+
+		for(i = 0; i < waiting.length; i++){
+			newWaiting[i] = {
+				rowid: waiting[i].id,
+				pid: waiting[i].id
+			}
+		}
+
+		newLog.waiting = newWaiting;
+		return newLog;
+	}
+
+
+	function transformLogMultilevel(log){
+		var newLog = {}, newWaiting = [], i, level = -1,
+			running = log.running,
+			waiting = log.waiting;
+
+		if(running){
+			newLog.running = {
+				rowid: running.level,
+				pid: running.id,
+			};
+
+			level = running.level;
+		}
+
+		for(i = 0; i < waiting.length; i++){
+			if(waiting[i].level > level){
+				level = waiting[i].level;
+
+				newWaiting[newWaiting.length] = {
+					rowid: level,
+					pid: waiting[i].id
+				};
+			}
+		}
+
+		newLog.waiting = newWaiting;
+		return newLog;
+	}
+
 
 	function transformSinglelevelRunning(process){
 		if(!process){

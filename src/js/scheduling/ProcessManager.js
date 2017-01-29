@@ -36,7 +36,7 @@
 		}
 
 		this._processData.insert({
-			insertLevel: level,
+			insertLevel: level - 1,
 			process: new Process(id, burstTime, arrivalTime, priority)
 		});
 	}
@@ -90,7 +90,8 @@
 
 	ProcessManager.prototype.run = function(){
 		var processDataItr = this._processData.getIterator(),
-			time = 0, 
+			time = 0, level, 
+			isMultilevel = this._scheduler.isMultilevel(),
 			running, nextArrivalTime, process,
 			nextProcessData = null,
 			record;
@@ -100,7 +101,7 @@
 			return;
 		}
 
-		if(this._scheduler.isMultilevel()){
+		if(isMultilevel){
 			record = new Record(this.getProcessIDs(), this._scheduler.getNumLevels());
 		}else{
 			record = new Record(this.getProcessIDs());	
@@ -114,7 +115,7 @@
 				// Add arriving process to scheduler
 				do{
 					nextProcessData = processDataItr.getNext();
-					this._scheduler.newArrivingProcess(nextProcessData.process, nextProcessData.level);
+					this._scheduler.newArrivingProcess(nextProcessData.process, nextProcessData.insertLevel);
 				}while(processDataItr.hasNext() && processDataItr.peekNext().process.arrivalTime === time);
 
 				if(processDataItr.hasNext()){
@@ -141,6 +142,7 @@
 				running = false;
 			}else{
 				record.log(this._scheduler.getRunningProcess(), this._scheduler.getWaitingProcesses());
+				//console.log(this._scheduler.getRunningProcess());
 				time++;
 			}
 		}

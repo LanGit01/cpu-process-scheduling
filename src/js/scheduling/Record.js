@@ -101,9 +101,9 @@
 		var pData = {
 			id: p.id,
 			remainingTime: p.remainingTime
-		};
+		}
 
-		if(level){
+		if(level > -1){
 			pData.level = level;
 		}
 
