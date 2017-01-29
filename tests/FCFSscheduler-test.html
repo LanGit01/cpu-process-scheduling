@@ -39,7 +39,18 @@
 			pm.addProcess(4, 5, 15);
 
 
+
 			record = pm.run();
+			var logs = record.getLogs().toArray();
+
+			for(var i = 0; i < logs.length; i++){
+				console.log("#" + i + "\n" +
+					"R: " + (logs[i].running ? 1 : 0) + "\n" +
+					"W: " + (logs[i].waiting.length)
+				);
+			}
+
+			/*
 			pids = selectionSort(record.getPIDs(), function(id1, id2){
 				if(id1 > id2){
 					return 1;
@@ -51,21 +62,25 @@
 				}
 			});
 
-			data = DataTransformer.transform(record);
+			//var testlog = record.getLogs();
+
+			console.log(testlog);*/
+
+			//data = DataTransformer.transform(record);
 
 				
 			window.onload = function(){
 				var div;
 				div = document.getElementById("gantt-chart-text");
-				div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, record.getLogs())));
+				//div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, record.getLogs())));
 				
 				div = document.getElementById("table-text");
-				div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
+				//div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
 				div = document.getElementById("gantt-chart-canvas");
-				ganttChart = new GanttChartGUI(data.rowids, data.logs);
-				ganttChart.init(div, null);
-				ganttChart.draw();
+				//ganttChart = new GanttChartGUI(data.rowids, data.logs);
+				//ganttChart.init(div, null);
+				//ganttChart.draw();
 				//div.appendChild(ganttChart.initDisplay());
 				//ganttChart.setPosition(495, 0);
 				//ganttChart.draw();
