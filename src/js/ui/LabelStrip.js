@@ -73,7 +73,6 @@
 
 		if(this.horizontal){
 			sw = Math.min(sw - Math.abs(offset), this.w);
-			console.log(this._img.width);
 			ctx.drawImage(this._img, offset, 0, this.w, this.h, this.x, this.y, this.w, this.h);
 		}else{
 			sh = Math.min(sh - Math.abs(offset), this.h);

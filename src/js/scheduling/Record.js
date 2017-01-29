@@ -1,10 +1,11 @@
 (function(global){
 
-	var LinkedList = global.CPUscheduling.LinkedList;
+	var LinkedList = global.CPUscheduling.LinkedList,
+		selectionSort = global.selectionSort;
 
 
 	function Record(pids, levels){
-		this._pids = pids;
+		this._pids = selectionSort(pids, compareNum);
 		this._logs = new LinkedList();
 		this._levels = levels || null;
 	}
@@ -54,7 +55,6 @@
 	/*---------------------------------------------*\
 					Private Functions
 	\*---------------------------------------------*/
-
 
 	function multilevelLog(runningProcess, waitingLevels){
 		var i, j, running, waiting = [], level, waitingProcesses;
@@ -108,6 +108,18 @@
 		}
 
 		return pData;
+	}
+
+
+	function compareNum(a, b){
+		if(a > b){
+			return 1;
+		}else
+		if(a < b){
+			return -1;
+		}else{
+			return 0;
+		}
 	}
 
 

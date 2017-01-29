@@ -1,81 +1,120 @@
 (function(global){
 
 	var DataTransformer = {
+		/**
+		 *	Returns an object {rowids, logs}
+		 *
+		 *	logs [array] = {
+		 *		running: markData, 
+		 *		waiting: Array[markData]
+		 *	}
+		 *
+		 *	markData = {rowid, pid}
+		 */
 		transform: function(record){
-			var rowids, rowidPrefix, log, logItr, transformFunc, i,
-				waiting, newWaiting, newLogs = [];
-
-			var rowids, rowidPrefix,
-				log, logItr, i,
-				waiting, newWaiting, newLogs = [],
-				transformFunc;
+			var logsItr = record.getLogs().getIterator(), newLogs = [],
+				transformRunning, transformWaiting,
+				i, numLevels, rowids;
 
 
 			if(record.isMultilevel()){
+				transformRunning = transformMultilevelRunning;
+				transformWaiting = transformMultilevelWaiting;
+				
+				numLevels = record.getNumLevels();
+				i = 0;
 				rowids = [];
-
-				for(i = 0; i < record.getNumLevels(); i++){
-					rowids[i] = i;
+				while(i < numLevels){
+					rowids[i] = i++;
 				}
-
-				transformFunc = multilevelTransform;
-				rowidPrefix = "L";
 			}else{
-				rowids = record.getPIDs();
-				transformFunc = singlelevelTransform;
-				rowidPrefix = "P";
+				transformRunning = transformSinglelevelRunning;
+				transformWaiting = transformSinglelevelWaiting;
+					
+				rowids =  record.getPIDs();
 			}
 
-			// Transform logs
-			logItr = record.getLogs().getIterator();
-			while(logItr.hasNext()){
-				log = logItr.getNext();
 
-				// transform each waiting
-				waiting = log.waiting;
-				newWaiting = [];
-				for(i = 0; i < waiting.length; i++){
-					newWaiting[i] = transformFunc(waiting[i]);
-				}
+			logIndex = 0;
+			while(logsItr.hasNext()){
+				log = logsItr.getNext();
 
-				newLogs[newLogs.length] = {
-					running: transformFunc(log.running),
-					waiting: newWaiting
+				newLogs[logIndex++] = {
+					running: transformRunning(log.running),
+					waiting: transformWaiting(log.waiting)
 				}
 			}
 
 			return {
 				rowids: rowids,
 				logs: newLogs
+			};
+		}
+
+	}
+
+
+	/*---------------------------------------------*\
+					Private Functions
+	\*---------------------------------------------*/
+
+	function transformSinglelevelRunning(process){
+		if(!process){
+			return null;
+		}
+
+		return {
+			rowid: process.id,
+			pid: process.id
+		};
+	}
+
+
+	function transformMultilevelRunning(process){
+		if(!process){
+			return null;
+		}
+
+		return {
+			rowid: process.level,
+			pid: process.id
+		};
+	}
+
+
+	function transformSinglelevelWaiting(waiting){
+		var i, newWaiting = [], id;
+
+		for(i = 0; i < waiting.length; i++){
+			pid = waiting[i].id;
+
+			newWaiting[i] = {
+				rowid: pid,
+				pid: pid
 			}
 		}
+
+		return newWaiting;
 	}
 
+
+	function transformMultilevelWaiting(waiting){
+		var i, level = -1, newWaiting = [];
+
+		for(i = 0; i < waiting.length; i++){
+			if(waiting[i].level > level){
+				level = waiting[i].level;
+
+				newWaiting[newWaiting.length] = {
+					rowid: level,
+					pid: level.pid
+				}
+			}
+		}
+
+		return newWaiting;
+	}
 	
-
-	function singlelevelTransform(d){
-		if(!d){
-			return null;
-		}
-
-		return {
-			rowid: d.process.id,
-			pid: d.process.id
-		};
-	}
-
-
-	function multilevelTransform(d){
-		if(!d){
-			return null;
-		}
-
-		return {
-			rowid: d.level,
-			pid: d.process.id
-		};
-	}
-
 
 	global.CPUscheduling.DataTransformer = DataTransformer;
 

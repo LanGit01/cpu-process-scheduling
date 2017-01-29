@@ -12,16 +12,18 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/ui/TextDisplay.js"></script>
-		<script type = "text/javascript" src = "../src/js/ui/GanttChartUI.js"></script>
-		<script type = "text/javascript" src = "../src/js/ui/GanttChartUIControl.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/DataTransformer.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/ChartGridArea.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/LabelStrip.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUI.js"></script>
 		<script>
 			var Process = CPUscheduling.Process,
 				LinkedList = CPUscheduling.LinkedList,
 				ProcessManager = CPUscheduling.ProcessManager,
 				RRScheduler = CPUscheduling.RRScheduler,
 				TextDisplay = CPUscheduling.TextDisplay,
-				GanttChartUI = CPUscheduling.GanttChartUI,
-				GanttChartUIControl = CPUscheduling.GanttChartUIControl;
+				DataTransformer = CPUscheduling.DataTransformer,
+				GanttChartGUI = CPUscheduling.GanttChartGUI;
 
 				var pm = new ProcessManager(),
 					logs, pids, itr, ganttChart;
@@ -50,27 +52,22 @@
 				pm.addProcess(9, 10, 61);
 
 				record = pm.run();
-				pids = selectionSort(record.getPIDs(), function(id1, id2){
-					if(id1 > id2){
-						return 1;
-					}else
-					if(id1 < id2){
-						return -1;
-					}else{
-						return 0;
-					}
-				});
+				var data = DataTransformer.transform(record);
 
-					
+
+				
 				window.onload = function(){
 					var div;
 					div = document.getElementById("gantt-chart-text");
-					div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, record.getLogs())));
+					//div.appendChild(document.createTextNode(TextDisplay.generateTextGanttChart(pids, record.getLogs())));
 					
 					div = document.getElementById("table-text");
-					div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
+					//div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
-					//div = document.getElementById("gantt-chart-canvas");
+					div = document.getElementById("gantt-chart-canvas");
+					ganttChart = new GanttChartGUI(data);
+					ganttChart.init(div, null);
+					ganttChart.draw();
 					//div.appendChild(ganttChart.initDisplay());
 					//ganttChart.setPosition(495, 0);
 					//ganttChart.draw();

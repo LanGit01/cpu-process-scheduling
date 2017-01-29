@@ -20,28 +20,37 @@
 	 *		- ids
 	 *		- logs
 	 */
-	function ChartGridArea(values){
-		//this._mainGUI = mainGUI;
+	function ChartGridArea(rowids, logs, measurements){
+		/**
+		 *	Returns an object {rowids, logs}
+		 *
+		 *	logs [array] = {
+		 *		running: markData, 
+		 *		waiting: Array[markData]
+		 *	}
+		 *
+		 *	markData = {rowid, pid}
+		 */
 
 		// Data
-		this._rowids = values.rowids;
-		this._logs = values.logs;
+		this._rowids = rowids;
+		this._logs = logs;
 
+		// Maps the rowids to the actual grid rows
 		this._rowMapping = (function(){
-			var i, len = values.rowids.length, map = {};
+			var i, len = rowids.length, map = {};
 
 			for(i = 0; i < len; i++){
-				map[values.rowids[i]] = i;
+				map[rowids[i]] = i;
 			}
 
 			return map;
 		})();
 
-
 		// Dimensions
-		this._fullGridDimensions = values.fullGridDimensions;
-		this._viewArea = values.viewArea;
-		this._cellDimensions = values.cellDimensions;
+		this._fullGridDimensions = measurements.fullGridDimensions;
+		this._viewArea = measurements.viewArea;
+		this._cellDimensions = measurements.cellDimensions;
 
 		this._imagesheet = createMarkImagesheet(this._cellDimensions.w - 1, this._cellDimensions.h - 1);
 	}
@@ -125,7 +134,7 @@
 			// Draw running (if there is)
 			if(log && log.running){
 				row = this._rowMapping[log.running.rowid];
-
+				
 				// If visible
 				if(row >= rowStart && row < rowEnd){
 					y = yOffset + ((row - rowStart) * ch);

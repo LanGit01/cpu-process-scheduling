@@ -41,32 +41,8 @@
 
 
 			record = pm.run();
-			var logs = record.getLogs().toArray();
+			var data = DataTransformer.transform(record);
 
-			for(var i = 0; i < logs.length; i++){
-				console.log("#" + i + "\n" +
-					"R: " + (logs[i].running ? 1 : 0) + "\n" +
-					"W: " + (logs[i].waiting.length)
-				);
-			}
-
-			/*
-			pids = selectionSort(record.getPIDs(), function(id1, id2){
-				if(id1 > id2){
-					return 1;
-				}else
-				if(id1 < id2){
-					return -1;
-				}else{
-					return 0;
-				}
-			});
-
-			//var testlog = record.getLogs();
-
-			console.log(testlog);*/
-
-			//data = DataTransformer.transform(record);
 
 				
 			window.onload = function(){
@@ -78,9 +54,9 @@
 				//div.appendChild(document.createTextNode(TextDisplay.generateTextProcessTable(pm.getProcesses())));
 
 				div = document.getElementById("gantt-chart-canvas");
-				//ganttChart = new GanttChartGUI(data.rowids, data.logs);
-				//ganttChart.init(div, null);
-				//ganttChart.draw();
+				ganttChart = new GanttChartGUI(data);
+				ganttChart.init(div, null);
+				ganttChart.draw();
 				//div.appendChild(ganttChart.initDisplay());
 				//ganttChart.setPosition(495, 0);
 				//ganttChart.draw();

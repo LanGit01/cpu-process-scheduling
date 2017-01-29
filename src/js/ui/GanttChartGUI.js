@@ -31,10 +31,10 @@
 	 *	@param ids [array]
 	 *	@param logs [array]
 	 */
-	function GanttChartGUI(rowids, logs){
+	function GanttChartGUI(data){
 		// Data
-		this._rowids = rowids;
-		this._logs = logs;
+		this._rowids = data.rowids;
+		this._logs = data.logs;
 
 
 		this._config = null;
@@ -171,13 +171,15 @@
 			gcSize.h
 		);
 
-		this._chartGridArea = new ChartGridArea({
-			fullGridDimensions: fgArea,
-			viewArea: gArea,
-			cellDimensions: gcSize,
-			rowids: this._rowids,
-			logs: this._logs
-		});
+		this._chartGridArea = new ChartGridArea(
+			this._rowids,
+			this._logs,
+			{
+				fullGridDimensions: fgArea,
+				viewArea: gArea,
+				cellDimensions: gcSize
+			}
+		);
 
 		this._positionBounds = new Dimensions(
 			Math.max(0, fgArea.w - gArea.w), 
