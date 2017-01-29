@@ -92,7 +92,7 @@
 		var processDataItr = this._processData.getIterator(),
 			time = 0, 
 			running, nextArrivalTime, process,
-			nextProcess = null, arrivedProcess = null,
+			nextProcessData = null,
 			record;
 		
 
@@ -111,7 +111,7 @@
 
 		while(running){
 			if(processDataItr.hasNext() && time === nextArrivalTime){
-				// add process to scheduler
+				// Add arriving process to scheduler
 				do{
 					nextProcessData = processDataItr.getNext();
 					this._scheduler.newArrivingProcess(nextProcessData.process, nextProcessData.level);
@@ -124,7 +124,7 @@
 
 			// scheduler step
 			this._scheduler.step();
-
+			
 			if(this._scheduler.hasRunningProcess()){
 				process = this._scheduler.getRunningProcess();
 
@@ -157,7 +157,7 @@
 	/*
 	 *	Data structure:
 	 *		- level
-	 *		- process	
+	 *		- process
 	 */
 	function compareArrivalTime(p1, p2){
 		var at1 = p1.process.arrivalTime,
@@ -166,7 +166,7 @@
 		if(at1 > at2){
 			return 1;
 		}else
-		if(at2 < at1){
+		if(at1 < at2){
 			return -1;
 		}else{
 			return 0;
