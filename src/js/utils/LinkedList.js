@@ -12,10 +12,10 @@
 	 *
 	 *	If a compare function is provided, inserted elements are sorted in ascending order
 	 * 
-	 *	compareFunc - function - a function that compares two elements, returning:
-	 *							 	- a positive number if the first element is greater,
-	 *								- a negative number if the second element is greater,
-	 *								- zero if they are equal
+	 *	compareFunc [function] a function that compares two elements, returning:
+	 *			- a positive number if the first element is greater,
+	 *			- a negative number if the second element is greater,
+	 *			- zero if they are equal
 	 */
 	function LinkedList(compareFunc, keyFunc){
 		this._head = null;
@@ -36,8 +36,12 @@
 	}
 
 	/*
-	 *	If a compare function is not provided, will insert elements at the end of the list
-	 *	
+	 *	If a compare function is not provided, will insert elements at the end of the list.
+	 *
+	 *	If a compare function is provided, will insert elements in the proper place, in ascending order of value returned by
+	 *	the compare function
+	 *
+	 *	If the element is not unique wrt compareFunc, the element will be placed after the similar elements
 	 */
 	LinkedList.prototype.insert = function(element){
 		var compareFunc = this._compareFunc,
@@ -59,7 +63,7 @@
 			}else{
 				current = this._head;
 
-				while(current.next !== null && compareFunc(newNode.data, current.next.data) > 0){
+				while(current.next !== null && compareFunc(newNode.data, current.next.data) >= 0){
 					current = current.next;
 				}
 
@@ -78,8 +82,10 @@
 		this._length++;
 	}
 
+
 	/*
-	 *	Removes the first node that contains the value of the `value` argument
+	 *	Removes the first node that contains the value of the `value` argument, and returns the element.
+	 *	If no element is found, returns null
 	 *
 	 *	If a keyFunc is provided in the construction of the list, the node data is 
 	 *	passed to `keyFunc`, and the return value is used for comparison 
@@ -89,13 +95,13 @@
 			current,
 			keyFunc = this._keyFunc;
 
-			for(current = this._head; current !== null; current = current.next){
-				if(value === keyFunc(current.data)){
-					element = current.data;
-					break;
-				}
-				prev = current;
+		for(current = this._head; current !== null; current = current.next){
+			if(value === keyFunc(current.data)){
+				element = current.data;
+				break;
 			}
+			prev = current;
+		}
 		
 
 		// No matching element found
@@ -148,7 +154,6 @@
 	LinkedList.prototype.removeTail = function(){
 
 	}
-
 
 
 	/**
@@ -230,4 +235,4 @@
 
 	global.CPUscheduling.LinkedList = LinkedList;
 
-})(window);
+})(this);
