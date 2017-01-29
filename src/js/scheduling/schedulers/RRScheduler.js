@@ -53,7 +53,7 @@
 
 
 	RRScheduler.prototype.getWaitingProcesses = function(){
-		return this._waitingProcesses;
+		return this._waitingProcesses.toArray();
 	}
 
 
