@@ -97,14 +97,14 @@
 			record;
 		
 
-		if(!processDataItr.hasNext()){
-			return;
-		}
-
 		if(isMultilevel){
 			record = new Record(this.getProcessIDs(), this._scheduler.getNumLevels());
 		}else{
 			record = new Record(this.getProcessIDs());	
+		}
+
+		if(!processDataItr.hasNext()){
+			return record;
 		}
 		
 		running = true;

@@ -78,26 +78,25 @@
 			waiting = this._waitingProcesses,
 			firstWaiting;
 
-		// Check if a process terminates
-		if(running !== null && running.remainingTime === 0){
-			running = null;
-		}
 
-		if(waiting.getLength() > 0){
-			if(running === null){
-				// if no processes are running, load one
-				running = waiting.removeHead();
+		if(running !== null){
+			// Check for running process termination or preemption
+			if(running.remainingTime === 0){
+				running = null;
 			}else
 			if(this._preemptive && this._newArrival){
-				// if should preempt
 				firstWaiting = waiting.elementAt(0);
 
 				if(compareRemainingTimes(firstWaiting, running) < 0){
-					firstWaiting = waiting.removeHead();
 					waiting.insert(running);
-					running = firstWaiting;
+					running = null;
 				}
 			}
+		}
+
+		// Check if a there is no running process, and if it should load one from the waiting
+		if(running === null && waiting.getLength() > 0){
+			running = waiting.removeHead();
 		}
 
 		if(running !== null){

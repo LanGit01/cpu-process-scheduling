@@ -63,14 +63,20 @@
 			running = createProcessData(runningProcess.process, runningProcess.level);
 		}
 
+		console.log("-----------------------------");
+		console.log(waitingLevels);
+
 		for(i = 0; i < waitingLevels.length; i++){
 			level = waitingLevels[i].level
 			waitingProcesses = waitingLevels[i].process;
 
+			console.log(waitingProcesses);
 			for(j = 0; j < waitingProcesses.length; j++){
 				waiting[waiting.length] = createProcessData(waitingProcesses[j], level);
 			}
 		}
+
+
 
 		return {
 			running: running,

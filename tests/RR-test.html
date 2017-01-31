@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>RR Scheduler Test</title>
+		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Record.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
+		
+		<script type = "text/javascript" src = "../src/js/ui/DataTransformer.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/ChartGridArea.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/LabelStrip.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUI.js"></script>
+		<script>
+			var Process = CPUscheduling.Process,
+				ProcessManager = CPUscheduling.ProcessManager,
+				DataTransformer = CPUscheduling.DataTransformer,
+				RRScheduler = CPUscheduling.RRScheduler,
+				GanttChartGUI = CPUscheduling.GanttChartGUI;
+
+			var pm = new ProcessManager(),
+				record, data;
+
+			pm.setScheduler(new RRScheduler(4));
+			pm.addProcess(0, 6, 1);
+			pm.addProcess(1, 6, 5);
+			pm.addProcess(2, 6, 5);
+			pm.addProcess(3, 3, 5);
+
+			record = pm.run();
+			data = DataTransformer.transform(record);
+
+			window.onload = function(){
+				var div = document.getElementById("gantt-chart-canvas");
+				ganttChart = new GanttChartGUI(data);
+				ganttChart.init(div, null);
+				ganttChart.draw();
+			}
+		</script>
+	</head>
+	<body>
+		<pre>
+			<div id = "gantt-chart-text"></div>
+			<div id = "table-text"></div>
+			<div id = "gantt-chart-canvas"></div>
+		</pre>
+	</body>
+</html>

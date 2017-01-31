@@ -24,12 +24,7 @@
 
 
 	RRScheduler.prototype.newArrivingProcess = function(process){
-		if(this._runningProcess === null){
-			this._runningProcess = process;
-			this._quantumCount = this._quanta;
-		}else{
-			this._waitingProcesses.insert(process);
-		}
+		this._waitingProcesses.insert(process);
 	}
 
 	RRScheduler.prototype.isMultilevel = function(){
@@ -83,6 +78,7 @@
 			running = null;
 		}
 
+		// Check if a there is no running process, and if it should load one from the waiting
 		if(running === null || running.remainingTime === 0){
 			// If no processes are running, load one
 			if(waiting.getLength() > 0){
@@ -93,7 +89,7 @@
 			}
 		}
 
-
+		// Process consumes one timestep
 		if(running !== null){
 			running.remainingTime--;
 			this._quantumCount--;

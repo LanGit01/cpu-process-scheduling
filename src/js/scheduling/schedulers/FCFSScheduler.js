@@ -21,9 +21,7 @@
 
 
 	FCFSScheduler.prototype.newArrivingProcess = function(process){
-		if(this._runningProcess === null){
-			this._runningProcess = process;
-		}else{
+		if(process !== null){
 			this._waitingProcesses.insert(process);
 		}
 	}
@@ -77,7 +75,9 @@
 		var running = this._runningProcess,
 			waiting = this._waitingProcesses;
 
+		// Check if a there is no running process, and if it should load one from the waiting
 		if(running === null || running.remainingTime === 0){
+			// If no processes are running, load one
 			if(waiting.getLength() > 0){
 				this._runningProcess = waiting.removeHead();
 			}else{
@@ -87,6 +87,7 @@
 			running = this._runningProcess;
 		}
 
+		// Process consumes one timestep
 		if(running !== null){
 			running.remainingTime--;
 		}
