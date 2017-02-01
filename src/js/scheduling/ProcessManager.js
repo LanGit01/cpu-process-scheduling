@@ -36,7 +36,7 @@
 		}
 
 		this._processData.insert({
-			insertLevel: level - 1,
+			insertLevel: level,
 			process: new Process(id, burstTime, arrivalTime, priority)
 		});
 	}
@@ -141,8 +141,8 @@
 			if(!processDataItr.hasNext() && !this._scheduler.hasRunningProcess()){
 				running = false;
 			}else{
-				record.log(this._scheduler.getRunningProcess(), this._scheduler.getWaitingProcesses());
-				//console.log(this._scheduler.getRunningProcess());
+				//record.log(this._scheduler.getRunningProcess(), this._scheduler.getWaitingProcesses());
+				debugLog(this._scheduler, time);
 				time++;
 			}
 		}
@@ -150,6 +150,31 @@
 		return record;
 	}
 
+	function debugLog(scheduler, time){
+		var running = scheduler.getRunningProcess(),
+			waiting = scheduler.getWaitingProcesses(),
+			text = "(" + time + ")", i, w, l;
+
+		if(running){
+			text += "\nRunning: " + running.process.id + " - " + running.process.remainingTime + " [" + running.level + "]";
+		}else{
+			text += "\nRunning: none"; 
+		}
+
+		if(waiting.length > 0){
+			text += "\nWaiting: ";
+
+			for(i = 0; i < waiting.length; i++){
+				l = waiting[i].level;
+				w = waiting[i].process[0];
+				text += "\n    " + w.id + " - " + w.remainingTime + " [" + l + "]";
+			}
+		}else{
+			text += "\nWaiting: none";
+		}
+
+		console.log(text);
+	}
 
 
 	/* -------------------------------------------------------- *\
