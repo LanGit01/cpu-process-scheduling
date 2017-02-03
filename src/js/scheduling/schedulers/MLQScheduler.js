@@ -82,12 +82,13 @@
 
 
 	MLQScheduler.prototype.getWaitingProcesses = function(){
-		var i, levelScheduler, processes, waitingArr = [];
+		var i, levelScheduler, runningProcess, processes, waitingArr = [];
 
 		for(i = this._top; i < this._levels.length; i++){
 			levelScheduler = this._levels[i];
+			runningProcess = levelScheduler.getRunningProcess();
 
-			if(i === this._runningLevel){
+			if(i === this._runningLevel || (runningProcess && runningProcess.remainingTime === 0)){
 				if(levelScheduler.hasWaitingProcesses()){
 					waitingArr[waitingArr.length] = {
 						level: i,
@@ -95,7 +96,7 @@
 					};
 				}
 			}else
-			if(levelScheduler.hasWaitingProcesses() || levelScheduler.hasRunningProcess()){
+			if(levelScheduler.hasRunningProcess()){
 				waitingArr[waitingArr.length] = {
 					level: i,
 					process: levelScheduler.getProcesses()
@@ -108,33 +109,28 @@
 
 
 	MLQScheduler.prototype.step = function(){
-		var running, hasProcess, level,
+		var hasRunningLevel, process,
 			numLevels = this._levels.length;
 
-		// Check if a process terminates
 		if(this._top < numLevels){
-			running = null;
-			hasProcess = true;
+			hasRunningLevel = false;
 
 			if(this._runningLevel < numLevels){
 				level = this._levels[this._runningLevel];
-				running = level.getRunningProcess();
-				hasProcess = (running && running.remainingTime > 0) || level.hasWaitingProcesses();
+				process = level.getRunningProcess();
+				hasRunningLevel = (process && process.remainingTime > 0) || level.hasWaitingProcesses();
 			}
 
-			if(running === null || !hasProcess){
-				//  || (this._preemptive && this._top < this._runningLevel)
-
-				// Find first nonempty level from top
+			if(!hasRunningLevel){
 				this._runningLevel = this._top;
-				hasProcess = false;
+				hasRunningLevel = false;
 
-				while(this._runningLevel < numLevels && !hasProcess){
+				while(this._runningLevel < numLevels && !hasRunningLevel){
 					level = this._levels[this._runningLevel];
 					level.step();
 
 					if(level.hasRunningProcess() || level.hasWaitingProcesses()){
-						hasProcess = true;
+						hasRunningLevel = true;
 					}else{
 						this._runningLevel++;
 					}
