@@ -84,13 +84,13 @@
 	MLQScheduler.prototype.getWaitingProcesses = function(){
 		var i, levelScheduler, runningProcess, processes, waitingArr = [],
 			hasWaitingProcess;
-		
+
 		for(i = this._top; i < this._levels.length; i++){
 			levelScheduler = this._levels[i];
 			runningProcess = levelScheduler.getRunningProcess();
 			hasWaitingProcesses = levelScheduler.hasWaitingProcesses();
 		
-			if(i !== this._runningLevel && (hasWaitingProcesses || (runningProcess && runningProcess.remainingTime > 0))){
+			if(i !== this._runningLevel && (hasWaitingProcesses && (runningProcess && runningProcess.remainingTime > 0))){
 				waitingArr[waitingArr.length] = {
 					level: i,
 					process: levelScheduler.getProcesses()
