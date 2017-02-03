@@ -82,24 +82,24 @@
 
 
 	MLQScheduler.prototype.getWaitingProcesses = function(){
-		var i, levelScheduler, runningProcess, processes, waitingArr = [];
-
+		var i, levelScheduler, runningProcess, processes, waitingArr = [],
+			hasWaitingProcess;
+		
 		for(i = this._top; i < this._levels.length; i++){
 			levelScheduler = this._levels[i];
 			runningProcess = levelScheduler.getRunningProcess();
-
-			if(i === this._runningLevel || (runningProcess && runningProcess.remainingTime === 0)){
-				if(levelScheduler.hasWaitingProcesses()){
-					waitingArr[waitingArr.length] = {
-						level: i,
-						process: levelScheduler.getWaitingProcesses()		
-					};
-				}
-			}else
-			if(levelScheduler.hasRunningProcess()){
+			hasWaitingProcesses = levelScheduler.hasWaitingProcesses();
+		
+			if(i !== this._runningLevel && (hasWaitingProcesses || (runningProcess && runningProcess.remainingTime > 0))){
 				waitingArr[waitingArr.length] = {
 					level: i,
 					process: levelScheduler.getProcesses()
+				};
+			}else
+			if(hasWaitingProcesses){
+				waitingArr[waitingArr.length] = {
+					level: i,
+					process: levelScheduler.getWaitingProcesses()
 				};
 			}
 		}
@@ -121,7 +121,7 @@
 				hasRunningLevel = (process && process.remainingTime > 0) || level.hasWaitingProcesses();
 			}
 
-			if(!hasRunningLevel){
+			if(!hasRunningLevel || (this._preemptive && this._top < this._runningLevel)){
 				this._runningLevel = this._top;
 				hasRunningLevel = false;
 
