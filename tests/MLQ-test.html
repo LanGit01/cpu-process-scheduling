@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<style>
+			table{
+				border-collapse: collapse;
+				text-align: center;
+				font: 14px monospace;
+			}
+
+			table, table th, table td{
+				border: 1px solid black;
+				padding: 2px 16px;
+			}
+		</style>
 		<title>Multilevel Queue Scheduler Test</title>
 		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
@@ -8,6 +20,9 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/Record.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/SJFScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/PriorityScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/MLQScheduler.js"></script>
 		
 		<script type = "text/javascript" src = "../src/js/ui/DataTransformer.js"></script>
@@ -19,58 +34,31 @@
 				ProcessManager = CPUscheduling.ProcessManager,
 				DataTransformer = CPUscheduling.DataTransformer,
 				FCFSScheduler = CPUscheduling.FCFSScheduler,
+				RRScheduler = CPUscheduling.RRScheduler,
+				SJFScheduler = CPUscheduling.SJFScheduler,
+				PriorityScheduler = CPUscheduling.PriorityScheduler,
 				MLQScheduler = CPUscheduling.MLQScheduler,
 				GanttChartGUI = CPUscheduling.GanttChartGUI;
 
 			var pm = new ProcessManager(),
 				record, data, s;
 
-			pm.setScheduler(new MLQScheduler(false, [
+			pm.setScheduler(new MLQScheduler(true, [
 				new FCFSScheduler(),
-				new FCFSScheduler()
+				new SJFScheduler(true)
 			]));
 
-			pm.addProcess(0, 4, 0, null, 0);
-			pm.addProcess(1, 4, 0, null, 1);
-			pm.addProcess(2, 4, 1, null, 1);
-
-			record = pm.run();
-			/*s = new MLQScheduler(false, [
-				new FCFSScheduler(),
-				new FCFSScheduler()
-			]);
-
-			var step = (function(){
-				var time = 0, running;
-
-				return function(s, num){
-					for(var i = 0; i < num; i++){
-						s.step();
-
-						if(s.hasRunningProcess()){
-							running = s.getRunningProcess();
-							console.log("(" + (time++) + ") " + running.process.id + " - " + running.process.remainingTime + " [" + running.level + "]");
-						}else{
-							console.log("(" + (time++) + ") none");
-						}
-
-						console.log(s.hasWaitingProcesses());
-					}
-				}
-			})();
-
-			s.newArrivingProcess(new Process(0, 8, 0, null), 0);
-			step(s, 6);
-			s.newArrivingProcess(new Process(1, 2, 0, null), 1);
-			step(s, 1);
-			s.newArrivingProcess(new Process(2, 2, 0, null), 0);
-			step(s, 6);*/
+			pm.addProcess(0, 4, 0, null, 1);
+			pm.addProcess(1, 2, 1, null, 1);
+			pm.addProcess(2, 4, 4, null, 0);
+			//pm.addProcess(id, burstTime, arrivalTime, priority, level);
 
 			
-			
+			window.onload = function(){
+				record = pm.run();
+			}
+
 			/*
-			data = DataTransformer.transform(record);
-
 			window.onload = function(){
 				var div = document.getElementById("gantt-chart-canvas");
 				ganttChart = new GanttChartGUI(data);
@@ -85,5 +73,14 @@
 			<div id = "table-text"></div>
 			<div id = "gantt-chart-canvas"></div>
 		</pre>
+		<table id = "test-table">
+			<tr>
+				<td>Time</td>
+				<td>ID</td>
+				<td>Remaining</td>
+				<td>Level</td>
+				<td>Waiting</td>
+			</tr>
+		</table>
 	</body>
 </html>
