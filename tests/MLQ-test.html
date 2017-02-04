@@ -45,18 +45,28 @@
 
 			pm.setScheduler(new MLQScheduler(true, [
 				new FCFSScheduler(),
-				new PriorityScheduler(false)
+				new FCFSScheduler()
 			]));
 
-			pm.addProcess(0, 4, 0, 0, 1);
-			pm.addProcess(1, 2, 0, 1, 1);
-			pm.addProcess(2, 4, 2, null, 0);
+			pm.addProcess(0, 4, 0, null, 1);
+			pm.addProcess(1, 4, 0, null, 1);
+			pm.addProcess(2, 4, 9, null, 0);
 			//pm.addProcess(id, burstTime, arrivalTime, priority, level);
 
 			
 			window.onload = function(){
 				record = pm.run();
 			}
+
+			/*
+				Tests:
+						FCFS		RR		Priority		SJF
+				FCFS
+				RR
+				Priority
+				SJF
+
+			*/
 
 			/*
 			window.onload = function(){

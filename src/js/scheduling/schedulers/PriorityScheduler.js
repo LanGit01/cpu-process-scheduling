@@ -38,6 +38,23 @@
 	}
 
 
+	PriorityScheduler.prototype.shouldPreempt = function(){
+		if(!this._preemptive){
+			return false;
+		}
+
+		var running = this._runningProcess,
+			firstWaiting;
+
+		if(running && this._waitingProcesses.getLength > 0 && this._newArrival){
+			firstWaiting = this._waitingProcesses.elementAt(0);
+			return (comparePriority(firstWaiting, running) > 0);
+		}
+
+		return false;
+	}
+
+
 	PriorityScheduler.prototype.hasRunningProcess = function(){
 		return (this._runningProcess !== null);
 	}

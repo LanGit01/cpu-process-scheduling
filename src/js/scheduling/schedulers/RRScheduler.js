@@ -27,8 +27,14 @@
 		this._waitingProcesses.insert(process);
 	}
 
+
 	RRScheduler.prototype.isMultilevel = function(){
 		return false;
+	}
+
+
+	RRScheduler.prototype.shouldPreempt = function(){
+		return (this._quantumCount === 0 && this._runningProcess !== null && this._runningProcess.remainingTime > 0);
 	}
 
 
