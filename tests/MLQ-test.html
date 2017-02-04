@@ -44,14 +44,14 @@
 				record, data, s;
 
 			pm.setScheduler(new MLQScheduler(true, [
-				new FCFSScheduler(),
-				new FCFSScheduler()
+				new SJFScheduler(true),
+				new SJFScheduler(true),
 			]));
 
-			pm.addProcess(0, 4, 0, null, 1);
-			pm.addProcess(1, 4, 0, null, 1);
-			pm.addProcess(2, 4, 9, null, 0);
-			//pm.addProcess(id, burstTime, arrivalTime, priority, level);
+			pm.addProcess(0, 5, 0, null, 1);
+			pm.addProcess(1, 3, 1, null, 1);
+			pm.addProcess(2, 5, 9, 0, 0);
+			pm.addProcess(3, 3, 10, 1, 0);
 
 			
 			window.onload = function(){
@@ -60,11 +60,11 @@
 
 			/*
 				Tests:
-						FCFS		RR		Priority		SJF
-				FCFS
-				RR
-				Priority
-				SJF
+							FCFS		RR		Priority		SJF
+				FCFS		x			x		x				x
+				RR			x			x		x				x
+				Priority	x			x		x				x
+				SJF			x			x		x				x
 
 			*/
 
