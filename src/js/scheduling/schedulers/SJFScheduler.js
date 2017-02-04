@@ -42,7 +42,7 @@
 		var running = this._runningProcess,
 			firstWaiting;
 
-		if(running && this._waitingProcesses.getLength > 0 && this._newArrival){
+		if(running && this._waitingProcesses.getLength() > 0 && this._newArrival){
 			firstWaiting = this._waitingProcesses.elementAt(0);
 			return (compareRemainingTimes(firstWaiting, running) < 0);
 		}
