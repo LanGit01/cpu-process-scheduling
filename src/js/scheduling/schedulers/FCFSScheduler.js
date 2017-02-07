@@ -1,106 +1,61 @@
-(function(global){
-	
-	// Check namespace
-	if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
-		console.log("CPUscheduling is not defined. Module unable to load.");
-		return;
-	}
+(function(Schedulers, Utils){
+	/**
+	 *	Required modules/classes:
+	 *		ProcessScheduling.Core.Schedulers
+	 *		ProcessScheduling.Utils	
+	 */
 
-	var LinkedList = global.CPUscheduling.LinkedList;
-
+	var LinkedList = Utils.LinkedList,
+		SimpleScheduler = Schedulers.SimpleScheduler;
 
 	/**
-	 *	Implementation of the "First Come, First Served" scheduling strategy
+	 *	Scheduler using the First Come First Served scheduling algorithm
 	 */
 	function FCFSScheduler(){
-		this._runningProcess = null;
-		this._waitingProcesses = new LinkedList();
+		this._running = null;
+		this._waiting = new LinkedList();
+		this._lastRunning = null;
 
-		this._logger = null;
 	}
 
 
-	FCFSScheduler.prototype.newArrivingProcess = function(process){
-		if(process !== null){
-			this._waitingProcesses.insert(process);
-		}
-	}
-
-
-	FCFSScheduler.prototype.isMultilevel = function(){
-		return false;
-	}
-
-
-	FCFSScheduler.prototype.shouldPreempt = function(){
-		return false;
-	}
-
-
-	FCFSScheduler.prototype.hasRunningProcess = function(){
-		return (this._runningProcess !== null);
-	}
-
-
-	FCFSScheduler.prototype.getRunningProcess = function(){
-		return this._runningProcess;
-	}
-
-
-	FCFSScheduler.prototype.hasWaitingProcesses = function(){
-		return (this._waitingProcesses.getLength() > 0);
-	}
-
-
-	FCFSScheduler.prototype.getWaitingProcesses = function(){
-		return this._waitingProcesses.toArray();
-	}
-
-
-	FCFSScheduler.prototype.getProcesses = function(){
-		var processes = this._waitingProcesses.toArray();;
-
-		if(this._runningProcess){
-			processes[processes.length] = this._runningProcess;
-		}
-
-		return processes;
-	}
-
-
-	FCFSScheduler.prototype.setLogger = function(logger){
-		this._logger = logger;
-	}
+	FCFSScheduler.subclass(SimpleScheduler);
 
 	/**
-	 *	Consume 1 time-step of the processor, and if there is a running process, allocates the
-	 *	processor resources to it. 
+	 *	Signifies the start of the timestep cycle.
+	 *
+	 *	Prepares the scheduler for the next cycle. This method must be called to start the next timestep. 
 	 */
-	FCFSScheduler.prototype.step = function(){
-		var running = this._runningProcess,
-			waiting = this._waitingProcesses;
-
-		// Check if a there is no running process, and if it should load one from the waiting
-		if(running === null || running.remainingTime === 0){
-			// If no processes are running, load one
-			if(waiting.getLength() > 0){
-				this._runningProcess = waiting.removeHead();
-			}else{
-				this._runningProcess = null;
-			}
-
-			running = this._runningProcess;
+	FCFSScheduler.prototype.ready = function(){
+		if(this._lastRunning && this._lastRunning.remainingTime === 0){
+			this._running = null;
 		}
 
-		// Process consumes one timestep
-		if(running !== null){
-			running.remainingTime--;
+		if(this._running === null && this._waiting.getLength() > 0){
+			this._running = this._waiting.removeHead();
 		}
 	}
 
 
+	FCFSScheduler.prototype.acceptProcess = function(process){
+		if(this._running === null){
+			this._running = process;
+		}else{
+			this._waiting.insert(process);
+		}
+	}
 
-	global.CPUscheduling.FCFSScheduler = FCFSScheduler;
+
+	FCFSScheduler.prototype.step = function(){
+		if(this._running){
+			this._running.remainingTime--;
+		}
+
+		this._lastRunning = this._running;
+	}
 
 
-})(this);
+	Schedulers.FCFSScheduler = FCFSScheduler;
+
+
+})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);

@@ -1,222 +1,164 @@
-	(function(global){
+(function(Core, Utils){
+	/**
+	 *	Required modules/classes:
+	 *		ProcessScheduling.Core
+	 */
+	var Process = Core.Process,
+		LinkedList = Utils.LinkedList;
 
-		// Check namespace
-		if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
-			console.log("CPUscheduling is not defined. Module unable to load.");
-			return;
+	/**
+	 *	A simulator for the processes inside a machine
+	 *
+	 *	Time is incremented in discrete steps until all of the processes has been completed.
+	 *	Processes arrives as specified, and needs to use N steps of the processor's time to complete. 
+	 */
+	function ProcessManager(){
+		// compareArrivalTime ensures list is sorted in ascending arrival time
+		this._processData = new LinkedList(compareArrivalTime, getProcessID);
+	}
+
+
+	ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime, priority, level){
+		// Priority and level is optional depending on the scheduler used
+		// (program could crash though if you don't provide required values)
+		if(typeof priority === "undefined"){
+			priority = Process.NO_VALUE;
 		}
 
-		var Process = global.CPUscheduling.Process,
-			LinkedList = global.CPUscheduling.LinkedList,
-			Record = global.CPUscheduling.Record;
-
-
-
-		/**
-		 *	A simulator for the processes inside a machine
-		 *
-		 *	Time is incremented in discrete steps until all of the processes has been completed.
-		 *	Processes arrives as specified, and needs to use N steps of the processor's time to complete. 
-		 */
-		function ProcessManager(){
-			// compareArrivalTime ensures list is sorted in ascending arrival time
-			this._processData = new LinkedList(compareArrivalTime, getProcessID);
-			this._scheduler = null;
+		if(typeof level === "undefined"){
+			level = null;
 		}
 
-
-		ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime, priority, level){
-			// Add  argument validation later
-			if(typeof priority === "undefined"){
-				priority = Process.NO_VALUE;
-			}
-
-			if(typeof level === "undefined"){
-				level = null;
-			}
-
-			this._processData.insert({
-				insertLevel: level,
-				process: new Process(id, burstTime, arrivalTime, priority)
-			});
-		}
+		this._processData.insert({
+			insertLevel: level,
+			process: new Process(id, burstTime, arrivalTime, priority)
+		});	
+	}
 
 
-		ProcessManager.prototype.removeProcess = function(id){
-			return this._processData.remove(id);
-		}
-
-
-		// Note to self: getters and setters are good if you want abstraction,
-		// and allows the underlying implementation to be changed without changing
-		// the interface. Don't be afraid to use them if needed!
-		ProcessManager.prototype.setScheduler = function(scheduler){
-			this._scheduler = scheduler;
-		}
-
-
-		ProcessManager.prototype.getScheduler = function(){
-			return this._scheduler;
-		}
-
-
+	ProcessManager.prototype.run = function(scheduler){
 		/*
-		 * Returns an array containing the processes. It is ordered based on when it was added.
-		 *
-		 */
-		ProcessManager.prototype.getProcesses = function(){
-			var processList = [],
-				itr = this._processData.getIterator();
+			Algorithm:
 
-			while(itr.hasNext()){
-				processList[processList.length] = itr.getNext();
-			}
+				set time = 0
+				while there are processes to arrive OR scheduler is still running
+					ready state
+					add arriving processes to scheduler
+					step state (execute timestep)
 
-			return processList;
-		}
-
-
-		ProcessManager.prototype.getProcessIDs = function(){
-			var itr = this._processData.getIterator(),
-				ids = [];
-
-			while(itr.hasNext()){
-				ids[ids.length] = itr.getNext().process.id;
-			}
-
-			return ids;
-		}
+			Loading the processes:
+				if next arriving process's arrivalTime === time
+					while next process === arrivalTime
+						add
+		*/
+		var processDataItr, running, 
+			nextArrivalTime, time, processData, processClone;
 
 
-		ProcessManager.prototype.run = function(){
-			var processDataItr = this._processData.getIterator(),
-				time = 0, level, 
-				isMultilevel = this._scheduler.isMultilevel(),
-				running, nextArrivalTime, process,
-				nextProcessData = null,
-				record;
-			
-
-			if(isMultilevel){
-				record = new Record(this.getProcessIDs(), this._scheduler.getNumLevels());
-			}else{
-				record = new Record(this.getProcessIDs());	
-			}
-
-			if(!processDataItr.hasNext()){
-				return record;
-			}
-			
+		// If empty, no need to run
+		if(this._processData.getLength() > 0){
 			running = true;
+			processDataItr = this._processData.getIterator();
 			nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
+			time = 0;
+		}
 
-			while(running){
-				if(processDataItr.hasNext() && time === nextArrivalTime){
-					// Add arriving process to scheduler
-					do{
-						nextProcessData = processDataItr.getNext();
-						this._scheduler.newArrivingProcess(nextProcessData.process, nextProcessData.insertLevel);
-					}while(processDataItr.hasNext() && processDataItr.peekNext().process.arrivalTime === time);
+		while(running){
+			// State 1
+			scheduler.ready();
+			// Poll for arriving processes
+			// Pass copy of arriving processes into scheduler
+			while(nextArrivalTime === time){
+				processData = processDataItr.getNext();
+				scheduler.acceptProcess(createProcessCopy(processData.process), processData.level);
 
-					if(processDataItr.hasNext()){
-						nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
-					}
-				}
-
-				// scheduler step
-				this._scheduler.step();
-				
-				if(this._scheduler.hasRunningProcess()){
-					process = this._scheduler.getRunningProcess();
-
-					if(process.burstTime === (process.remainingTime + 1)){
-						process.startTime = time;
-					}
-					if(process.remainingTime === 0){
-						process.endTime = time;
-					}
-				}
-
-				// check if still running
-				if(!processDataItr.hasNext() && !this._scheduler.hasRunningProcess()){
-					running = false;
+				if(processDataItr.hasNext()){
+					nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
 				}else{
-					//record.log(this._scheduler.getRunningProcess(), this._scheduler.getWaitingProcesses());
-					debugLog(this._scheduler, time);
-					time++;
+					nextArrivalTime = null;
 				}
 			}
 
-			return record;
+			// State 2
+			scheduler.step();
+
+			// Check if still running
+			if(nextArrivalTime === null && !scheduler.hasRunning() && !scheduler.hasWaiting()){
+				running = false;
+			}else{
+				//console.log("Time: " + time + "\nID: " + scheduler.getRunning().id + "\nRemaining: " + scheduler.getRunning().remainingTime);
+				debugLog(scheduler, time);
+				time++;
+			}
+		}
+	}
+
+	Core.ProcessManager = ProcessManager;
+
+
+
+	/*==================================================*\
+					Private Functions
+	\*==================================================*/
+
+	function debugLog(scheduler, time){
+		var running = scheduler.getRunning(),
+			waiting = scheduler.getWaiting(),
+			table = document.getElementById("debug-table").tBodies[0],
+			i, tr, td, text;
+
+		tr = table.insertRow();
+		tr.insertCell().appendChild(document.createTextNode(time));
+
+		if(running){
+			tr.insertCell().appendChild(document.createTextNode(running.id));
+			tr.insertCell().appendChild(document.createTextNode(running.remainingTime));
+		}else{
+			td = tr.insertCell();
+			td.colSpan = 2;
+			td.appendChild(document.createTextNode("- no running process -"));
 		}
 
-		function debugLog(scheduler, time){
-			var running = scheduler.getRunningProcess(),
-				waiting = scheduler.getWaitingProcesses(),
-				table = document.getElementById("test-table"),
-				i, j, tr, td, text, processes;
-
-			tr = table.insertRow();
-			tr.insertCell().appendChild(document.createTextNode(time));
-
-			if(running){
-				tr.insertCell().appendChild(document.createTextNode(running.process.id));
-				tr.insertCell().appendChild(document.createTextNode(running.process.remainingTime));
-				tr.insertCell().appendChild(document.createTextNode(running.level));
-			}else{
-				td = tr.insertCell();
-				td.colSpan = 3;
-				td.appendChild(document.createTextNode("- no running process -"));
-			}
-
 		
-			if(waiting.length > 0){
-				text = "";
-				for(i = 0; i < waiting.length; i++){
-					processes = waiting[i].process;
-					for(j = 0; j < processes.length; j++){
-						text += "[" + processes[j].id + ", " + waiting[i].level + "]  ";
-					}
+		if(waiting.length > 0){
+			text = "[";
+			for(i = 0; i < waiting.length; i++){
+				text += waiting[i].id;
+				
+				if(i < waiting.length - 1){
+					text += ", ";
 				}
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode(text));
-			}else{
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode("- none -"));
 			}
-
+			text += "]";
+			td = tr.insertCell();
+			td.appendChild(document.createTextNode(text));
+		}else{
+			td = tr.insertCell();
+			td.appendChild(document.createTextNode("- none -"));
 		}
+	}
+
+	function createProcessCopy(process){
+		return new Process(process.id, process.burstTime, process.arrivalTime);
+	}
+
+	function compareArrivalTime(p1, p2){
+		var at1 = p1.process.arrivalTime,
+			at2 = p2.process.arrivalTime;
 
 
-		/* -------------------------------------------------------- *\
-							Auxillary Functions
-		\* -------------------------------------------------------- */
-		
-		/*
-		 *	Data structure:
-		 *		- level
-		 *		- process
-		 */
-		function compareArrivalTime(p1, p2){
-			var at1 = p1.process.arrivalTime,
-				at2 = p2.process.arrivalTime;
-
-			if(at1 > at2){
-				return 1;
-			}else
-			if(at1 < at2){
-				return -1;
-			}else{
-				return 0;
-			}
+		if(at1 > at2){
+			return 1;
+		}else
+		if(at1 < at2){
+			return -1;
+		}else{
+			return 0;
 		}
+	}
 
+	function getProcessID(p){
+		return p.process.id;
+	}
 
-		function getProcessID(p){
-			return p.process.id;
-		}
-
-
-		global.CPUscheduling.ProcessManager = ProcessManager;
-
-	})(this);
+})(ProcessScheduling.Core, ProcessScheduling.Utils);
