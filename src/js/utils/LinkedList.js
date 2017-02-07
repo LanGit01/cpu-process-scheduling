@@ -1,10 +1,16 @@
-(function(global){
+(function(ns){
 
 	// namespace check
-	if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
+	/*if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
 		console.log("CPUscheduling is not defined. Module unable to load.");
 		return;
-	}
+	}*/
+
+	/**
+	 *	Required modules/classes:
+	 *		ProcessScheduling.Utils
+	 */
+
 
 
 	/**
@@ -233,6 +239,6 @@
 
 
 
-	global.CPUscheduling.LinkedList = LinkedList;
+	ns.LinkedList = LinkedList;
 
-})(this);
+})(ProcessScheduling.Utils);

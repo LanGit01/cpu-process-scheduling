@@ -1,8 +1,8 @@
-(function(global){
-
-	if(!global.CPUscheduling){
-		global.CPUscheduling = {};
-	}
+(function(Core){
+	/**
+	 *	Required modules/classes:
+	 *		ProcessScheduling.Core
+	 */
 
 	var NO_VALUE = -1;
 
@@ -63,6 +63,6 @@
 
 	Process.NO_VALUE = NO_VALUE;
 
-	global.CPUscheduling.Process = Process;
+	Core.Process = Process;
 
-})(this);
+})(ProcessScheduling.Core);
