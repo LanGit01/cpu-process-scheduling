@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			table{
+				border-collapse: collapse;
+				text-align: center;
+				font: 14px monospace;
+			}
+
+			table, table th, table td{
+				border: 1px solid black;
+				padding: 2px 16px;
+			}
+		</style>
+		<title>Multilevel Queue Scheduler Test</title>
+		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Record.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/SJFScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/PriorityScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/MLFQScheduler.js"></script>
+		
+		<script type = "text/javascript" src = "../src/js/ui/DataTransformer.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/ChartGridArea.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/LabelStrip.js"></script>
+		<script type = "text/javascript" src = "../src/js/ui/GanttChartGUI.js"></script>
+		<script>
+			var Process = CPUscheduling.Process,
+				ProcessManager = CPUscheduling.ProcessManager,
+				DataTransformer = CPUscheduling.DataTransformer,
+				FCFSScheduler = CPUscheduling.FCFSScheduler,
+				RRScheduler = CPUscheduling.RRScheduler,
+				SJFScheduler = CPUscheduling.SJFScheduler,
+				PriorityScheduler = CPUscheduling.PriorityScheduler,
+				MLFQScheduler = CPUscheduling.MLFQScheduler,
+				GanttChartGUI = CPUscheduling.GanttChartGUI;
+
+			var pm = new ProcessManager(),
+				record, data, s;
+
+			pm.setScheduler(new MLFQScheduler(false, [2, 4], new FCFSScheduler()));
+
+			pm.addProcess(0, 5, 0, null, 0);
+			//pm.addProcess(0, 5, 0, null, 1);
+			//pm.addProcess(1, 3, 1, null, 1);
+			//pm.addProcess(2, 5, 9, 0, 0);
+			//pm.addProcess(3, 3, 10, 1, 0);
+
+			
+			window.onload = function(){
+				record = pm.run();
+			}
+
+			/*
+				Tests:
+							FCFS		RR		Priority		SJF
+				FCFS		
+				RR			
+				Priority	
+				SJF			
+
+			*/
+
+			/*
+			window.onload = function(){
+				var div = document.getElementById("gantt-chart-canvas");
+				ganttChart = new GanttChartGUI(data);
+				ganttChart.init(div, null);
+				ganttChart.draw();
+			}*/
+		</script>
+	</head>
+	<body>
+		<pre>
+			<div id = "gantt-chart-text"></div>
+			<div id = "table-text"></div>
+			<div id = "gantt-chart-canvas"></div>
+		</pre>
+		<table id = "test-table">
+			<tr>
+				<td>Time</td>
+				<td>ID</td>
+				<td>Remaining</td>
+				<td>Level</td>
+				<td>Waiting</td>
+			</tr>
+		</table>
+	</body>
+</html>

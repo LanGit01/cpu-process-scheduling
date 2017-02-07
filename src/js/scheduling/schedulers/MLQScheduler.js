@@ -20,7 +20,6 @@
 		this._top = schedulers.length;
 		this._preemptive = preemptive;
 
-		this._lastRunning = null;	// for checking preemption on individual levels
 	}
 
 
