@@ -1,110 +1,126 @@
-(function(global){
-
-	// Check namespace
-	if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
-		console.log("CPUscheduling is not defined. Module unable to load.");
-		return;
-	}
-
-	var LinkedList = global.CPUscheduling.LinkedList;
-
+(function(Schedulers, Utils){
+	/**
+	 *	Required modules/classes:
+	 *		ProcessScheduling.Core.Schedulers
+	 *		ProcessScheduling.Utils
+	 */
+	var LinkedList = Utils.LinkedList,
+		SimpleScheduler = Schedulers.SimpleScheduler;
 
 	/**
-	 *	Implementation of the "Round Robin" scheduling strategy
+	 *	Scheduler using the Round Robin scheduling algorithm
 	 */
 	function RRScheduler(quanta){
-		this._runningProcess = null;
-		this._waitingProcesses = new LinkedList();
-
-		this._logger = null;
+		this._running = null;
+		this._lastRunning = null;
 
 		this._quanta = quanta;
-		this._quantumCount = 0;
+		this._remainingQuanta = 0;
+
+		this._comparatorObj = createPreemptedComparatorObject();
+		this._waiting = new LinkedList(this._comparatorObj.comparator, null);
 	}
 
 
-	RRScheduler.prototype.newArrivingProcess = function(process){
-		this._waitingProcesses.insert(process);
-	}
+	RRScheduler.subclass(SimpleScheduler);
 
+	var i = 0;
 
-	RRScheduler.prototype.isMultilevel = function(){
-		return false;
-	}
+	RRScheduler.prototype.ready = function(){
+		this._comparatorObj.setPreempted(null);
 
-
-	RRScheduler.prototype.shouldPreempt = function(){
-		return (this._quantumCount === 0 && this._runningProcess !== null && this._runningProcess.remainingTime > 0);
-	}
-
-
-	RRScheduler.prototype.hasRunningProcess = function(){
-		return (this._runningProcess !== null);
-	}
-
-
-	RRScheduler.prototype.getRunningProcess = function(){
-		return this._runningProcess;
-	}
-
-
-	RRScheduler.prototype.hasWaitingProcesses = function(){
-		return (this._waitingProcesses.getLength() > 0);
-	}
-
-
-	RRScheduler.prototype.getWaitingProcesses = function(){
-		return this._waitingProcesses.toArray();
-	}
-
-
-	RRScheduler.prototype.getProcesses = function(){
-		var processes = this._waitingProcesses.toArray();;
-
-		if(this._runningProcess){
-			processes[processes.length] = this._runningProcess;
+		console.log(i++);
+		if(this.hasRunning()){
+			// Check for termination/preemption
+			if(this.runningTerminated()){
+				this._running = null;
+			}else
+			if(this._remainingQuanta === 0){
+				this._waiting.insert(this._running);
+				this._comparatorObj.setPreempted(this._running);
+				this._running = null;
+			}
 		}
 
-		return processes;
+		// Load process if there isn't any
+		if(this._running === null && this._waiting.getLength() > 0){
+			this._running = this._waiting.removeHead();
+			this._remainingQuanta = this._quanta;
+		}
 	}
 
 
-	RRScheduler.prototype.setLogger = function(logger){
-		this._logger = logger;
+	RRScheduler.prototype.acceptProcess = function(process){
+		if(this._running === null){
+			this._running = process;
+			this._remainingQuanta = this._quanta;
+		}else
+		if(this._running === this._lastRunning && this._remainingQuanta === this._quanta){
+			// Current running is already preempted, give priority to new arriving processes
+			this._waiting.insert(this._running);
+			this._running = process;
+		}else{
+			this._waiting.insert(process);
+		}
 	}
 
 
 	RRScheduler.prototype.step = function(){
-		var running = this._runningProcess,
-			waiting = this._waitingProcesses;
-
-		// Check for preemption
-		if(this._quantumCount === 0 && running !== null && running.remainingTime > 0){
-			waiting.insert(running);
-			running = null;
+		if(this._running){
+			this._running.remainingTime--;
+			this._remainingQuanta--;
 		}
 
-		// Check if a there is no running process, and if it should load one from the waiting
-		if(running === null || running.remainingTime === 0){
-			// If no processes are running, load one
-			if(waiting.getLength() > 0){
-				running = waiting.removeHead();
-				this._quantumCount = this._quanta;
-			}else{
-				running = null;
-			}
-		}
-
-		// Process consumes one timestep
-		if(running !== null){
-			running.remainingTime--;
-			this._quantumCount--;
-		}
-
-		this._runningProcess = running;
+		this._lastRunning = this._running;
 	}
 
 
-	global.CPUscheduling.RRScheduler = RRScheduler;
+	Schedulers.RRScheduler = RRScheduler;
 
-})(this);
+	/* -------------------------------------------------------- *\
+						Auxillary Functions
+	\* -------------------------------------------------------- */
+	
+	function createPreemptedComparatorObject(){
+		/*	Makes sure the preempted process is on the tail	
+		 * 
+		 *	This works because the element is inserted after all elements <= to it.
+		 *	The preempted is treated as largest, while others are treated as equal.
+		 *
+		 *	NOTE: This is just coincidence, and I actually think this is bad code because it would not work
+		 *		  if not for that coincidence T_T
+		 *	
+		 *		  Should have had insertBefore method in LinkedList
+		 */
+		return (function(){
+			var preempted = null;
+
+			return {
+				comparator: function(a, b){
+					// preempted > everything
+					
+					if(preempted !== null){
+						if(b === preempted){
+							return -1;
+						}else
+						if(a === preempted){
+							return 1;
+						}
+					}
+
+					return 0;
+				},
+
+				setPreempted: function(process){
+					preempted = process;
+				}
+			}	
+		})();
+	}
+
+	
+
+
+
+
+})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);

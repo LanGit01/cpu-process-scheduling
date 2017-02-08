@@ -38,9 +38,16 @@
 
 
 	SimpleScheduler.prototype.isStartingProcess = function(){
-		// applicable only at State 2
+		// applicable only at State 2 (Running State)
 		return (this._lastRunning && this._lastRunning.burstTime === (this._lastRunning.remainingTime + 1));
 	}
+
+
+	SimpleScheduler.prototype.hasPreempted = function(){
+		// Applicable only at State 1 (Ready State)
+		return (this._lastRunning && this._lastRunning.remainingTime > 0 && this._lastRunning !== this._running);
+	}
+
 
 	SimpleScheduler.prototype.getProcesses = function(){}
 
