@@ -1,144 +1,78 @@
-(function(global){
-	
-	// Check namespace
-	if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
-		console.log("CPUscheduling is not defined. Module unable to load.");
-		return;
-	}
+(function(Schedulers, Utils){
+	/**
+	 *	Required modules/classes:
+	 *		ProcessScheduling.Core.Schedulers
+	 *		ProcessScheduling.Utils	
+	 */
 
-	var LinkedList = global.CPUscheduling.LinkedList;
+	var LinkedList = Utils.LinkedList,
+		SimpleScheduler = Schedulers.SimpleScheduler;
 
 
 	/**
-	 *	Implementation of the "Priority" scheduling strategy
-	 *
-	 *	The priority goes higher as the priority number goes higher, i.e. 2 has more priority than 1
+	 *	Scheduler using the Priority scheduling algorithm
 	 */
 	function PriorityScheduler(preemptive){
-		this._runningProcess = null;
-		this._waitingProcesses = new LinkedList(function(a, b){
-			return comparePriority(a, b) * -1;
-		});
-
-		this._logger = null;
-
+		this._running = null;
+		this._waiting = new LinkedList(comparePriority);
 		this._preemptive = preemptive;
-		this._newArrival = false;
 	}
 
 
-	PriorityScheduler.prototype.newArrivingProcess = function(process){
-		this._waitingProcesses.insert(process);
-		this._newArrival = true;
+	PriorityScheduler.subclass(SimpleScheduler);
+
+
+	PriorityScheduler.prototype.ready = function(){
+		
 	}
 
 
-	PriorityScheduler.prototype.isMultilevel = function(){
-		return false;
+	PriorityScheduler.prototype.acceptProcess = function(process){
+		this._waiting.insert(process);
 	}
 
 
-	PriorityScheduler.prototype.shouldPreempt = function(){
-		if(!this._preemptive){
-			return false;
-		}
-
-		var running = this._runningProcess,
-			firstWaiting;
-
-		if(running && this._waitingProcesses.getLength() > 0 && this._newArrival){
-			firstWaiting = this._waitingProcesses.elementAt(0);
-			return (comparePriority(firstWaiting, running) > 0);
-		}
-
-		return false;
-	}
-
-
-	PriorityScheduler.prototype.hasRunningProcess = function(){
-		return (this._runningProcess !== null);
-	}
-
-
-	PriorityScheduler.prototype.getRunningProcess = function(){
-		return this._runningProcess;
-	}
-
-
-	PriorityScheduler.prototype.hasWaitingProcesses = function(){
-		return (this._waitingProcesses.getLength() > 0);
-	}
-
-
-	PriorityScheduler.prototype.getWaitingProcesses = function(){
-		return this._waitingProcesses.toArray();
-	}
-
-
-	PriorityScheduler.prototype.getProcesses = function(){
-		var processes = this._waitingProcesses.toArray();
-
-		if(this._runningProcess){
-			processes[processes.length] = this._runningProcess;
-		}
-
-		return processes;
-	}
-
-
-	PriorityScheduler.prototype.setLogger = function(logger){
-		this._logger = logger;
-	}
-
-	/**
-	 *	Consume 1 time-step of the processor, and if there is a running process, allocates the
-	 *	processor resources to it. 
-	 */
 	PriorityScheduler.prototype.step = function(){
-		var running = this._runningProcess,
-			waiting = this._waitingProcesses,
-			firstWaiting;
-
-		// Check if a process terminates
-		if(running !== null && running.remainingTime === 0){
-			running = null;
+		// Check for termination
+		if(this._running && this._running.remainingTime === 0){
+			this._running = null;
 		}
 
-		if(waiting.getLength() > 0){
-			if(running === null){
-				// if no processes are running, load one
-				running = waiting.removeHead();
-			}else
-			if(this._preemptive && this._newArrival){
-				// if should preempt
-				firstWaiting = waiting.elementAt(0);
-
-				if(comparePriority(firstWaiting, running) > 0){
-					firstWaiting = waiting.removeHead();
-					waiting.insert(running);
-					running = firstWaiting;
-				}
+		// Select process to run
+		if(this._preemptive && this._running !== null && this._waiting.getLength() > 0){
+			// Preempt if priority value is less than the highest priority value in waiting
+			if(comparePriority(this._running, this._waiting.elementAt(0)) > 0){
+				this._waiting.insert(this._running);
+				this._running = null;
 			}
 		}
 
-		if(running !== null){
-			running.remainingTime--;
+		if(this._running === null && this._waiting.getLength() > 0){
+			this._running = this._waiting.removeHead();
 		}
 
-		this._runningProcess = running;
-		this._newArrival = false;
+		if(this._running){
+			this._running.remainingTime--;
+		}
+
+		this._lastRunning = this._running;
 	}
 
 
-	/*			Auxillary functions			*/
-	function comparePriority(p1, p2){
-		var pr1 = p1.priority,
-			pr2 = p2.priority;
+	Schedulers.PriorityScheduler = PriorityScheduler;
 
-		if(pr1 > pr2){
+	/* -------------------------------------------------------- *\
+						Auxillary Functions
+	\* -------------------------------------------------------- */
+
+	/*
+	 *	lower number -> higher priority
+	 */
+	function comparePriority(p1, p2){
+		if(p1.priority > p2.priority){
 			return 1;
 		}else
-		if(pr1 < pr2){
+		if(p1.priority < p2.priority){
 			return -1;
 		}else{
 			return 0;
@@ -146,7 +80,4 @@
 	}
 
 
-	global.CPUscheduling.PriorityScheduler = PriorityScheduler;
-
-
-})(this);
+})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);
