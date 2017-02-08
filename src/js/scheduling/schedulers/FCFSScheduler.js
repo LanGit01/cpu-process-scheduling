@@ -27,31 +27,29 @@
 	 *	Prepares the scheduler for the next cycle. This method must be called to start the next timestep. 
 	 */
 	FCFSScheduler.prototype.ready = function(){
-		if(this._lastRunning && this._lastRunning.remainingTime === 0){
-			this._running = null;
-		}
 
-		if(this._running === null && this._waiting.getLength() > 0){
-			this._running = this._waiting.removeHead();
-		}
 	}
 
 
 	FCFSScheduler.prototype.acceptProcess = function(process){
-		if(this._running === null){
-			this._running = process;
-		}else{
-			this._waiting.insert(process);
-		}
+		this._waiting.insert(process);
 	}
 
 
 	FCFSScheduler.prototype.step = function(){
+		// Check for termination, remove terminated process
+		if(this._running && this._running.remainingTime === 0){
+			this._running = null;
+		}
+
+		// Select process to run
+		if(this._running === null && this._waiting.getLength() > 0){
+			this._running = this._waiting.removeHead();
+		}
+
 		if(this._running){
 			this._running.remainingTime--;
 		}
-
-		this._lastRunning = this._running;
 	}
 
 

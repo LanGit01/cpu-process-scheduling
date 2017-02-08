@@ -134,10 +134,11 @@
 
 		if(running){
 			tr.insertCell().appendChild(document.createTextNode(running.id));
+			tr.insertCell().appendChild(document.createTextNode((running.priority === Process.NO_VALUE ? "- none -" : running.priority)));
 			tr.insertCell().appendChild(document.createTextNode(running.remainingTime));
 		}else{
 			td = tr.insertCell();
-			td.colSpan = 2;
+			td.colSpan = 3;
 			td.appendChild(document.createTextNode("- no running process -"));
 		}
 
@@ -161,7 +162,7 @@
 	}
 
 	function createProcessCopy(process){
-		return new Process(process.id, process.burstTime, process.arrivalTime);
+		return new Process(process.id, process.burstTime, process.arrivalTime, process.priority);
 	}
 
 	function compareArrivalTime(p1, p2){
