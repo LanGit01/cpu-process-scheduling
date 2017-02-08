@@ -31,8 +31,15 @@
 		return this._waiting.toArray();
 	}
 
-	SimpleScheduler.prototype.runningTerminated = function(){
 
+	SimpleScheduler.prototype.runningTerminated = function(){
+		return (this._lastRunning && this._lastRunning.remainingTime === 0);
+	}
+
+
+	SimpleScheduler.prototype.isStartingProcess = function(){
+		// applicable only at State 2
+		return (this._lastRunning && this._lastRunning.burstTime === (this._lastRunning.remainingTime + 1));
 	}
 
 	SimpleScheduler.prototype.getProcesses = function(){}

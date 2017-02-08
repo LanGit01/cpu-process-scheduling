@@ -52,15 +52,17 @@
 						add
 		*/
 		var processDataItr, running, 
-			nextArrivalTime, time, processData, processClone;
+			nextArrivalTime, time, processData, 
+			process, processClones;
 
 
 		// If empty, no need to run
 		if(this._processData.getLength() > 0){
-			running = true;
 			processDataItr = this._processData.getIterator();
+			processClones = [];
 			nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
 			time = 0;
+			running = true;
 		}
 
 		while(running){
@@ -70,7 +72,10 @@
 			// Pass copy of arriving processes into scheduler
 			while(nextArrivalTime === time){
 				processData = processDataItr.getNext();
-				scheduler.acceptProcess(createProcessCopy(processData.process), processData.level);
+
+				process = createProcessCopy(processData.process);
+				processClones[processClones.length] = process;
+				scheduler.acceptProcess(process, processData.level);	
 
 				if(processDataItr.hasNext()){
 					nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
@@ -82,6 +87,21 @@
 			// State 2
 			scheduler.step();
 
+			// Check for termination/start of a new process
+			// For process data gathering
+			if(scheduler.hasRunning()){
+				process = scheduler.getRunning();
+				
+				if(scheduler.runningTerminated()){
+					process.endTime = time;
+				}
+
+				if(scheduler.isStartingProcess()){
+					process.startTime = time;
+				}
+			}
+
+
 			// Check if still running
 			if(nextArrivalTime === null && !scheduler.hasRunning() && !scheduler.hasWaiting()){
 				running = false;
@@ -91,6 +111,8 @@
 				time++;
 			}
 		}
+
+		return processClones;
 	}
 
 	Core.ProcessManager = ProcessManager;

@@ -22,13 +22,14 @@
 
 		this.remainingTime = burstTime;
 
+		this.priority = priority;
+
 		// Log data
 		this.endTime = NO_VALUE;
-		this.waitTime = NO_VALUE;
 		this.startTime = NO_VALUE;
-		this.responseTime = NO_VALUE;
-
-		this.priority = priority;
+		
+		//this.responseTime = NO_VALUE;
+		//this.waitTime = NO_VALUE;
 	}
 
 
