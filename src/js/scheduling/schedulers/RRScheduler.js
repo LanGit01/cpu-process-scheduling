@@ -12,66 +12,50 @@
 	 */
 	function RRScheduler(quanta){
 		this._running = null;
-		this._lastRunning = null;
+		this._waiting = new LinkedList();
 
 		this._quanta = quanta;
 		this._remainingQuanta = 0;
-
-		this._comparatorObj = createPreemptedComparatorObject();
-		this._waiting = new LinkedList(this._comparatorObj.comparator, null);
 	}
 
 
 	RRScheduler.subclass(SimpleScheduler);
-
-	var i = 0;
+	
 
 	RRScheduler.prototype.ready = function(){
-		this._comparatorObj.setPreempted(null);
 
-		console.log(i++);
-		if(this.hasRunning()){
-			// Check for termination/preemption
-			if(this.runningTerminated()){
-				this._running = null;
-			}else
-			if(this._remainingQuanta === 0){
-				this._waiting.insert(this._running);
-				this._comparatorObj.setPreempted(this._running);
-				this._running = null;
-			}
-		}
-
-		// Load process if there isn't any
-		if(this._running === null && this._waiting.getLength() > 0){
-			this._running = this._waiting.removeHead();
-			this._remainingQuanta = this._quanta;
-		}
 	}
 
 
 	RRScheduler.prototype.acceptProcess = function(process){
-		if(this._running === null){
-			this._running = process;
-			this._remainingQuanta = this._quanta;
-		}else
-		if(this._running === this._lastRunning && this._remainingQuanta === this._quanta){
-			// Current running is already preempted, give priority to new arriving processes
-			this._waiting.insert(this._running);
-			this._running = process;
-		}else{
-			this._waiting.insert(process);
-		}
+		this._waiting.insert(process);
 	}
 
 
 	RRScheduler.prototype.step = function(){
+		
+		if(this._running){
+			if(this._running.remainingTime === 0){
+				// Check for termination, remove terminated process
+				this._running = null;
+			}else
+			if(this._remainingQuanta === 0){
+				// Check for preemption
+				this._waiting.insert(this._running);
+				this._running = null;
+			}
+		}
+
+		// Select process to run
+		if(this._running === null && this._waiting.getLength() > 0){
+			this._running = this._waiting.removeHead();
+			this._remainingQuanta = this._quanta;
+		}
+
 		if(this._running){
 			this._running.remainingTime--;
 			this._remainingQuanta--;
 		}
-
-		this._lastRunning = this._running;
 	}
 
 
