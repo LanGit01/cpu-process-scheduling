@@ -22,6 +22,16 @@
 	PriorityScheduler.subclass(SimpleScheduler);
 
 
+	PriorityScheduler.prototype.shouldPreempt = function(){
+		if(!this._preemptive){
+			return false;
+		}
+
+		return (this._running !== null && this._waiting.getLength() > 0 && 
+			    comparePriority(this._running, this._waiting.elementAt(0)) > 0);
+	}
+
+
 	PriorityScheduler.prototype.ready = function(){
 		
 	}

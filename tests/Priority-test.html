@@ -62,9 +62,18 @@
 			}
 
 			pm = new ProcessManager();
+			
 			pm.addProcess(1, 10, 0, 3);
 			pm.addProcess(2, 5, 1, 2);
 			pm.addProcess(3, 2, 2, 1);
+			
+
+			/*
+			pm.addProcess(0, 5, 0, 5);
+			pm.addProcess(1, 5, 2, 3);
+			pm.addProcess(2, 5, 4, 4);
+			pm.addProcess(3, 5, 6, 0);
+			*/
 
 			window.onload = function(){
 				generateProcessDataTable(pm.run(new PriorityScheduler(true)));
