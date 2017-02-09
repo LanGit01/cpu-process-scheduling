@@ -44,7 +44,7 @@
 	}
 
 
-	SimpleScheduler.prototype.hasPreempted = function(){
+	SimpleScheduler.prototype.shouldPreempt = function(){
 		// Applicable only at State 1 (Ready State)
 		// Override
 		return false;

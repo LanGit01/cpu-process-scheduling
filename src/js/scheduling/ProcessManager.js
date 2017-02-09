@@ -84,6 +84,8 @@
 				}
 			}
 
+			console.log(time + " " + scheduler.shouldPreempt());
+
 			// State 2
 			scheduler.step();
 
