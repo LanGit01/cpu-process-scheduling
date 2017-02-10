@@ -1,36 +1,34 @@
-(function(global){
-	
-	// Check namespace
-	if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
-		console.log("CPUscheduling is not defined. Module unable to load.");
-		return;
-	}
-
-	var LinkedList = global.CPUscheduling.LinkedList;
+(function(Schedulers, Utils){
+	/**
+	 *	Required Modules:
+	 *		ProcessScheduling.Core.Schedulers
+	 *		ProcessScheduling.Utils
+	 */
+	var LinkedList = Utils.LinkedList,
+		SimpleScheduler = Schedulers.SimpleScheduler;
 
 
 	/**
-	 *	Implementation of the "Shortest Job First" scheduling strategy
+	 *	Scheduler using the Shortest Job First(non-preemptive) or Shortest Remaining Time First(preemptive)
+	 *	scheduling algorithm
 	 */
 	function SJFScheduler(preemptive){
-		this._runningProcess = null;
-		this._waitingProcesses = new LinkedList(compareRemainingTimes);
-
+		this._running = null;
+		this._waiting = null;
 		this._preemptive = preemptive;
-		this._newArrival = false;
 
-		this._logger = null;
+		if(preemptive){
+			this._waiting = new LinkedList(compareBurstTime);
+		}else{
+			this._waiting = new LinkedList(compareRemainingTime);
+		}
 	}
 
 
-	SJFScheduler.prototype.newArrivingProcess = function(process){
-		this._waitingProcesses.insert(process);
-		this._newArrival = true;
-	}
+	SJFScheduler.subclass(SimpleScheduler);
 
+	SJFScheduler.prototype.ready = function(){
 
-	SJFScheduler.prototype.isMultilevel = function(){
-		return false;
 	}
 
 
@@ -39,101 +37,50 @@
 			return false;
 		}
 
-		var running = this._runningProcess,
-			firstWaiting;
-
-		if(running && this._waitingProcesses.getLength() > 0 && this._newArrival){
-			firstWaiting = this._waitingProcesses.elementAt(0);
-			return (compareRemainingTimes(firstWaiting, running) < 0);
-		}
-
-		return false;
+		return (this._running !== null && this._waiting.getLength() > 0 && compareRemainingTime(this._running, this._waiting.elementAt(0)) > 0);
 	}
 
 
-	SJFScheduler.prototype.hasRunningProcess = function(){
-		return (this._runningProcess !== null);
+	SJFScheduler.prototype.acceptProcess = function(process){
+		this._waiting.insert(process);
 	}
 
 
-	SJFScheduler.prototype.getRunningProcess = function(){
-		return this._runningProcess;
-	}
-
-
-	SJFScheduler.prototype.hasWaitingProcesses = function(){
-		return (this._waitingProcesses.getLength() > 0);
-	}
-
-
-	SJFScheduler.prototype.getWaitingProcesses = function(){
-		return this._waitingProcesses.toArray();
-	}
-
-
-	SJFScheduler.prototype.getProcesses = function(){
-		var processes = this._waitingProcesses.toArray();;
-
-		if(this._runningProcess){
-			processes[processes.length] = this._runningProcess;
-		}
-
-		return processes;
-	}
-
-
-	SJFScheduler.prototype.setLogger = function(logger){
-		this._logger = logger;
-	}
-
-	/**
-	 *	Consume 1 time-step of the processor, and if there is a running process, allocates the
-	 *	processor resources to it. 
-	 */
 	SJFScheduler.prototype.step = function(){
-		var running = this._runningProcess,
-			waiting = this._waitingProcesses,
-			firstWaiting;
-
-
-		if(running !== null){
-			// Check for running process termination or preemption
-			if(running.remainingTime === 0){
-				running = null;
+		if(this._running){
+			if(this._running.remainingTime === 0){
+				// Running process terminated
+				this._running = null;
 			}else
-			if(this._preemptive && this._newArrival){
-				firstWaiting = waiting.elementAt(0);
-
-				if(compareRemainingTimes(firstWaiting, running) < 0){
-					waiting.insert(running);
-					running = null;
-				}
+			if(this._preemptive && this._waiting.getLength() > 0 && compareRemainingTime(this._running, this._waiting.elementAt(0)) > 0){
+				// Running process preempted
+				this._waiting.insert(this._running);
+				this._running = null;
 			}
 		}
 
-		// Check if a there is no running process, and if it should load one from the waiting
-		if(running === null && waiting.getLength() > 0){
-			running = waiting.removeHead();
+		if(this._running === null){
+			this._running = this._waiting.removeHead();
 		}
 
-		if(running !== null){
-			running.remainingTime--;
+		if(this._running){
+			this._running.remainingTime--;
 		}
-
-		this._runningProcess = running;
-		this._newArrival = false;
 	}
 
 
-	/*			Auxillary functions			*/
-	function compareRemainingTimes(p1, p2){
-		var r1 = p1.remainingTime,
-			r2 = p2.remainingTime;
+	Schedulers.SJFScheduler = SJFScheduler;
 
-		if(r1 > r2){
+	/* -------------------------------------------------------- *\
+						Auxillary Functions
+	\* -------------------------------------------------------- */
+	
+
+	function compareBurstTime(p1, p2){
+		if(p1.burstTime > p2.burstTime){
 			return 1;
 		}else
-		if(r1 < r2){
+		if(p1.burstTime < p2.burstTime){
 			return -1;
 		}else{
 			return 0;
@@ -141,8 +88,16 @@
 	}
 
 
+	function compareRemainingTime(p1, p2){
+		if(p1.remainingTime > p2.remainingTime){
+			return 1;
+		}else
+		if(p1.remainingTime < p2.remainingTime){
+			return -1;
+		}else{
+			return 0;
+		}
+	}
 
-	global.CPUscheduling.SJFScheduler = SJFScheduler;
 
-
-})(this);
+})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);
