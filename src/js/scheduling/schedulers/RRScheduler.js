@@ -66,50 +66,5 @@
 
 	Schedulers.RRScheduler = RRScheduler;
 
-	/* -------------------------------------------------------- *\
-						Auxillary Functions
-	\* -------------------------------------------------------- */
-	
-	function createPreemptedComparatorObject(){
-		/*	Makes sure the preempted process is on the tail	
-		 * 
-		 *	This works because the element is inserted after all elements <= to it.
-		 *	The preempted is treated as largest, while others are treated as equal.
-		 *
-		 *	NOTE: This is just coincidence, and I actually think this is bad code because it would not work
-		 *		  if not for that coincidence T_T
-		 *	
-		 *		  Should have had insertBefore method in LinkedList
-		 */
-		return (function(){
-			var preempted = null;
-
-			return {
-				comparator: function(a, b){
-					// preempted > everything
-					
-					if(preempted !== null){
-						if(b === preempted){
-							return -1;
-						}else
-						if(a === preempted){
-							return 1;
-						}
-					}
-
-					return 0;
-				},
-
-				setPreempted: function(process){
-					preempted = process;
-				}
-			}	
-		})();
-	}
-
-	
-
-
-
 
 })(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);
