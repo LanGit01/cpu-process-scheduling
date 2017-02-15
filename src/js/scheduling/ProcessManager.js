@@ -36,7 +36,7 @@
 	}
 
 
-	ProcessManager.prototype.run = function(scheduler){
+	ProcessManager.prototype.run = function(scheduler, logger){
 		/*
 			Algorithm:
 
@@ -84,8 +84,6 @@
 				}
 			}
 
-			console.log(time + " " + scheduler.shouldPreempt());
-
 			// State 2
 			scheduler.step();
 
@@ -109,7 +107,10 @@
 				running = false;
 			}else{
 				//console.log("Time: " + time + "\nID: " + scheduler.getRunning().id + "\nRemaining: " + scheduler.getRunning().remainingTime);
-				debugLog(scheduler, time);
+				if(logger){
+					logger.log(scheduler.getRunning(), scheduler.getWaiting());
+				}
+				//debugLog(scheduler, time);
 				time++;
 			}
 		}
