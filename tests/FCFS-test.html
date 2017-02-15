@@ -33,33 +33,15 @@
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/SimpleScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Record.js"></script>
+		<script type = "text/javascript" src = "js/TestUtils.js"></script>
 		<script>
 			var FCFSScheduler = ProcessScheduling.Core.Schedulers.FCFSScheduler,
 				Process = ProcessScheduling.Core.Process,
-				ProcessManager = ProcessScheduling.Core.ProcessManager;
+				ProcessManager = ProcessScheduling.Core.ProcessManager,
+				Record = ProcessScheduling.Core.Record;
 
-			var pm, processList;
-
-			function generateProcessDataTable(processList){
-				var row, process, tbody,
-					tr;
-
-				tbody = document.getElementById("process-data-table").tBodies[0];
-
-				for(row = 0; row < processList.length; row++){
-					process = processList[row];
-
-					tr = tbody.insertRow();
-					tr.insertCell().appendChild(document.createTextNode(process.id));
-					tr.insertCell().appendChild(document.createTextNode(process.burstTime));
-					tr.insertCell().appendChild(document.createTextNode(process.arrivalTime));
-					tr.insertCell().appendChild(document.createTextNode(process.startTime));
-					tr.insertCell().appendChild(document.createTextNode(process.endTime));
-					tr.insertCell().appendChild(document.createTextNode(process.getWaitTime()));
-					tr.insertCell().appendChild(document.createTextNode(process.getResponseTime()));
-					tr.insertCell().appendChild(document.createTextNode(process.getTurnaroundTime()));
-				}
-			}
+			var pm, processList, record;
 
 			pm = new ProcessManager();
 			pm.addProcess(1, 8, 0);
@@ -68,46 +50,21 @@
 			pm.addProcess(4, 9, 1);
 			pm.addProcess(5, 3, 3);
 
-			window.onload = function(){
-				generateProcessDataTable(pm.run(new FCFSScheduler()));
+			record = Record.getInstance();
+			processList = pm.run(new FCFSScheduler(), record);
 
+			window.onload = function(){
+				var content = document.getElementById("content");
+				TestUtils.generateLogTable(document.getElementById("content"), record.getLogs());
+				TestUtils.generateProcessDataTable(content, processList);
 			}
 			
 
 		</script>
 	</head>
 	<body>
-		<div>
-			<table id = "debug-table">
-				<thead>
-					<tr>
-						<th>Time</th>
-						<th>ID</th>
-						<th>Priority</th>
-						<th>Remaining</th>
-						<th>Waiting</th>
-					</tr>
-				</thead>
-				<tbody>
-
-				</tbody>
-			</table>
-			<table id = "process-data-table">
-				<thead>
-					<tr>
-						<th>Process ID</th>
-						<th>Burst Time</th>
-						<th>Arrival Time</th>
-						<th>Start Time</th>
-						<th>End Time</th>
-						<th>Wait Time</th>
-						<th>Response Time</th>
-						<th>Turnaround Time</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
+		<div id = "content">
+			
 		</div>
 	</body>
 </html>
