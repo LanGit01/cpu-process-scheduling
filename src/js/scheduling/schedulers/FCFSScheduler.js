@@ -12,42 +12,27 @@
 	 *	Scheduler using the First Come First Served scheduling algorithm
 	 */
 	function FCFSScheduler(){
-		this._running = null;
-		this._waiting = new LinkedList();
-		this._lastRunning = null;
-
+		SimpleScheduler.call(this, new LinkedList(null, function(process){
+			return process.id;
+		}));
 	}
 
 
 	FCFSScheduler.subclass(SimpleScheduler);
 
-	/**
-	 *	Signifies the start of the timestep cycle.
-	 *
-	 *	Prepares the scheduler for the next cycle. This method must be called to start the next timestep. 
-	 */
-	FCFSScheduler.prototype.ready = function(){
-
-	}
-
-
-	FCFSScheduler.prototype.acceptProcess = function(process){
-		this._waiting.insert(process);
-	}
-
 
 	FCFSScheduler.prototype.step = function(){
 		// Check for termination, remove terminated process
-		if(this._running && this._running.remainingTime === 0){
+		if(this.runningTerminated()){
 			this._running = null;
 		}
 
 		// Select process to run
-		if(this._running === null && this._waiting.getLength() > 0){
+		if(!this.hasRunning() && this.hasWaiting()){
 			this._running = this._waiting.removeHead();
 		}
 
-		if(this._running){
+		if(this.hasRunning()){
 			this._running.remainingTime--;
 		}
 	}

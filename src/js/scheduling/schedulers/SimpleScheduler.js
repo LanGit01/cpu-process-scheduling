@@ -13,6 +13,7 @@
 		this._waiting = list;
 	}
 
+
 	SimpleScheduler.prototype = {
 		hasRunning: function(){
 			return (this._running !== null);
@@ -99,6 +100,12 @@
 			this._waiting.insert(process);
 		},
 
+		/**
+		 *	Removes the process that matches the argument id from the scheduler
+		 *
+		 *	@return the process removed
+		 *			null if none removed
+		 */
 		removeProcess: function(id){
 			var process = null;
 

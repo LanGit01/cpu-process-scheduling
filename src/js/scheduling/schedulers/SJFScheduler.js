@@ -27,43 +27,33 @@
 
 	SJFScheduler.subclass(SimpleScheduler);
 
-	SJFScheduler.prototype.ready = function(){
-
-	}
-
 
 	SJFScheduler.prototype.shouldPreempt = function(){
 		if(!this._preemptive){
 			return false;
 		}
 
-		return (this._running !== null && this._waiting.getLength() > 0 && compareRemainingTime(this._running, this._waiting.elementAt(0)) > 0);
-	}
-
-
-	SJFScheduler.prototype.acceptProcess = function(process){
-		this._waiting.insert(process);
+		return (this.hasRunning() && this.hasWaiting() && compareRemainingTime(this._running, this._waiting.elementAt(0)) > 0);
 	}
 
 
 	SJFScheduler.prototype.step = function(){
-		if(this._running){
-			if(this._running.remainingTime === 0){
-				// Running process terminated
-				this._running = null;
-			}else
-			if(this._preemptive && this._waiting.getLength() > 0 && compareRemainingTime(this._running, this._waiting.elementAt(0)) > 0){
-				// Running process preempted
-				this._waiting.insert(this._running);
-				this._running = null;
-			}
+		// Check for termination
+		if(this.runningTerminated()){
+			this._running = null;
 		}
 
-		if(this._running === null){
+		// Check for preemption
+		if(this.shouldPreempt()){
+			this._waiting.insert(this._running);
+			this._running = null;
+		}
+
+		if(!this.hasRunning()){
 			this._running = this._waiting.removeHead();
 		}
 
-		if(this._running){
+		if(this.hasRunning()){
 			this._running.remainingTime--;
 		}
 	}
@@ -71,10 +61,10 @@
 
 	Schedulers.SJFScheduler = SJFScheduler;
 
+
 	/* -------------------------------------------------------- *\
 						Auxillary Functions
 	\* -------------------------------------------------------- */
-	
 
 	function compareBurstTime(p1, p2){
 		if(p1.burstTime > p2.burstTime){
