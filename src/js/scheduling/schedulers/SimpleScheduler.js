@@ -4,55 +4,119 @@
 	 *		ProcessScheduling.Core.SimpleSchedulers
 	 */
 
-
 	/**
-	 *	Base (interface)class for the simple schedulers: FCFS, SJF, Priority, and Round Robin
-	 *
-	 *		
-	 *
+	 *	Base (abstract) class for the simple schedulers: FCFS, SJF, Priority, and Round Robin
+	 *	@class
 	 */
-	function SimpleScheduler(){}
-
-
-	SimpleScheduler.prototype.hasRunning = function(){
-		return (this._running !== null);
+	function SimpleScheduler(list){
+		this._running = null;
+		this._waiting = list;
 	}
 
+	SimpleScheduler.prototype = {
+		hasRunning: function(){
+			return (this._running !== null);
+		},
 
-	SimpleScheduler.prototype.hasWaiting = function(){
-		return (this._waiting.getLength() > 0);
-	}
+		hasWaiting: function(){
+			return (this._waiting.getLength() > 0);
+		},
 
-	SimpleScheduler.prototype.getRunning = function(){
-		return this._running;
-	}
+		hasProcess: function(){
+			return (this.hasRunning() || this.hasWaiting());
+		},
 
-	SimpleScheduler.prototype.getWaiting = function(){
-		return this._waiting.toArray();
-	}
+		/**
+		 *	@return {Process} - running process
+		 */
+		getRunning: function(){
+			return this._running;
+		},
 
+		/**
+		 *	@return {Array<Process>} - list of waiting processes
+		 */
+		getWaiting: function(){
+			return this._waiting.toArray();
+		},
 
-	SimpleScheduler.prototype.runningTerminated = function(){
-		// applicable only at State 2 (Running State)
-		return (this._running && this._running.remainingTime === 0);
-	}
+		/**
+		 *	Note there are no guarantees in the ordering of the returned array.
+		 *
+		 *	@return {Array<Process>} - list of all process
+		 */
+		getProcesses: function(){
+			var processes = this.getWaiting();
+			if(this.hasRunning()){
+				processes.push(this.getRunning());
+			}
+			return processes;
+		},
 
+		/**
+		 *	Returns true if the current running process only started running this time step.
+		 *	Or rather, if it is the first time it used the processor's resources.
+		 *
+		 *	@return true if first time running
+		 *			falsy if not, or if there is no running process
+		 */
+		hasNewStartingProcess: function(){
+			return (this._running && this._running.burstTime === (this._running.remainingTime + 1));
+		},
 
-	SimpleScheduler.prototype.isStartingProcess = function(){
-		// applicable only at State 2 (Running State)
-		return (this._running && this._running.burstTime === (this._running.remainingTime + 1));
-	}
+		/**
+		 *	@return true if the current running process is terminated this time step.
+		 *			falsy if not, or if there is no running process
+		 */
+		runningTerminated: function(){
+			return (this._running && this._running.remainingTime === 0);
+		},
 
+		/*
+		hasPreempted: function(){
 
-	SimpleScheduler.prototype.shouldPreempt = function(){
-		// Applicable only at State 1 (Ready State)
-		// Override
-		return false;
-		//return (this._lastRunning && this._lastRunning.remainingTime > 0 && this._lastRunning !== this._running);
-	}
+		},*/
 
+		/**
+		 *	Returns true if the current running process will be preempted next timestep.
+		 *	This method should be called after all process for this timestep has arrived, and before calling
+		 *	'step()'
+		 *
+		 *	This should be overrided in subclasses.
+		 *
+		 *	@return true if the current running process should be preempted,
+		 *			false if not, or if there is no running process
+		 */
+		shouldPreempt: function(){
+			return false;
+		},
 
-	SimpleScheduler.prototype.getProcesses = function(){}
+		contains: function(id){
+
+		},
+
+		acceptProcess: function(process){
+			this._waiting.insert(process);
+		},
+
+		removeProcess: function(id){
+			var process = null;
+
+			if(this._running && this._running.id === id){
+				process = this._running;
+				this._running = null;
+			}else{
+				process = this._waiting.remove(id);
+			}
+
+			return process;
+		},
+
+		/**
+		 *	Should be overriden by subclasses.
+		 */
+		step: function(){}
+	};
 
 	Schedulers.SimpleScheduler = SimpleScheduler;
 
