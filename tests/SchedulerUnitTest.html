@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			#test-results{
+				font: 13px monospace;
+			}
+		</style>
+		<title>Single Level Scheduling Unit Testing</title>
+		<script type = "text/javascript" src = "../src/js/utils/sugar.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
+		<script type = "text/javascript" src = "../src/js/main.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/SimpleScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/FCFSScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/PriorityScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/SJFScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Record.js"></script>
+		<script type = "text/javascript" src = "js/SchedulerUnitTester.js"></script>
+		<script type = "text/javascript" src = "js/TestData1.js"></script>
+	</head>
+	<body>
+		<pre>
+			<div id = "test-results"></div>
+		</pre>
+	</body>
+	<script>
+		SchedulerUnitTester.test(TestData1, document.getElementById("test-results"));
+	</script>
+</html>
