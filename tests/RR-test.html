@@ -27,86 +27,63 @@
 		</style>
 		<title>Round Robin Scheduling Test</title>
 		<script type = "text/javascript" src = "../src/js/utils/sugar.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
 		<script type = "text/javascript" src = "../src/js/main.js"></script>
 		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/Process.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/SimpleScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/schedulers/RRScheduler.js"></script>
 		<script type = "text/javascript" src = "../src/js/scheduling/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/scheduling/Record.js"></script>
+		<script type = "text/javascript" src = "js/TestUtils.js"></script>
+		<script type = "text/javascript" src = "TestData.js"></script>
 		<script>
 			var RRScheduler = ProcessScheduling.Core.Schedulers.RRScheduler,
 				Process = ProcessScheduling.Core.Process,
-				ProcessManager = ProcessScheduling.Core.ProcessManager;
+				ProcessManager = ProcessScheduling.Core.ProcessManager,
+				Record = ProcessScheduling.Core.Record;
 
-			var pm, processList;
-
-			function generateProcessDataTable(processList){
-				var row, process, tbody,
-					tr;
-
-				tbody = document.getElementById("process-data-table").tBodies[0];
-
-				for(row = 0; row < processList.length; row++){
-					process = processList[row];
-
-					tr = tbody.insertRow();
-					tr.insertCell().appendChild(document.createTextNode(process.id));
-					tr.insertCell().appendChild(document.createTextNode(process.burstTime));
-					tr.insertCell().appendChild(document.createTextNode(process.arrivalTime));
-					tr.insertCell().appendChild(document.createTextNode(process.startTime));
-					tr.insertCell().appendChild(document.createTextNode(process.endTime));
-					tr.insertCell().appendChild(document.createTextNode(process.getWaitTime()));
-					tr.insertCell().appendChild(document.createTextNode(process.getResponseTime()));
-					tr.insertCell().appendChild(document.createTextNode(process.getTurnaroundTime()));
-				}
-			}
+		
+			var pm, processList, record;
 
 			pm = new ProcessManager();
-			pm.addProcess(1, 16, 0);
-			pm.addProcess(2, 10, 0);
-			pm.addProcess(3, 4, 6);
-			pm.addProcess(4, 6, 7);
-			pm.addProcess(5, 10, 8);
 
+			(function(){
+				var arr = [
+					[0, 5, 0, 0],
+					[1, 3, 0, 2],
+					[2, 4, 0, 1],
+					[3, 2, 12, 0],
+					[4, 8, 16, 1],
+					[5, 4, 18, 0],
+					[6, 5, 19, 2],
+					[7, 3, 35, 2],
+					[8, 4, 34, 0],
+					[9, 6, 39, 3],
+					[10, 4, 40, 1]	
+				];
+
+				for(var i = 0; i < arr.length; i++){
+					pm.addProcess(arr[i][0], arr[i][1], arr[i][2], arr[i][3]);
+				}
+			})();
+			
+
+			record = new Record();
+			processList = pm.run(new RRScheduler(2), record);
+			
 			window.onload = function(){
-				generateProcessDataTable(pm.run(new RRScheduler(5)));
+				var content = document.getElementById("content");
+				TestUtils.generateLogTable(document.getElementById("content"), record.getLogs());
+				TestUtils.generateProcessDataTable(content, processList);
 			}
 			
 
 		</script>
 	</head>
 	<body>
-		<div>
-			<table id = "debug-table">
-				<thead>
-					<tr>
-						<th>Time</th>
-						<th>ID</th>
-						<th>Priority</th>
-						<th>Remaining</th>
-						<th>Waiting</th>
-					</tr>
-				</thead>
-				<tbody>
-
-				</tbody>
-			</table>
-			<table id = "process-data-table">
-				<thead>
-					<tr>
-						<th>Process ID</th>
-						<th>Burst Time</th>
-						<th>Arrival Time</th>
-						<th>Start Time</th>
-						<th>End Time</th>
-						<th>Wait Time</th>
-						<th>Response Time</th>
-						<th>Turnaround Time</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
+		<div id = "content">
+			
 		</div>
 	</body>
 </html>
