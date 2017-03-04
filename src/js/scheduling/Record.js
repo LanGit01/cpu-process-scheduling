@@ -1,100 +1,85 @@
 /**
  *
- *	Multi Level:
- *
+ *	Single Level Timestep Entry:
+ *		
  *		entry: {
- *			running: {level, process},
- *			waiting: {
- *				level,
- *				processes: [process]
- *			}
- *			event: 
+ *			running: process,
+ *			waiting: Array<process>
  *		}
  *
- *	Single Level:
+ *
+ *	Multi Level Timestep Entry
  *
  *		entry: {
  *			running: process
- *			waiting: [process]
- *			event:
+ *			waiting: Array<process>
+ *			levelmap: Map<id, level>
  *		}
- *
- *	
- *
- *
  */
  (function(Core){
- 	/**
- 	 *	Required modules/classes
- 	 *		ProcessScheduling.Utils.LinkedList
- 	 */
 
- 	function Logger(multilevel){
+ 	function Record(){
  		this._logs = [];
- 		this.isMultilevel = multilevel;
+ 		this._boundScheduler = null;
  	}
 
 
- 	Logger.prototype.log = function(runningProcess, waitingProcesses){
- 		if(this.isMultilevel){
-
- 		}else{
- 			this._logs[this._logs.length] = createSingleLevelLog(runningProcess, waitingProcesses);
+ 	Record.prototype.bindScheduler = function(scheduler){
+ 		if(!scheduler || !scheduler.getRunning || !scheduler.getWaiting){
+ 			return false;
  		}
+
+ 		this.clearLogs();
+ 		this._boundScheduler = scheduler;
  	}
 
 
- 	Logger.prototype.getLogs = function(){
+ 	Record.prototype.releaseScheduler = function(){
+ 		var scheduler = this._boundScheduler;
+ 		this._boundScheduler = null;
+ 		return scheduler;
+ 	}
+
+
+ 	Record.prototype.notifyTimestepOccurred = function(){
+ 		var running, waiting, i, waitingIDs = [];
+
+ 		if(this._boundScheduler === null){
+ 			return;
+ 		}
+
+ 		running = this._boundScheduler.getRunning();
+ 		waiting = this._boundScheduler.getWaiting();
+
+ 		for(i = 0; i < waiting.length; i++){
+ 			waitingIDs[i] = createProcessLogData(waiting[i].id);
+ 		}
+
+ 		this._logs.push({
+ 			running: running && createProcessLogData(running),
+ 			waiting: waiting
+ 		});
+ 	}
+
+
+ 	Record.prototype.clearLogs = function(){
+ 		this._logs = [];
+ 	}
+
+
+ 	Record.prototype.getLogs = function(){
  		return this._logs;
  	}
 
 
- 	/*==================================================*\
-					Private Functions
-	\*==================================================*/
-	
- 	function createSingleLevelLog(runningProcess, waitingProcesses){
- 		var i, waiting = [];
+ 	Core.Record = Record;
 
- 		for(i = 0; i < waitingProcesses.length; i++){
- 			waiting[i] = createProcessLogData(waitingProcesses[i]);
- 		}
 
+ 	function createProcessLogData(p){
  		return {
- 			running: createProcessLogData(runningProcess),
- 			waiting: waiting
+ 			id: p.id,
+ 			remainingTime: p.remainingTime
  		};
  	}
-
-
-
- 	function createProcessLogData(process, level){
- 		if(process === null){
- 			return null;
- 		}
-
- 		var pData = {
- 			id: process.id,
- 			remainingTime: process.remainingTime
- 		};
-
- 		if(level){
- 			pData.level = level;
- 		}
-
- 		return pData;
- 	}
-
-
- 	Core.Record = {
- 		getInstance: function(){
- 			return new Logger(false);
- 		},
-
- 		getMultiLevelInstance: function(){
- 			return new Logger(true);
- 		}
- 	};
-
 
  })(ProcessScheduling.Core);
