@@ -38,22 +38,14 @@
 
 	ProcessManager.prototype.run = function(scheduler, logger){
 		/*
-			Algorithm:
-
-				set time = 0
-				while there are processes to arrive OR scheduler is still running
-					ready state
-					add arriving processes to scheduler
-					step state (execute timestep)
-
-			Loading the processes:
-				if next arriving process's arrivalTime === time
-					while next process === arrivalTime
-						add
-		*/
+		 *	while has future process and has running process
+		 *		send this timestep's arriving process to scheduler
+		 *		execute timestep
+		 *		examine and log the timestep
+		 */
 		var processDataItr, running, 
 			nextArrivalTime, time, processData, 
-			process, processClones;
+			process, processClones = null;
 
 
 		// If empty, no need to run
@@ -63,11 +55,19 @@
 			nextArrivalTime = processDataItr.peekNext().process.arrivalTime;
 			time = 0;
 			running = true;
+
+			// Check for invalid logger object
+			if(logger){
+				if(!logger.bindScheduler || !logger.releaseScheduler || !logger.notifyTimestepOccurred){
+					logger = null;
+				}else{
+					logger.bindScheduler(scheduler);
+				}
+			}
 		}
 
+
 		while(running){
-			// State 1
-			scheduler.ready();
 			// Poll for arriving processes
 			// Pass copy of arriving processes into scheduler
 			while(nextArrivalTime === time){
@@ -84,7 +84,6 @@
 				}
 			}
 
-			// State 2
 			scheduler.step();
 
 			// Check for termination/start of a new process
@@ -96,7 +95,7 @@
 					process.endTime = time;
 				}
 
-				if(scheduler.isStartingProcess()){
+				if(scheduler.hasNewStartingProcess()){
 					process.startTime = time;
 				}
 			}
@@ -108,11 +107,16 @@
 			}else{
 				//console.log("Time: " + time + "\nID: " + scheduler.getRunning().id + "\nRemaining: " + scheduler.getRunning().remainingTime);
 				if(logger){
-					logger.log(scheduler.getRunning(), scheduler.getWaiting());
+					logger.notifyTimestepOccurred();
+					//logger.log(scheduler.getRunning(), scheduler.getWaiting());
 				}
 				//debugLog(scheduler, time);
 				time++;
 			}
+		}
+
+		if(logger){
+			logger.releaseScheduler(scheduler);
 		}
 
 		return processClones;
