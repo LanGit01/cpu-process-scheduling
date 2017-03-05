@@ -9,10 +9,6 @@
 
 	/**
 	 *	Container object for scheduling-related data of a single process
-	 *
-	 *	Holds the two data categories:
-	 *		1. initial data
-	 *		2. log data - data collected after the process is ran and completed
 	 */
 	function Process(id, burstTime, arrivalTime, priority){
 		// Initial data
@@ -27,9 +23,6 @@
 		// Log data
 		this.endTime = NO_VALUE;
 		this.startTime = NO_VALUE;
-		
-		//this.responseTime = NO_VALUE;
-		//this.waitTime = NO_VALUE;
 	}
 
 

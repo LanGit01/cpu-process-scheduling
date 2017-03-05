@@ -54,8 +54,6 @@
 		if(this.hasRunning()){
 			this._running.remainingTime--;
 		}
-
-		this._lastRunning = this._running;
 	};
 
 
@@ -65,10 +63,9 @@
 						Auxillary Functions
 	\* -------------------------------------------------------- */
 
-	/*
-	 *	lower number -> higher priority
-	 */
+
 	function comparePriority(p1, p2){
+		// higher number -> higher priority
 		if(p1.priority > p2.priority){
 			return -1;
 		}else

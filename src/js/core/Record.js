@@ -17,6 +17,10 @@
  *		}
  */
  (function(Core){
+ 	/*
+ 	 *	Required modules/classes
+ 	 *		ProcessScheduling.Core
+ 	 */
 
  	function Record(){
  		this._logs = [];

@@ -1,12 +1,11 @@
 (function(Schedulers){
 	/**
 	 *	Required modules/classes:
-	 *		ProcessScheduling.Core.SimpleSchedulers
+	 *		ProcessScheduling.Core.Schedulers
 	 */
 
 	/**
 	 *	Base (abstract) class for the simple schedulers: FCFS, SJF, Priority, and Round Robin
-	 *	@class
 	 */
 	function SimpleScheduler(list){
 		this._running = null;
@@ -15,6 +14,7 @@
 
 
 	SimpleScheduler.prototype = {
+		constructor: SimpleScheduler,
 		hasRunning: function(){
 			return (this._running !== null);
 		},
