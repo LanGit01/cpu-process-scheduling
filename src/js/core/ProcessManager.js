@@ -33,7 +33,7 @@
 			insertLevel: level,
 			process: new Process(id, burstTime, arrivalTime, priority)
 		});	
-	}
+	};
 
 
 	ProcessManager.prototype.run = function(scheduler, logger){
@@ -120,7 +120,7 @@
 		}
 
 		return processClones;
-	}
+	};
 
 	Core.ProcessManager = ProcessManager;
 

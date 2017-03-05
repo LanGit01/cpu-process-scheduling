@@ -31,7 +31,7 @@
 
 		return (this.hasRunning() && this.hasWaiting() && 
 			    comparePriority(this._running, this._waiting.elementAt(0)) > 0);
-	}
+	};
 
 
 	PriorityScheduler.prototype.step = function(){
@@ -56,7 +56,7 @@
 		}
 
 		this._lastRunning = this._running;
-	}
+	};
 
 
 	Schedulers.PriorityScheduler = PriorityScheduler;

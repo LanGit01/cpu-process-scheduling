@@ -31,14 +31,14 @@
 
  		this.clearLogs();
  		this._boundScheduler = scheduler;
- 	}
+ 	};
 
 
  	Record.prototype.releaseScheduler = function(){
  		var scheduler = this._boundScheduler;
  		this._boundScheduler = null;
  		return scheduler;
- 	}
+ 	};
 
 
  	Record.prototype.notifyTimestepOccurred = function(){
@@ -59,17 +59,17 @@
  			running: running && createProcessLogData(running),
  			waiting: waiting
  		});
- 	}
+ 	};
 
 
  	Record.prototype.clearLogs = function(){
  		this._logs = [];
- 	}
+ 	};
 
 
  	Record.prototype.getLogs = function(){
  		return this._logs;
- 	}
+ 	};
 
 
  	Core.Record = Record;

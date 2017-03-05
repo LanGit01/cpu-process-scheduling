@@ -39,7 +39,7 @@
 		}
 
 		return NO_VALUE;
-	}
+	};
 
 
 	Process.prototype.getResponseTime = function(){
@@ -48,7 +48,7 @@
 		}
 
 		return NO_VALUE;
-	}
+	};
 
 
 	Process.prototype.getWaitTime = function(){
@@ -59,7 +59,7 @@
 		}
 
 		return NO_VALUE;
-	}
+	};
 
 
 	Process.NO_VALUE = NO_VALUE;

@@ -35,7 +35,7 @@
 		if(this.hasRunning()){
 			this._running.remainingTime--;
 		}
-	}
+	};
 
 
 	Schedulers.FCFSScheduler = FCFSScheduler;

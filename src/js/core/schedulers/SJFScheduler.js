@@ -34,7 +34,7 @@
 		}
 
 		return (this.hasRunning() && this.hasWaiting() && compareRemainingTime(this._running, this._waiting.elementAt(0)) > 0);
-	}
+	};
 
 
 	SJFScheduler.prototype.step = function(){
@@ -56,7 +56,7 @@
 		if(this.hasRunning()){
 			this._running.remainingTime--;
 		}
-	}
+	};
 
 
 	Schedulers.SJFScheduler = SJFScheduler;

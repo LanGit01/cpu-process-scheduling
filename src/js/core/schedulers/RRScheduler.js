@@ -25,7 +25,7 @@
 
 	RRScheduler.prototype.shouldPreempt = function(){
 		return (this._running !== null && this._running.remainingTime > 0 && this._remainingQuanta === 0);
-	}
+	};
 
 
 	RRScheduler.prototype.step = function(){
@@ -50,7 +50,7 @@
 			this._running.remainingTime--;
 			this._remainingQuanta--;
 		}
-	}
+	};
 
 
 	Schedulers.RRScheduler = RRScheduler;

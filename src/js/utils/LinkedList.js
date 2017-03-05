@@ -86,7 +86,7 @@
 		}
 
 		this._length++;
-	}
+	};
 
 
 	/*
@@ -134,7 +134,7 @@
 
 		this._length--;
 		return element;
-	}
+	};
 
 
 	LinkedList.prototype.removeHead = function(){
@@ -154,12 +154,12 @@
 
 		this._length--;
 		return element;
-	}
+	};
 
 
 	LinkedList.prototype.removeTail = function(){
 
-	}
+	};
 
 
 	/**
@@ -178,17 +178,17 @@
 		}
 
 		return current.data;
-	}
+	};
 
 
 	LinkedList.prototype.getLength = function(){
 		return this._length;
-	}
+	};
 
 
 	LinkedList.prototype.getIterator = function(){
 		return new Iterator(this);
-	}
+	};
 
 
 	LinkedList.prototype.toArray = function(){
@@ -200,7 +200,7 @@
 		}
 
 		return ar;
-	}
+	};
 
 
 
@@ -215,7 +215,7 @@
 
 	Iterator.prototype.hasNext = function(){
 		return (this._current !== null);
-	}
+	};
 
 
 	Iterator.prototype.getNext = function(){
@@ -226,7 +226,7 @@
 		var element = this._current.data;
 		this._current = this._current.next;
 		return element;
-	}
+	};
 
 
 	Iterator.prototype.peekNext = function(){
@@ -235,7 +235,7 @@
 		}
 
 		return this._current.data;
-	}
+	};
 
 
 
