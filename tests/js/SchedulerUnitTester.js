@@ -78,7 +78,7 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 			if(
 				value.id !== correctValue[ID] ||
 				value.startTime !== correctValue[ST] ||
-				value.endTime !== correctValue[ET] |
+				value.endTime !== correctValue[ET] ||
 				value.getWaitTime() !== correctValue[WT] ||
 				value.getTurnaroundTime() !== correctValue[TT]
 			){
