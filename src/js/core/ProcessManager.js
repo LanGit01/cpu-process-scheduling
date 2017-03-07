@@ -30,7 +30,7 @@
 		}
 
 		this._processData.insert({
-			insertLevel: level,
+			level: level,
 			process: new Process(id, burstTime, arrivalTime, priority)
 		});	
 	};

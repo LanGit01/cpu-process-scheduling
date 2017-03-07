@@ -4,10 +4,11 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 		FCFSScheduler = Schedulers.FCFSScheduler,
 		RRScheduler = Schedulers.RRScheduler,
 		PriorityScheduler = Schedulers.PriorityScheduler,
-		SJFScheduler = Schedulers.SJFScheduler;
+		SJFScheduler = Schedulers.SJFScheduler,
+		MLQScheduler = Schedulers.MLQScheduler;
 
 	// ID BT AT Priority ST ET WT TT
-	var ID = 0, BT = 1, AT = 2, Prio = 3, ST = 4, ET = 5, WT = 6, TT = 7;
+	var ID = 0, BT = 1, AT = 2, Prio = 3, ST = 4, ET = 5, WT = 6, TT = 7, level = 8;
 
 	function test(data, htmlDiv){
 		var outputStr = "Scheduler Unit Test\n==============================\n\n\n";
@@ -23,12 +24,12 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 		}
 
 		if(data.PriorityNonPreemptive){
-			outputStr += "Priority Non Preemptive\n-----\n" + 
+			outputStr += "Priority Non Preemptive\n-----------------------\n" + 
 					  generateTextReport(runScheduler(data.PriorityNonPreemptive.data, new PriorityScheduler(false)), data.PriorityNonPreemptive) + "\n\n\n";							
 		}
 
 		if(data.PriorityPreemptive){
-			outputStr += "Priority Preemptive\n-----\n" + 
+			outputStr += "Priority Preemptive\n--------------------\n" + 
 					  generateTextReport(runScheduler(data.PriorityPreemptive.data, new PriorityScheduler(true)), data.PriorityPreemptive) + "\n\n\n";							
 		}
 
@@ -42,6 +43,18 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 					  generateTextReport(runScheduler(data.SRTF.data, new SJFScheduler(true)), data.SRTF) + "\n\n\n";
 		}
 
+		if(data.MLQ){
+			outputStr += "MLQ Non-Preemptive\n------------------\n" +
+					  	generateTextReport(runScheduler(data.MLQ.data, 
+					  		new MLQScheduler(false, [
+					  			new PriorityScheduler(true),
+					  			new SJFScheduler(true),
+					  			new RRScheduler(2),
+					  			new FCFSScheduler()
+					  		])), 
+					  	data.MLQ, true) + "\n\n\n";
+		}
+
 
 		if(htmlDiv){
 			htmlDiv.appendChild(document.createTextNode(outputStr));
@@ -51,12 +64,12 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 	}
 
 
-	function generateTextReport(results, correct){
+	function generateTextReport(results, correct, multilevel){
 		var processes = results.processes,
 			logs = results.logs,
 			incorrectProcesses = findIncorrectData(results.processes, correct.data),
 			incorrectLogs = findIncorrectLogs(results.logs, correct.logs),
-			report;
+			incorrectMaps, report;
 
 		report = "Tested: " + processes.length + "\nCorrect: " + (processes.length - incorrectProcesses.length) +
 				 "\nIncorrect: " + incorrectProcesses.length +
@@ -67,6 +80,11 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 		report += "Num Logs: " + logs.length + 
 				  "\nIncorrect Logs List: [" + (incorrectLogs.join(", ") || "none") + "]";
 
+		if(multilevel){
+			incorrectMaps = findIncorrectMap(results.processLevelMap, correct.map);
+			report += "\nIncorrect Map List: [" + (incorrectMaps.join(", ")|| "none") + "]";	
+		}
+		
 		return report;
 	}
 
@@ -101,13 +119,30 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 	}
 
 
+	function findIncorrectMap(resultMap, correctMap){
+		return resultMap.reduce(function(accumulator, value, index){
+			var i, m = correctMap[index], pair;
+
+			for(i = 0; i < m.length; i++){
+				pair = m[i];
+				if(!(pair[0] in value) || value[pair[0]] !== pair[1]){
+					accumulator.push(index);
+					break;
+				}
+			}
+
+			return accumulator;
+		}, []);
+	}
+
+
 	function runScheduler(data, scheduler){
 		var pm = new ProcessManager(),
-			i, pData, record, processes;
+			i, pData, record, processes, recordLogs;
 
 		for(i = 0; i < data.length; i++){
 			pData = data[i];
-			pm.addProcess(pData[ID], pData[BT], pData[AT], pData[Prio]);
+			pm.addProcess(pData[ID], pData[BT], pData[AT], pData[Prio], pData[level]);
 		}
 
 		record = new Record();
@@ -127,7 +162,11 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 
 			logs: record.getLogs().map(function(value){
 				return (value.running ? value.running.id : -1);
-			})
+			}),
+
+			processLevelMap: (scheduler.getProcessLevelMap ? record.getLogs().map(function(value){
+				return value.processLevelMap;
+			}) : null)
 		}
 	}
 

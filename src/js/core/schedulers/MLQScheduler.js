@@ -1,80 +1,51 @@
-(function(global){
-	
-	// Check namespace
-	if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
-		console.log("CPUscheduling is not defined. Module unable to load.");
-		return;
-	}
-
-	var LinkedList = global.CPUscheduling.LinkedList;
-
-
-	// Get methods could probably use some caching
-
+(function(Schedulers, Utils){
 	/**
-	 *	Implementation of the "Multilevel Queue" scheduling strategy
+	 *	Required modules/classes:
+	 *		ProcessScheduling.Core.Schedulers
+	 *		ProcessScheduling.Utils	
 	 */
+
+	var LinkedList = Utils.LinkedList;
+
+
 	function MLQScheduler(preemptive, schedulers){
 		this._levels = schedulers;
-		this._runningLevel = schedulers.length;
-		this._top = schedulers.length;
 		this._preemptive = preemptive;
 
+		this._top = schedulers.length;
+		this._currentLevel = schedulers.length;
 	}
 
 
-	MLQScheduler.prototype.newArrivingProcess = function(process, level){
-		// level is zero-indexed
-		if(level < 0 || level > this._levels.length - 1){
+	MLQScheduler.prototype.acceptProcess = function(process, level){
+		if((!level && level !== 0) || level > this._levels.length - 1){
 			return;
 		}
 
-		this._levels[level].newArrivingProcess(process);
-		
-		if(this._top > level){
+		this._levels[level].acceptProcess(process);
+		if(level < this._top){
 			this._top = level;
 		}
 	}
 
 
-	MLQScheduler.prototype.isMultilevel = function(){
-		return true;
+	MLQScheduler.prototype.hasRunning = function(){
+		return (this._currentLevel < this._levels.length && this._levels[this._currentLevel].hasRunning());
 	}
 
 
-	MLQScheduler.prototype.getNumLevels = function(){
-		return this._levels.length;
-	}
+	MLQScheduler.prototype.hasWaiting = function(){
+		var i, hasWaiting = false;
 
-
-	MLQScheduler.prototype.hasRunningProcess = function(){
-		return this._runningLevel < this._levels.length && this._levels[this._runningLevel].hasRunningProcess();
-	}
-
-
-	MLQScheduler.prototype.getRunningProcess = function(){
-		if(this._runningLevel < this._levels.length){
-			return {
-				level: this._runningLevel,
-				process: this._levels[this._runningLevel].getRunningProcess()
-			}
+		if(!this.hasProcess()){
+			return false;
 		}
 
-		return null;
-	}
-
-
-	MLQScheduler.prototype.hasWaitingProcesses = function(){
-		var i, p, level, hasWaiting = false;
-
 		for(i = this._top; i < this._levels.length && !hasWaiting; i++){
-			level = this._levels[i];
-
-			if(i === this._runningLevel){
-				hasWaiting = this._levels[i].hasWaitingProcesses();
+			if(i === this._currentLevel){
+				hasWaiting = this._levels[i].hasWaiting();
 			}else{
-				p = level.getRunningProcess();
-				hasWaiting = level.hasWaitingProcesses() || (p !== null && p.remainingTime > 0);
+				hasWaiting = this._levels[i].hasProcess();
 			}
 		}
 
@@ -82,88 +53,125 @@
 	}
 
 
-	MLQScheduler.prototype.getWaitingProcesses = function(){
-		var currentLevel, levelScheduler, running, hasWaiting,
-			waitingArr = [];
+	MLQScheduler.prototype.getRunning = function(){
+		if(this._currentLevel < this._levels.length){
+			return this._levels[this._currentLevel].getRunning();
+		}
 
-		for(currentLevel = this._top; currentLevel < this._levels.length; currentLevel++){
-			levelScheduler = this._levels[currentLevel];
-			running = levelScheduler.getRunningProcess();
-			hasWaiting = levelScheduler.hasWaitingProcesses();
+		return null;
+	}
 
-			if(currentLevel !== this._runningLevel && (running && running.remainingTime > 0)){
-				waitingArr[waitingArr.length] = {
-					level: currentLevel,
-					process: levelScheduler.getProcesses()
-				};
-			}else
-			if(hasWaiting){
-				waitingArr[waitingArr.length] = {
-					level: currentLevel,
-					process: levelScheduler.getWaitingProcesses()
-				};
+
+	MLQScheduler.prototype.getWaiting = function(){
+		var waiting = [], waitingOnLevel,
+			level, i;
+
+		for(levelIndex = this._top; levelIndex < this._levels.length; levelIndex++){
+			if(levelIndex === this._currentLevel){
+				waitingOnLevel = this._levels[levelIndex].getWaiting();
+			}else{
+				waitingOnLevel = this._levels[levelIndex].getProcesses();
+			}
+
+			for(i = 0; i < waitingOnLevel.length; i++){
+				waiting[waiting.length] = waitingOnLevel[i];
 			}
 		}
 
-		return waitingArr;
+		return waiting;
 	}
+
+
+	MLQScheduler.prototype.hasProcess = function(){
+		return (this._top < this._levels.length);
+	}
+
+
+
+	MLQScheduler.prototype.runningTerminated = function(){
+		return (this.hasRunning() && this._levels[this._currentLevel].runningTerminated());
+	}
+
+
+	MLQScheduler.prototype.shouldPreempt = function(){
+		return (this._preemptive && this._top < this._currentLevel);
+	}
+
+
+	MLQScheduler.prototype.hasNewStartingProcess = function(){
+		var running = this.getRunning();
+
+		return !!(running && running.remainingTime + 1 === running.burstTime);
+	}
+
+
+	MLQScheduler.prototype.contains = function(id){
+
+	}
+
+
+	MLQScheduler.prototype.getProcessLevelMap = function(){
+		var map = Object.create(null),
+			levelIndex, i, processes;
+
+		for(levelIndex = this._top; levelIndex < this._levels.length; levelIndex++){
+			processes = this._levels[levelIndex].getProcesses();
+
+			for(i = 0; i < processes.length; i++){
+				map[processes[i].id] = levelIndex;
+			}
+		}
+
+		return map;
+	}
+
+
+	MLQScheduler.prototype._findTopLevel = function(){
+		for(var topLevel = this._top; topLevel < this._levels.length; topLevel++){
+			if(this._levels[topLevel].hasProcess()){
+				break;
+			}
+		}
+
+		return topLevel;
+	}
+
 
 
 	MLQScheduler.prototype.step = function(){
-		var shouldReevaluate, running, level,
-			hasUnemptyLevel,
-			numLevels = this._levels.length;
+		var shouldReevaluate, top, current, level;
+		
+		if(!this.hasProcess()){
+			return;
+		}
 
-		/*
-			Should reevaluate when:
-				1. a process terminates/is preempted and top < running level
-				2. a process terminates/is preempted and there is no waiting process in the same level
+		top = this._top;
+		current = this._currentLevel;
 
-			Reevaluation:
-				Assumptions:
-					- this._top always points to the highest unempty level
-
-				Algorithm:
-					1. From this._top to end of levels, do:
-						- step the scheduler at the current level
-						- if there is running, finish the loop and set top = current level
-					2. If there are no unempty levels, set both top and runningLevel to length of level array
-		 */
-		if(this._top < numLevels){
-			shouldReevaluate = (this._runningLevel === numLevels);
-
+		if(current === this._levels.length){
+			shouldReevaluate = true;
+		}else{
+			level = this._levels[current];
 			// Check for termination
-			if(this._runningLevel < numLevels){
-				level = this._levels[this._runningLevel];
-				running = level.getRunningProcess();
-				shouldReevaluate = ((running && running.remainingTime === 0) || level.shouldPreempt()) && (this._top < this._runningLevel || !level.hasWaitingProcesses());
-
-				// Check for preemption
-				shouldReevaluate = shouldReevaluate || (this._preemptive && this._top < this._runningLevel);
-			}
-
-			if(shouldReevaluate){
-				this._runningLevel = this._top;
-				hasUnemptyLevel = false;
-
-				while(this._runningLevel < numLevels && !hasUnemptyLevel){
-					level = this._levels[this._runningLevel];
-					level.step();
-
-					if(level.hasRunningProcess()){
-						hasUnemptyLevel = true;
-					}else{
-						this._runningLevel++;
-					}
-				}
-
-				this._top = this._runningLevel;
-			}else{
-				this._levels[this._runningLevel].step();
+			if(this.runningTerminated()){
+				level.removeProcess(level.getRunning().id);
+				shouldReevaluate = (top < current || !level.hasWaiting());
+			}else
+			if((top < current) && (level.shouldPreempt() || this._preemptive)){
+				shouldReevaluate = true;
 			}
 		}
+
+		if(shouldReevaluate){
+			this._top = this._currentLevel = current = this._findTopLevel();
+		}
+
+		if(current < this._levels.length){
+			this._levels[current].step();
+		}
+
 	}
 
-	global.CPUscheduling.MLQScheduler = MLQScheduler;
+	Schedulers.MLQScheduler = MLQScheduler;
 
-})(this);
+})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);

@@ -46,7 +46,7 @@
 
 
  	Record.prototype.notifyTimestepOccurred = function(){
- 		var running, waiting, i, waitingIDs = [];
+ 		var running, waiting, i, waitingIDs = [], log;
 
  		if(this._boundScheduler === null){
  			return;
@@ -59,10 +59,16 @@
  			waitingIDs[i] = createProcessLogData(waiting[i].id);
  		}
 
- 		this._logs.push({
+ 		log = {
  			running: running && createProcessLogData(running),
  			waiting: waiting
- 		});
+ 		};
+
+ 		if(this._boundScheduler.getProcessLevelMap){
+ 			log.processLevelMap = this._boundScheduler.getProcessLevelMap();
+ 		}
+
+ 		this._logs.push(log);
  	};
 
 
