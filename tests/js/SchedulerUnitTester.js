@@ -55,6 +55,18 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 					  	data.MLQ, true) + "\n\n\n";
 		}
 
+		if(data.MLQPreemptive){
+			outputStr += "MLQ Preemptive\n--------------\n" +
+					  	generateTextReport(runScheduler(data.MLQPreemptive.data, 
+					  		new MLQScheduler(true, [
+					  			new PriorityScheduler(true),
+					  			new SJFScheduler(true),
+					  			new RRScheduler(2),
+					  			new FCFSScheduler()
+					  		])), 
+					  	data.MLQPreemptive, true) + "\n\n\n";
+		}
+
 
 		if(htmlDiv){
 			htmlDiv.appendChild(document.createTextNode(outputStr));
