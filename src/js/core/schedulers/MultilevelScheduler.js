@@ -100,7 +100,7 @@
 		},
 
 		_findTopLevel: function(){
-			for(var topLevel = this._top; topLevel < this._levels.length; topLevel++){
+			for(var topLevel = this._topIndex; topLevel < this._levels.length; topLevel++){
 				if(this._levels[topLevel].hasProcess()){
 					break;
 				}
