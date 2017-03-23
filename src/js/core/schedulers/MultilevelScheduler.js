@@ -70,6 +70,19 @@
 			return waiting;
 		},
 
+		/**
+		 *	Note there are no guarantees in the ordering of the returned array.
+		 *
+		 *	@return {Array<Process>} - list of all process
+		 */
+		getProcesses: function(){
+			var processes = this.getWaiting();
+			if(this.hasRunning()){
+				processes.push(this.getRunning());
+			}
+			return processes;
+		},
+		
 
 		hasProcess: function(){
 			return (this._topIndex < this._levels.length);
