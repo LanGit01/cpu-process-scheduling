@@ -1,14 +1,14 @@
-(function(Schedulers, Utils){
+(function(Schedulers){
 	/**
 	 *	Required modules/classes:
 	 *		ProcessScheduling.Core.Schedulers
-	 *		ProcessScheduling.Utils	
 	 */
 
-	var LinkedList = Utils.LinkedList,
-		MultilevelScheduler = Schedulers.MultilevelScheduler;
+	var MultilevelScheduler = Schedulers.MultilevelScheduler;
 
-
+	/**
+	 *	Scheduler using the Multilevel Queue algorithm
+	 */
 	function MLQScheduler(preemptive, schedulers){
 		MultilevelScheduler.call(this, schedulers, preemptive);
 	}
@@ -39,6 +39,13 @@
 		top = this._topIndex;
 		current = this._currentIndex;
 
+		/*
+			When to reevaluate
+			- no current running and has running
+			- has higher level and preemptive
+			- no higher level, current running terminated and no waiting
+			- no higher level, current running preempted and no waiting
+		*/
 		if(current === this._levels.length){
 			shouldReevaluate = true;
 		}else{
@@ -63,6 +70,7 @@
 
 	}
 
+
 	Schedulers.MLQScheduler = MLQScheduler;
 
-})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);
+})(ProcessScheduling.Core.Schedulers);

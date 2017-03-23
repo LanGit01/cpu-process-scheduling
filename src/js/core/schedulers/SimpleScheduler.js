@@ -42,7 +42,7 @@
 		},
 
 		/**
-		 *	Note there are no guarantees in the ordering of the returned array.
+		 *	Note that there are no guarantees in the ordering of the returned array.
 		 *
 		 *	@return {Array<Process>} - list of all process
 		 */
@@ -72,11 +72,6 @@
 		runningTerminated: function(){
 			return (this._running && this._running.remainingTime === 0);
 		},
-
-		/*
-		hasPreempted: function(){
-
-		},*/
 
 		/**
 		 *	Returns true if the current running process will be preempted next timestep.

@@ -1,8 +1,16 @@
-(function(Schedulers, Utils){
+(function(Schedulers){
+	/**
+	 *	Required modules/classes:
+	 *		ProcessScheduling.Core.Schedulers
+	 *		ProcessScheduling.Core.Schedulers.RRScheduler
+	 */
 
 	var MultilevelScheduler = Schedulers.MultilevelScheduler,
 		RRScheduler = Schedulers.RRScheduler;
 
+	/**
+	 *	Scheduler using the Multilevel Feedback Queue algorithm
+	 */
 	function MLFQScheduler(preemptive, bottomLevelScheduler, levelQuanta){
 		MultilevelScheduler.call(this, createLevels(bottomLevelScheduler, levelQuanta), preemptive);
 	}
@@ -16,6 +24,7 @@
 			return;
 		}
 
+		// Always add to topmost level
 		this._levels[0].acceptProcess(process);
 		this._topIndex = 0;
 	}
@@ -80,6 +89,7 @@
 		return levels;
 	}
 
+
 	Schedulers.MLFQScheduler = MLFQScheduler;
 
-})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);
+})(ProcessScheduling.Core.Schedulers);
