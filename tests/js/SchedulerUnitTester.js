@@ -5,7 +5,8 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 		RRScheduler = Schedulers.RRScheduler,
 		PriorityScheduler = Schedulers.PriorityScheduler,
 		SJFScheduler = Schedulers.SJFScheduler,
-		MLQScheduler = Schedulers.MLQScheduler;
+		MLQScheduler = Schedulers.MLQScheduler,
+		MLFQScheduler = Schedulers.MLFQScheduler;
 
 	// ID BT AT Priority ST ET WT TT
 	var ID = 0, BT = 1, AT = 2, Prio = 3, ST = 4, ET = 5, WT = 6, TT = 7, level = 8;
@@ -65,6 +66,22 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 					  			new FCFSScheduler()
 					  		])), 
 					  	data.MLQPreemptive, true) + "\n\n\n";
+		}
+
+		if(data.MLFQ){
+			outputStr += "MLFQ\n------\n" +
+						generateTextReport(runScheduler(data.MLFQ.data, 
+								new MLFQScheduler(false, new SJFScheduler(true), [2, 3, 4])
+							),
+						data.MLFQ, true) + "\n\n\n";
+		}
+
+		if(data.MLFQPreemptive){
+			outputStr += "MLFQ Preemptive\n--------------\n" +
+						generateTextReport(runScheduler(data.MLFQPreemptive.data,
+								new MLFQScheduler(true, new SJFScheduler(true), [2, 3, 4])
+							),
+						data.MLFQPreemptive, true) + "\n\n\n";
 		}
 
 
