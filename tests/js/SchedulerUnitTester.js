@@ -1,4 +1,16 @@
+/**
+ *	SchedulerUnitTester is meant for Unit Testing, and is made without care about speed and optimization. 
+ *	This is supposed to be just a check for correctness, nothing more.
+ *
+ *	To test data, you need to call `SchedulerUnitTester.test` passing 2 parameters: 
+ *		param 1 - the data
+ *		param 2 - the html div to output the results, if none provided, outputs to console
+ *
+ *	Do note that the output string does not contain html breaks (<br>), so if it the output will be in html,
+ *	it is highly recommended that you wrap the <div> in <pre>
+ */
 var SchedulerUnitTester = (function(Core, Schedulers){
+	
 	var ProcessManager = Core.ProcessManager,
 		Record = Core.Record,
 		FCFSScheduler = Schedulers.FCFSScheduler,

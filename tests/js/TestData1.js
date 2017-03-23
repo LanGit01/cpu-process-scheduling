@@ -12,7 +12,7 @@ var TestData1 = {
 			[9, 6, 39, 3],
 			[10, 4, 40, 1]
 	],
-	// ID BT AT Priority ST ET WT TT
+	
 	FCFS: {
 		data: [
 			[0, 5, 0, 0, 0, 4, 0, 5],
