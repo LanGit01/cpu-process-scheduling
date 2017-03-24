@@ -6,8 +6,16 @@
 	var Process = Core.Process,
 		LinkedList = Utils.LinkedList;
 
+
 	/**
 	 *	A simulator for the processes inside a machine
+	 *
+	 *	An instance of this class handles a list of initial process data.
+	 *	Each process data contains 3 required values: id, burst time, and arrival time,
+	 *	and 2 conditional values: priority, and level.
+	 *	 
+	 *	The priority and level values may be ommitted if the scheduler to be used in
+	 *	the `run` method does not need those values.
 	 *
 	 *	Time is incremented in discrete steps until all of the processes has been completed.
 	 *	Processes arrives as specified, and needs to use N steps of the processor's time to complete. 
@@ -18,6 +26,9 @@
 	}
 
 
+	/**
+	 *	Adds a process data to the internal list.
+	 */
 	ProcessManager.prototype.addProcess = function(id, burstTime, arrivalTime, priority, level){
 		// Priority and level is optional depending on the scheduler used
 		// (program could crash though if you don't provide required values)
@@ -36,12 +47,21 @@
 	};
 
 
+	/**
+	 *	Removes the process data with the specified id
+	 *
+	 *	@return {Process} - the removed process if a matching id is found,
+	 *						null otherwise
+	 */
 	ProcessManager.prototype.removeProcess = function(id){
 		var data = this._processData.remove(id);
 		return data && data.process;
 	}
 
 
+	/**
+	 *	Removes all the processes
+	 */
 	ProcessManager.prototype.clearList = function(){
 		var len = this._processData.getLength();
 
@@ -52,6 +72,13 @@
 	}
 
 
+	/**
+	 *	Runs the simulation through the provided scheduler, using the list of
+	 *	process data.
+	 *
+	 *	@param {Scheduler} scheduler
+	 *	@param {Logger} [logger]
+	 */
 	ProcessManager.prototype.run = function(scheduler, logger){
 		/*
 		 *	while has future process and has running process
@@ -121,12 +148,9 @@
 			if(nextArrivalTime === null && !scheduler.hasRunning() && !scheduler.hasWaiting()){
 				running = false;
 			}else{
-				//console.log("Time: " + time + "\nID: " + scheduler.getRunning().id + "\nRemaining: " + scheduler.getRunning().remainingTime);
 				if(logger){
 					logger.notifyTimestepOccurred();
-					//logger.log(scheduler.getRunning(), scheduler.getWaiting());
 				}
-				//debugLog(scheduler, time);
 				time++;
 			}
 		}
