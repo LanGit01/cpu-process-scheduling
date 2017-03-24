@@ -36,6 +36,22 @@
 	};
 
 
+	ProcessManager.prototype.removeProcess = function(id){
+		var data = this._processData.remove(id);
+		return data && data.process;
+	}
+
+
+	ProcessManager.prototype.clearList = function(){
+		var len = this._processData.getLength();
+
+		while(len-- > 0){
+			this._processData.removeHead();
+		}
+
+	}
+
+
 	ProcessManager.prototype.run = function(scheduler, logger){
 		/*
 		 *	while has future process and has running process
