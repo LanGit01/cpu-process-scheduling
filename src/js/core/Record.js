@@ -1,27 +1,26 @@
-/**
- *
- *	Single Level Timestep Entry:
- *		
- *		entry: {
- *			running: process,
- *			waiting: Array<process>
- *		}
- *
- *
- *	Multi Level Timestep Entry
- *
- *		entry: {
- *			running: process
- *			waiting: Array<process>
- *			levelmap: Map<id, level>
- *		}
- */
- (function(Core){
+(function(Core){
  	/*
  	 *	Required modules/classes
  	 *		ProcessScheduling.Core
  	 */
 
+
+ 	/**
+ 	 *	Records the state of the scheduler bound to the instance.
+ 	 *
+ 	 *	An instance of this class is an observer. It fetches and logs data from the bound
+ 	 *	scheduler every time it is notified (`notifyTimeStepOccured` is called).
+ 	 *
+ 	 *	It stores the data on a list of Logs. The Log data structures is:
+ 	 *
+ 	 *		Log: {
+ 	 *			running: {Process},
+ 	 *			waiting: {Array.<Process>},
+ 	 *			levelmap: {Object.<id, level>}
+ 	 *		}
+ 	 *
+ 	 *	Log.levelmap is only present on multilevel schedulers' logs
+ 	 */
  	function Record(){
  		this._logs = [];
  		this._boundScheduler = null;
@@ -45,6 +44,9 @@
  	};
 
 
+ 	/**
+ 	 *	Notify this that data should be fetched
+ 	 */
  	Record.prototype.notifyTimestepOccurred = function(){
  		var running, waiting, i, waitingIDs = [], log;
 
