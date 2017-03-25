@@ -1,27 +1,37 @@
 (function(ns){
-
-	// namespace check
-	/*if(typeof global.CPUscheduling !== "object" || global.CPUscheduling === null){
-		console.log("CPUscheduling is not defined. Module unable to load.");
-		return;
-	}*/
-
 	/**
 	 *	Required modules/classes:
 	 *		ProcessScheduling.Utils
 	 */
 
 
+	/**
+	 *	Callback for comparing two elements for ordering
+	 *	
+	 *	@callback compareFunc
+	 *	@param {element} first element to compare
+	 *	@param {element} second element to compare
+	 *  @return {int} - positive number if the second element before first
+	 *				  - negative number if the first element before first
+	 *				  - zero if the elements are equal
+	 */
+
+	/**
+	 *	Returns the key(identifier) for the element
+	 *
+	 *	@callback keyFunc
+	 *	@param {element} element to identify
+	 *	@return key
+	 */
 
 	/**
 	 *	An implementaion of a singly linked list.
 	 *
-	 *	If a compare function is provided, inserted elements are sorted in ascending order
+	 *	Orders the elements in ascending order. A compare function can be provided to define the
+	 *	ordering. A key getter function can be provided for identification of the elements.
 	 * 
-	 *	compareFunc [function] a function that compares two elements, returning:
-	 *			- a positive number if the first element is greater,
-	 *			- a negative number if the second element is greater,
-	 *			- zero if they are equal
+	 *	@param {compareFunc} compareFunc
+	 *	@param {keyFunc} keyFunc
 	 */
 	function LinkedList(compareFunc, keyFunc){
 		this._head = null;
@@ -43,11 +53,9 @@
 
 	/*
 	 *	If a compare function is not provided, will insert elements at the end of the list.
-	 *
-	 *	If a compare function is provided, will insert elements in the proper place, in ascending order of value returned by
-	 *	the compare function
-	 *
-	 *	If the element is not unique wrt compareFunc, the element will be placed after the similar elements
+	 *	If a compare function is provided, it will determine the order of the elements
+	 *	If the element to be inserted is not unique with respect to compareFunc, 
+	 *	the element will be placed after the similar elements
 	 */
 	LinkedList.prototype.insert = function(element){
 		var compareFunc = this._compareFunc,
@@ -90,11 +98,13 @@
 
 
 	/*
-	 *	Removes the first node that contains the value of the `value` argument, and returns the element.
-	 *	If no element is found, returns null
+	 *	Removes the matching element from the list.
 	 *
-	 *	If a keyFunc is provided in the construction of the list, the node data is 
-	 *	passed to `keyFunc`, and the return value is used for comparison 
+	 *	Uses the keyFunc for identification. If no keyFunc function provided, uses strict
+	 *	equality operator to compare `value` to elements.
+	 *
+	 *	@return {?element} element removed from list
+	 *					  null if value is not matched, and none is removed
 	 */
 	LinkedList.prototype.remove = function(value){
 		var element = prev = null,
@@ -137,6 +147,12 @@
 	};
 
 
+	/**
+	 *	Removes the head of the list
+	 *	
+	 *	@return {?element} element removed
+	 *					  null if list is empty
+	 */
 	LinkedList.prototype.removeHead = function(){
 		var element;
 
@@ -157,14 +173,17 @@
 	};
 
 
+	/**
+	 *	Not implemented
+	 */
 	LinkedList.prototype.removeTail = function(){
 
 	};
 
 
 	/**
-	 *	return - element at `index` or
-	 *			 null if index is out of bounds
+	 *	@return {?element} element at index,
+	 *					  null if index is out of bounds
 	 */
 	LinkedList.prototype.elementAt = function(index){
 		var current = this._head, i;
@@ -207,7 +226,19 @@
 
 
 
-	/*		Iterator for LinkedList		*/
+	/**
+	 *	Used for iterating over elements in the linked list
+	 *
+	 *	Usage:
+	 *		var list = new LinkedList();
+	 *		// insert elements
+	 *		
+	 *		var iterator = list.getIterator(),
+	 *			elements;
+	 *		while(iterator.hasNext()){
+	 *			element = iterator.getNext();
+	 *		}
+	 */
 	function Iterator(list){
 		this._current = list._head;
 	}
@@ -218,6 +249,11 @@
 	};
 
 
+	/**
+	 *	Returns the next element and increments the iterator
+	 *	
+	 *	@return {element} the next element
+	 */
 	Iterator.prototype.getNext = function(){
 		if(!this.hasNext()){
 			return null;
@@ -229,6 +265,11 @@
 	};
 
 
+	/**
+	 *	Returns the next element without incrementing the iterator
+	 *
+	 *	@return {element} the next element
+	 */
 	Iterator.prototype.peekNext = function(){
 		if(!this.hasNext()){
 			return null;

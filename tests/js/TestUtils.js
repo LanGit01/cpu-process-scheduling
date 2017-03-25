@@ -1,6 +1,7 @@
+/**
+ *	TestUtils is a set of tools meant only for testing	
+ */
 this.TestUtils = (function(){
-
-
 
 	function generateLogTable(container, logs){
 		var i, j, log, waiting,
