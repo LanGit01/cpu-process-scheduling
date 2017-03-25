@@ -15,7 +15,7 @@
 			var newProto = Function.prototype.subclass.emptyClass;
 			newProto.prototype = parentClass.prototype;
 			this.prototype = new newProto();
-		}
+		};
 
 		Function.prototype.subclass.emptyClass = function(){};
 	}

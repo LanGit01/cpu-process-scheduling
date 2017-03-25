@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			#content{
+				width: 100%;
+			}
+
+			#content td{
+				padding: 0px 20px;
+				vertical-align: top;
+			}
+
+			#test-results{
+				font: 13px monospace;
+			}
+
+		</style>
+		<title>Single Level Scheduling Unit Testing</title>
+		<script type = "text/javascript" src = "../src/js/utils/sugar.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/misc.js"></script>
+		<script type = "text/javascript" src = "../src/js/main.js"></script>
+		<script type = "text/javascript" src = "../src/js/utils/LinkedList.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/Process.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/schedulers/SimpleScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/schedulers/MultilevelScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/schedulers/FCFSScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/schedulers/RRScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/schedulers/PriorityScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/schedulers/SJFScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/schedulers/MLQScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/schedulers/MLFQScheduler.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/ProcessManager.js"></script>
+		<script type = "text/javascript" src = "../src/js/core/Record.js"></script>
+		<script type = "text/javascript" src = "js/SchedulerUnitTester.js"></script>
+		<script type = "text/javascript" src = "js/TestData1.js"></script>
+		<script type = "text/javascript" src = "js/TestData2.js"></script>
+	</head>
+	<body>
+		<table id = "content">
+			<tr>
+				<td>
+					<h2>Test Data #1</h2>
+					<pre><div id = "test-results-1"></div></pre>
+				</td>
+				<td>
+					<h2>Test Data #2</h2>
+					<pre><div id = "test-results-2"></div></pre>
+				</td>
+			</tr>
+		</table>
+	</body>
+	<script>
+		SchedulerUnitTester.test(TestData1, document.getElementById("test-results-1"));
+		SchedulerUnitTester.test(TestData2, document.getElementById("test-results-2"));
+	</script>
+</html>
