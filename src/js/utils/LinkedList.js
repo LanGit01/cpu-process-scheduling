@@ -1,10 +1,4 @@
-(function(ns){
-	/**
-	 *	Required modules/classes:
-	 *		ProcessScheduling.Utils
-	 */
-
-
+define(function(){
 	/**
 	 *	Callback for comparing two elements for ordering
 	 *	
@@ -280,6 +274,5 @@
 
 
 
-	ns.LinkedList = LinkedList;
-
-})(ProcessScheduling.Utils);
+	return LinkedList;
+});

@@ -1,11 +1,4 @@
-(function(Schedulers){
-	/**
-	 *	Required modules/classes:
-	 *		ProcessScheduling.Core.Schedulers
-	 */
-
-	var MultilevelScheduler = Schedulers.MultilevelScheduler;
-
+define(["Schedulers/MultilevelScheduler"], function(MultilevelScheduler){
 	/**
 	 *	Scheduler using the Multilevel Queue algorithm
 	 */
@@ -71,6 +64,5 @@
 	}
 
 
-	Schedulers.MLQScheduler = MLQScheduler;
-
-})(ProcessScheduling.Core.Schedulers);
+	return MLQScheduler;
+});

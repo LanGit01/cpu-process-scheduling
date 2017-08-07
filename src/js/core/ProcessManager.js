@@ -1,11 +1,4 @@
-(function(Core, Utils){
-	/**
-	 *	Required modules/classes:
-	 *		ProcessScheduling.Core
-	 */
-	var Process = Core.Process,
-		LinkedList = Utils.LinkedList;
-
+define(["Core/Process", "Utils/LinkedList"], function(Process, LinkedList){
 
 	/**
 	 *	A simulator for the processes inside a machine
@@ -162,9 +155,6 @@
 		return processClones;
 	};
 
-	Core.ProcessManager = ProcessManager;
-
-
 
 	/*==================================================*\
 					Private Functions
@@ -231,4 +221,5 @@
 		return p.process.id;
 	}
 
-})(ProcessScheduling.Core, ProcessScheduling.Utils);
+	return ProcessManager;
+});

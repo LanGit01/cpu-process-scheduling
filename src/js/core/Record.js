@@ -1,11 +1,5 @@
-(function(Core){
- 	/*
- 	 *	Required modules/classes
- 	 *		ProcessScheduling.Core
- 	 */
-
-
- 	/**
+define(function(){
+	/**
  	 *	Records the state of the scheduler bound to the instance.
  	 *
  	 *	An instance of this class is an observer. It fetches and logs data from the bound
@@ -84,9 +78,6 @@
  	};
 
 
- 	Core.Record = Record;
-
-
  	function createProcessLogData(p){
  		return {
  			id: p.id,
@@ -94,4 +85,5 @@
  		};
  	}
 
- })(ProcessScheduling.Core);
+ 	return Record;
+});

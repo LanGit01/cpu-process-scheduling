@@ -5,6 +5,9 @@
 		Core: {
 			Schedulers: {}
 		},
+		Gui: {
+
+		},
 		Utils: {},
 	};
 

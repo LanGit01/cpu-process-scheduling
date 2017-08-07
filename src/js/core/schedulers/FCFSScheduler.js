@@ -1,13 +1,4 @@
-(function(Schedulers, Utils){
-	/**
-	 *	Required modules/classes:
-	 *		ProcessScheduling.Core.Schedulers
-	 *		ProcessScheduling.Utils	
-	 */
-
-	var LinkedList = Utils.LinkedList,
-		SimpleScheduler = Schedulers.SimpleScheduler;
-
+define(["Schedulers/SimpleScheduler", "Utils/LinkedList"], function(SimpleScheduler, LinkedList){
 	/**
 	 *	Scheduler using the First Come First Served scheduling algorithm
 	 */
@@ -38,7 +29,5 @@
 	};
 
 
-	Schedulers.FCFSScheduler = FCFSScheduler;
-
-
-})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);
+	return FCFSScheduler;
+});

@@ -1,14 +1,4 @@
-(function(Schedulers, Utils){
-	/**
-	 *	Required modules/classes:
-	 *		ProcessScheduling.Core.Schedulers
-	 *		ProcessScheduling.Utils	
-	 */
-
-	var LinkedList = Utils.LinkedList,
-		SimpleScheduler = Schedulers.SimpleScheduler;
-
-
+define(["Schedulers/SimpleScheduler", "Utils/LinkedList"], function(SimpleScheduler, LinkedList){
 	/**
 	 *	Scheduler using the Priority scheduling algorithm
 	 */
@@ -56,9 +46,6 @@
 		}
 	};
 
-
-	Schedulers.PriorityScheduler = PriorityScheduler;
-
 	/* -------------------------------------------------------- *\
 						Auxillary Functions
 	\* -------------------------------------------------------- */
@@ -76,5 +63,5 @@
 		}
 	}
 
-
-})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);
+	return PriorityScheduler;
+});

@@ -1,13 +1,4 @@
-(function(Schedulers, Utils){
-	/**
-	 *	Required Modules:
-	 *		ProcessScheduling.Core.Schedulers
-	 *		ProcessScheduling.Utils
-	 */
-	var LinkedList = Utils.LinkedList,
-		SimpleScheduler = Schedulers.SimpleScheduler;
-
-
+define(["Schedulers/SimpleScheduler", "Utils/LinkedList"], function(SimpleScheduler, LinkedList){
 	/**
 	 *	Scheduler using the Shortest Job First(non-preemptive) or Shortest Remaining Time First(preemptive)
 	 *	scheduling algorithm
@@ -89,5 +80,5 @@
 		}
 	}
 
-
-})(ProcessScheduling.Core.Schedulers, ProcessScheduling.Utils);
+	return SJFScheduler;
+});

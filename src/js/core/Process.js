@@ -1,11 +1,6 @@
-(function(Core){
-	/**
-	 *	Required modules/classes:
-	 *		ProcessScheduling.Core
-	 */
+define(function(){
 
 	var NO_VALUE = -1;
-
 
 	/**
 	 *	Container object for scheduling-related data of a single process
@@ -57,6 +52,5 @@
 
 	Process.NO_VALUE = NO_VALUE;
 
-	Core.Process = Process;
-
-})(ProcessScheduling.Core);
+	return Process;
+});

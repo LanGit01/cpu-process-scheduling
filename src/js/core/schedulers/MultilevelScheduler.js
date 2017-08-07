@@ -1,10 +1,4 @@
-(function(Schedulers){
-
-	/**
-	 *	Required modules/classes:
-	 *		ProcessScheduling.Core.Schedulers
-	 */
-
+define(function(){
 	/**
 	 *	Base (abstract) class for the multilevel schedulers: MLQ, MLFQ
 	 */
@@ -158,7 +152,5 @@
 		},
 	}
 
-
-	Schedulers.MultilevelScheduler = MultilevelScheduler;
-
-})(ProcessScheduling.Core.Schedulers);
+	return MultilevelScheduler;
+});

@@ -1,4 +1,4 @@
-(function(Schedulers){
+define(function(){
 	/**
 	 *	Required modules/classes:
 	 *		ProcessScheduling.Core.Schedulers
@@ -120,6 +120,6 @@
 		step: function(){}
 	};
 
-	Schedulers.SimpleScheduler = SimpleScheduler;
+	return SimpleScheduler;
 
-})(ProcessScheduling.Core.Schedulers);
+});
