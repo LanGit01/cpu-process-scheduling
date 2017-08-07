@@ -49,10 +49,6 @@ define(["Schedulers/SimpleScheduler", "Utils/LinkedList"], function(SimpleSchedu
 		}
 	};
 
-
-	Schedulers.SJFScheduler = SJFScheduler;
-
-
 	/* -------------------------------------------------------- *\
 						Auxillary Functions
 	\* -------------------------------------------------------- */
