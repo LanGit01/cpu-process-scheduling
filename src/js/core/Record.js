@@ -42,7 +42,7 @@ define(function(){
  	 *	Notify this that data should be fetched
  	 */
  	Record.prototype.notifyTimestepOccurred = function(){
- 		var running, waiting, i, waitingIDs = [], log;
+ 		var running, waiting, i, log;
 
  		if(this._boundScheduler === null){
  			return;
@@ -51,13 +51,9 @@ define(function(){
  		running = this._boundScheduler.getRunning();
  		waiting = this._boundScheduler.getWaiting();
 
- 		for(i = 0; i < waiting.length; i++){
- 			waitingIDs[i] = createProcessLogData(waiting[i].id);
- 		}
-
  		log = {
  			running: running && createProcessLogData(running),
- 			waiting: waiting
+ 			waiting: waiting && waiting.map(createProcessLogData)
  		};
 
  		if(this._boundScheduler.getProcessLevelMap){
