@@ -9,121 +9,96 @@
  *	Do note that the output string does not contain html breaks (<br>), so if it the output will be in html,
  *	it is highly recommended that you wrap the <div> in <pre>
  */
-var SchedulerUnitTester = (function(Core, Schedulers){
-	
-	var ProcessManager = Core.ProcessManager,
-		Record = Core.Record,
-		FCFSScheduler = Schedulers.FCFSScheduler,
-		RRScheduler = Schedulers.RRScheduler,
-		PriorityScheduler = Schedulers.PriorityScheduler,
-		SJFScheduler = Schedulers.SJFScheduler,
-		MLQScheduler = Schedulers.MLQScheduler,
-		MLFQScheduler = Schedulers.MLFQScheduler;
+define([
+	"Core/ProcessManager",
+	"Core/Record",
+	"Schedulers/FCFSSCheduler",
+	"Schedulers/RRScheduler",
+	"Schedulers/PriorityScheduler",
+	"Schedulers/SJFScheduler",
+	"Schedulers/MLQScheduler",
+	"Schedulers/MLFQScheduler"
+], function(ProcessManager, Record, FCFSScheduler, RRScheduler, PriorityScheduler, SJFScheduler, MLQScheduler, MLFQScheduler){
 
 	// ID BT AT Priority ST ET WT TT
 	var ID = 0, BT = 1, AT = 2, Prio = 3, ST = 4, ET = 5, WT = 6, TT = 7, level = 8;
 
-	function test(data, htmlDiv){
-		var outputStr = "Scheduler Unit Test\n==============================\n\n\n";
 
-		if(data.FCFS){
-			outputStr += "FCFS\n-----\n" + 
-					  generateTextReport(runScheduler(data.FCFS.data, new FCFSScheduler()), data.FCFS) + "\n\n\n";
-		}
 
-		if(data.RR){
-			outputStr += "RR\n-----\n" + 
-					  generateTextReport(runScheduler(data.RR.data, new RRScheduler(data.RR.quanta)), data.RR) + "\n\n\n";				
-		}
+	function test(data){
+		var outputStr = "Scheduler Unit Test\n==============================\n\n\n",
+			div;
 
-		if(data.PriorityNonPreemptive){
-			outputStr += "Priority Non Preemptive\n-----------------------\n" + 
-					  generateTextReport(runScheduler(data.PriorityNonPreemptive.data, new PriorityScheduler(false)), data.PriorityNonPreemptive) + "\n\n\n";							
-		}
+		if(data.FCFS) 	
+			outputStr += testData("First Come First Served", data.FCFS, new FCFSScheduler());
+		
+		if(data.RR)
+			outputStr += testData("Round Robin", data.RR, new RRScheduler(data.RR.quanta));
+		
+		if(data.PriorityNonPreemptive)
+			outputStr += testData("Priority Non-Preemptive", data.PriorityNonPreemptive, new PriorityScheduler(false));
 
-		if(data.PriorityPreemptive){
-			outputStr += "Priority Preemptive\n--------------------\n" + 
-					  generateTextReport(runScheduler(data.PriorityPreemptive.data, new PriorityScheduler(true)), data.PriorityPreemptive) + "\n\n\n";							
-		}
+		if(data.PriorityPreemptive)
+			outputStr += testData("Priority Preemptive", data.PriorityPreemptive, new PriorityScheduler(true));
 
-		if(data.SJF){
-			outputStr += "SJF\n-----\n" + 
-					  generateTextReport(runScheduler(data.SJF.data, new SJFScheduler(false)), data.SJF) + "\n\n\n";
-		}
+		if(data.SJF)
+			outputStr += testData("Shortest Job First", data.SJF, new SJFScheduler(false));
 
-		if(data.SRTF){
-			outputStr += "SRTF\n-----\n" + 
-					  generateTextReport(runScheduler(data.SRTF.data, new SJFScheduler(true)), data.SRTF) + "\n\n\n";
-		}
+		if(data.SRTF)
+			outputStr += testData("Shortest Remaining Time First", data.SRTF, new SJFScheduler(true));
 
-		if(data.MLQ){
-			outputStr += "MLQ Non-Preemptive\n------------------\n" +
-					  	generateTextReport(runScheduler(data.MLQ.data, 
-					  		new MLQScheduler(false, [
-					  			new PriorityScheduler(true),
-					  			new SJFScheduler(true),
-					  			new RRScheduler(2),
-					  			new FCFSScheduler()
-					  		])), 
-					  	data.MLQ, true) + "\n\n\n";
-		}
+		if(data.MLQ)
+			outputStr += testData("Multilevel Queue Non-Preemptive", data.MLQ, new MLQScheduler(false, [
+				new PriorityScheduler(true),
+				new SJFScheduler(true),
+				new RRScheduler(2),
+				new FCFSScheduler()
+			]));
 
 		if(data.MLQPreemptive){
-			outputStr += "MLQ Preemptive\n--------------\n" +
-					  	generateTextReport(runScheduler(data.MLQPreemptive.data, 
-					  		new MLQScheduler(true, [
-					  			new PriorityScheduler(true),
-					  			new SJFScheduler(true),
-					  			new RRScheduler(2),
-					  			new FCFSScheduler()
-					  		])), 
-					  	data.MLQPreemptive, true) + "\n\n\n";
+			outputStr += testData("Multilevel Queue Preemptive", data.MLQPreemptive, new MLQScheduler(true, [
+				new PriorityScheduler(true),
+				new SJFScheduler(true),
+				new RRScheduler(2),
+				new FCFSScheduler()
+			]));
 		}
 
-		if(data.MLFQ){
-			outputStr += "MLFQ\n------\n" +
-						generateTextReport(runScheduler(data.MLFQ.data, 
-								new MLFQScheduler(false, new SJFScheduler(true), [2, 3, 4])
-							),
-						data.MLFQ, true) + "\n\n\n";
-		}
+		if(data.MLFQ)
+			outputStr += testData("Multilevel Feedback Queue", data.MLFQ, new MLFQScheduler(false, new SJFScheduler(true), [2, 3, 4]));
 
-		if(data.MLFQPreemptive){
-			outputStr += "MLFQ Preemptive\n--------------\n" +
-						generateTextReport(runScheduler(data.MLFQPreemptive.data,
-								new MLFQScheduler(true, new SJFScheduler(true), [2, 3, 4])
-							),
-						data.MLFQPreemptive, true) + "\n\n\n";
-		}
+		if(data.MLFQPreemptive)
+			outputStr += testData("Multilevel Feedback Queue Preemptive", data.MLFQPreemptive, new MLFQScheduler(true, new SJFScheduler(true), [2, 3, 4]));
 
-
-		if(htmlDiv){
-			htmlDiv.appendChild(document.createTextNode(outputStr));
-		}else{
-			console.log(outputStr);
-		}
+		div = document.createElement("div");
+		div.appendChild(document.createTextNode(outputStr));
+		return div;
 	}
 
 
-	function generateTextReport(results, correct, multilevel){
+	function testData(title, testData, scheduler){
+		return title + "\n" + ("-").repeat(title.length) + "\n" + generateTextReport(runScheduler(testData.data, scheduler), testData) + "\n\n\n";
+	}
+
+
+	function generateTextReport(results, correct){
 		var processes = results.processes,
 			logs = results.logs,
 			incorrectProcesses = findIncorrectData(results.processes, correct.data),
 			incorrectLogs = findIncorrectLogs(results.logs, correct.logs),
-			incorrectMaps, report;
+			incorrectMaps, 
+			report = "";
 
-		report = "Tested: " + processes.length + "\nCorrect: " + (processes.length - incorrectProcesses.length) +
-				 "\nIncorrect: " + incorrectProcesses.length +
-				 "\nIDs of Incorrect: [" + (incorrectProcesses.join(", ") || "none") + "]";
+		report = 	"Tested: " + processes.length + "\n" +
+					"Correct: " + (processes.length - incorrectProcesses.length) + "\n" +
+					"IDs of incorrect: [" + (incorrectProcesses.join(", ") || "none") + "]\n" +
+					(" - ").repeat(8) + "\n" +
+					"Num Logs: " + logs.length + "\n" +
+					"Incorrect Logs List: [" + (incorrectLogs.join(", ") || "none") + "]\n";
 
-		report += "\n-  -  -  -  -  -  -  -  -\n";
-
-		report += "Num Logs: " + logs.length + 
-				  "\nIncorrect Logs List: [" + (incorrectLogs.join(", ") || "none") + "]";
-
-		if(multilevel){
+		if(correct.map){
 			incorrectMaps = findIncorrectMap(results.processLevelMap, correct.map);
-			report += "\nIncorrect Map List: [" + (incorrectMaps.join(", ")|| "none") + "]";	
+			report += "Incorrect Map List: [" + (incorrectMaps.join(", ")|| "none") + "]\n";	
 		}
 		
 		return report;
@@ -176,15 +151,12 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 		}, []);
 	}
 
-
 	function runScheduler(data, scheduler){
-		var pm = new ProcessManager(),
-			i, pData, record, processes, recordLogs;
+		var pm = new ProcessManager();
 
-		for(i = 0; i < data.length; i++){
-			pData = data[i];
+		data.forEach(function(pData){
 			pm.addProcess(pData[ID], pData[BT], pData[AT], pData[Prio], pData[level]);
-		}
+		});
 
 		record = new Record();
 		processes = pm.run(scheduler, record);
@@ -213,6 +185,5 @@ var SchedulerUnitTester = (function(Core, Schedulers){
 
 	return {
 		test: test
-	}
-
-})(ProcessScheduling.Core, ProcessScheduling.Core.Schedulers);
+	};
+});
