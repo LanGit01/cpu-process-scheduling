@@ -59,6 +59,10 @@ define(function(){
 
 
 	function filterLog(log, level){
+		if(!log.processLevelMap){
+			throw new Error("Expecting a level map. Level map not found.");
+		}
+
 		return {
 			running: (log.running && log.processLevelMap[log.running.id] === level ? log.running : null),
 			waiting: log.waiting.filter(function(process){
