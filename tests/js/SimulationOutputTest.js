@@ -43,13 +43,13 @@ window.onload = function(){
 		runSimulation(SJFScheduler, arr, true);
 
 		createSection("PriorityScheduler (Non-Preemptive)");
-		runSimulation(SJFScheduler, arr, false);
+		runSimulation(PriorityScheduler, arr, false);
 
 		createSection("PriorityScheduler (Preemptive)");
-		runSimulation(SJFScheduler, arr, true);
+		runSimulation(PriorityScheduler, arr, true);
 
 		createSection("RRScheduler (quanta = 2)");
-		runSimulation(SJFScheduler, arr, 2);
+		runSimulation(RRScheduler, arr, 2);
 
 
 
@@ -59,14 +59,23 @@ window.onload = function(){
 				container = document.body.appendChild(document.createElement("div")),
 				processList;
 
+
 			processValues.forEach(function(value){
 				pm.addProcess(value[0], value[1], value[2], value[3]);
 			});
 
+			//var test = new (Function.bind.apply(Scheduler, Array.prototype.splice.call(arguments, 2)));
+			var args = [null];
+			args.push.apply(args, Array.prototype.slice.call(arguments, 2))
 
-			processList = pm.run(new (Scheduler.bind.apply(Scheduler, Array.prototype.splice.call(arguments, 2))), record);
+			//console.log(new (Scheduler.bind.apply(Scheduler, Array.prototype.splice.call(arguments, 2))));
+			processList = pm.run(new (Scheduler.bind.apply(Scheduler, args)), record);
 			container.appendChild(SimulationOutputTester.generateLogTable(record.getLogs()));
 			container.appendChild(SimulationOutputTester.generateProcessDataTable(processList));
+		}
+
+		function createScheduler(Scheduler, args){
+
 		}
 
 		function createSection(title){
