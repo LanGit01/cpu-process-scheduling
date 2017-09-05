@@ -47,17 +47,13 @@ define(function(){
 		 *	@return {Array<Process>} - list of waiting processes
 		 */
 		getWaiting: function(){
-			var waiting = [], levelWaitingList, levelIndex, i;
+			var waiting = [], levelIndex;
 
 			for(levelIndex = this._topIndex; levelIndex < this._levels.length; levelIndex++){
 				if(levelIndex === this._currentIndex){
-					levelWaitingList = this._levels[levelIndex].getWaiting();
+					waiting.push.apply(waiting, this._levels[levelIndex].getWaiting());
 				}else{
-					levelWaitingList = this._levels[levelIndex].getProcesses();
-				}
-
-				for(i = 0; i < levelWaitingList.length; i++){
-					waiting[waiting.length] = levelWaitingList[i];
+					waiting.push.apply(waiting, this._levels[levelIndex].getProcesses());
 				}
 			}
 
