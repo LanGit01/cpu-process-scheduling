@@ -41,23 +41,23 @@ define(function(){
 
 
 	function calculateDimensions(config, rowLabelWidth, colLabelWidth){
-		var gridWidth, gridHeight, rowLabelHeight;
+		var gridCellWidth, gridCellHeight, rowLabelHeight;
 
 		rowLabelWidth += (2 * config.stringHPad);
 		colLabelWidth += (2 * config.stringHPad);
 
-		gridWidth = Math.max(config.cellWidth + (2 * Defaults.CELL_MARGIN), colLabelWidth);
-		gridHeight = Math.max(config.cellHeight + (2 * Defaults.CELL_MARGIN), config.fontSize + (2 * config.stringVPad));
+		gridCellWidth = Math.max(config.cellWidth + (2 * Defaults.CELL_MARGIN), colLabelWidth);
+		gridCellHeight = Math.max(config.cellHeight + (2 * Defaults.CELL_MARGIN), config.fontSize + (2 * config.stringVPad));
 
 		if(config.cellWidth === 0 && config.cellHeight === 0){
-			gridWidth = gridHeight = rowLabelHeight = colLabelWidth = Math.max(gridWidth, gridHeight);
+			gridCellWidth = gridCellHeight = rowLabelHeight = colLabelWidth = Math.max(gridCellWidth, gridCellHeight);
 		}else{
-			rowLabelHeight = gridHeight;
+			rowLabelHeight = gridCellHeight;
 		}
 
 		return{
-			gridWidth: gridWidth,
-			gridHeight: gridHeight,
+			gridCellWidth: gridCellWidth,
+			gridCellHeight: gridCellHeight,
 
 			rowLabelWidth: Math.max(rowLabelWidth, config.rowLabelWidth),
 			rowLabelHeight: rowLabelHeight,
