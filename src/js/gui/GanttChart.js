@@ -65,9 +65,15 @@ define(function(){
 			colLabelWidth: colLabelWidth,
 			colLabelHeight: config.fontSize + (2 * config.stringVPad)
 		};
-		
 	}
 
+
+	function maxStringWidth(ctx, strArr){
+		return ~~strArr.reduce(function(max, str){
+			var width = ctx.measureText(str).width;
+			return (width > max ? width : max);
+		}, 0);
+	}
 
 	return GanttChart;
 });
