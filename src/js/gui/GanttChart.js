@@ -10,7 +10,12 @@ define(function(){
 
 	
 	function GanttChart(chartData, options){
+		var a = "12", b;
+		var c = (b = (+a) + 1) === 12;
 		
+		console.log(a);
+		console.log(b);
+		console.log(c);
 	}
 
 

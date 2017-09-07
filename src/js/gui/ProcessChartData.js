@@ -18,18 +18,7 @@ define(function(){
 	 *	will be an error.
 	 */
 	function ProcessChartData(logs, level){
-		if(level || level === 0){
-			this._logs = logs.map(function(log){
-				return filterLog(log, level);
-			});
-		}else{
-			this._logs = logs.map(function(log){
-				return {
-					running: log.running,
-					waiting: log.waiting
-				}
-			});
-		}	
+		this._logs = logs.map(filterLogFunc(level));
 	}
 
 
@@ -58,17 +47,23 @@ define(function(){
 	};
 
 
-	function filterLog(log, level){
-		if(!log.processLevelMap){
-			throw new Error("Expecting a level map. Level map not found.");
+	function filterLogFunc(level){
+		var hasLevel = (level >= 0);
+
+		function shouldInclude(log, process){
+			return (!hasLevel || log.processLevelMap[process.id] === level);
 		}
 
-		return {
-			running: (log.running && log.processLevelMap[log.running.id] === level ? log.running : null),
-			waiting: log.waiting.filter(function(process){
-				return log.processLevelMap[process.id] === level;
-			})
-		};
+		return function(log){
+			var running = log.running, waiting = log.waiting;
+
+			return {
+				running: (running && shouldInclude(log, running) ? running : null),
+				waiting: waiting.filter(function(process){
+					return shouldInclude(log, process);
+				})
+			}
+		}
 	}
 
 
