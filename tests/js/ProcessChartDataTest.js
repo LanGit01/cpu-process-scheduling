@@ -52,12 +52,12 @@ window.onload = function(){
 		var logs = record.getLogs();
 		printLogs(logs);
 
-		var level = 2,
+		var level = 1,
 			pcd = new ProcessChartData(logs, level);
 
 
 		for(var i = 0; i < 29; i++){
-			printComparison(logs, pcd, i, level);
+			//printComparison(logs, pcd, i, level);
 		}
 	});
 

@@ -1,4 +1,4 @@
-define(function(){
+define(["Utils/selectionSort"], function(selectionSort){
 
 	/**
 	 *	Wrapper class for log data.
@@ -18,7 +18,9 @@ define(function(){
 	 *	will be an error.
 	 */
 	function ProcessChartData(logs, level){
+		//this._logs = logs.map(filterLogFunc(level));
 		this._logs = logs.map(filterLogFunc(level));
+		this._ids = selectionSort(this._logs.reduce(addUniqueIDs, []), function(a, b) { return a - b; });
 	}
 
 
@@ -65,6 +67,26 @@ define(function(){
 			}
 		}
 	}
+
+
+	function addUniqueIDs(arr, log){
+		var id;
+
+		if(log.running && arr.indexOf(log.running.id) == -1){
+			arr.push(log.running.id);
+		}
+
+		for(var i = 0; i < log.waiting.length; i++){
+			id = log.waiting[i].id;
+
+			if(arr.indexOf(id) == -1){
+				arr.push(id);
+			}
+		}
+
+		return arr;
+	}
+
 
 
 	return ProcessChartData;
