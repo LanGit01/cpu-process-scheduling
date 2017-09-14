@@ -42,24 +42,17 @@ define(["RGB"], function(RGB){
 
 		hue *= 6;
 
-
 		if(hue < 1){
-			// Q1 -> [0, 1) -> secondary
-			return (hue * (max - min)) + min;
-		}
-
+			return (hue * (max - min)) + min; 	// Q1 -> [0, 1) -> secondary		
+		}else
 		if(hue < 3){
-			// Q2 + Q3 -> [1, 3) -> max
-			return max;
-		}
-
+			return max;		// Q2 + Q3 -> [1, 3) -> max
+		}else
 		if(hue < 4){
-			// Q4 -> [3, 4) -> secondary
-			return ((4 - hue) * (max - min) + min);
+			return ((4 - hue) * (max - min) + min);		// Q4 -> [3, 4) -> secondary
 		}
 
-		// Q5 + Q6 -> [4, 6) -> min
-		return min;
+		return min; // Q5 + Q6 -> [4, 6) -> min
 	}
 
 	return HueGenerator;
