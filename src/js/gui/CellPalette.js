@@ -1,6 +1,6 @@
 define(function(){
 
-	function CellPallete(numDistinct, width, height, bevel){
+	function CellPalette(numDistinct, width, height, bevel){
 		
 	}
 
@@ -62,5 +62,5 @@ define(function(){
 
 	createCell(40, 40, 4, "#666666", "#aaaaaa", "#222222");
 
-	return CellPallete;
+	return CellPalette;
 });
