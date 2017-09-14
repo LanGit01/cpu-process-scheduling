@@ -1,9 +1,49 @@
-define(function(){
+define(["HueGenerator"], function(HueGenerator){
+
+	var FLAT = 0,
+		RAISED = 1,
+		BASE_SATURATION = 0.7,
+		BASE_LIGHTNESS = 0.5;
 
 	function CellPalette(numDistinct, width, height, bevel){
-		
+		var hueGenerator = new HueGenerator(),
+			colors, i;
+
+		hueGenerator.addChroma("base", BASE_SATURATION, BASE_LIGHTNESS);
+		hueGenerator.addChroma("light", BASE_SATURATION, BASE_LIGHTNESS + 0.2);
+		hueGenerator.addChroma("dark", BASE_SATURATION, BASE_LIGHTNESS - 0.2);
+
+		colors = hueGenerator.generateColors(numDistinct);
+
+		this._cells = [];
+
+		for(i = 0; i < numDistinct; i++){
+			this._cells.push([
+				createCell(width, height, bevel, colors.base[i]),
+				createCell(width, height, bevel, colors.base[i], colors.light[i], colors.dark[i]),
+			]);
+		}
 	}
 
+
+	CellPalette.FLAT = FLAT;
+	CellPalette.RAISED = RAISED;
+
+	CellPalette.prototype = {
+		constructor: CellPalette,
+
+		getNumCells: function(){
+			return this._cells.length;
+		},
+
+		getCell: function(index, type){
+			if(index < 0 || index > this._cells.length - 1){
+				return null;
+			}
+
+			return this._cells[index][type];
+		}
+	};
 
 
 	function createCell(width, height, bevel, cBase, cLight, cDark){
@@ -30,8 +70,6 @@ define(function(){
 			
 			fillCorner(ctx, cLight, width, height, bevel);
 		}
-
-		document.body.appendChild(canvas);
 		
 		return canvas;
 	}
@@ -59,8 +97,7 @@ define(function(){
 		canvas.height = height;
 		return canvas;
 	}
-
-	createCell(40, 40, 4, "#666666", "#aaaaaa", "#222222");
+	
 
 	return CellPalette;
 });
