@@ -1,11 +1,50 @@
 define(["RGB"], function(RGB){
 
-	function HueGenerator(){
+	var GOLDEN_RATIO = 1.61803398875;
 
+	function HueGenerator(){
+		this._chromas = Object.create(null);
 	}
 
 
 	HueGenerator.hslToRgb = hslToRgb;
+
+
+	HueGenerator.prototype = {
+		constructor: HueGenerator,
+
+		addChroma: function(chromaId, saturation, lightness){
+			this._chromas[chromaId] = {
+				s: saturation,
+				l: lightness
+			};
+		},
+
+		removeChroma: function(chromaId){
+			var chroma = this._chromas[chromaId] || null;
+			delete this._chromas[chromaId];
+			return chroma;
+		},
+
+		generateColors: function(numColors, startHue){
+			var i, id, hue, colors = {}, chromas = this._chromas;
+
+			hue = startHue || 0;
+
+			for(id in chromas){
+				colors[id] = [];
+			}
+
+			for(i = 0; i < numColors; i++){
+				for(id in colors){
+					colors[id].push(hslToRgb(hue, chromas[id].s, chromas[id].l));
+				}
+				hue = (hue + GOLDEN_RATIO) % 1;
+			}
+
+			return colors;
+		}
+	};
 
 
 	function hslToRgb(h, s, l){
