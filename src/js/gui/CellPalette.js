@@ -1,17 +1,17 @@
-define(["HueGenerator"], function(HueGenerator){
+define(["Gui/HueGenerator"], function(HueGenerator){
 
 	var FLAT = 0,
 		RAISED = 1,
-		BASE_SATURATION = 0.7,
-		BASE_LIGHTNESS = 0.5;
+		BASE_SATURATION = 0.55,
+		BASE_LIGHTNESS = 0.6;
 
 	function CellPalette(numDistinct, width, height, bevel){
 		var hueGenerator = new HueGenerator(),
 			colors, i;
 
 		hueGenerator.addChroma("base", BASE_SATURATION, BASE_LIGHTNESS);
-		hueGenerator.addChroma("light", BASE_SATURATION, BASE_LIGHTNESS + 0.2);
-		hueGenerator.addChroma("dark", BASE_SATURATION, BASE_LIGHTNESS - 0.2);
+		hueGenerator.addChroma("light", BASE_SATURATION, BASE_LIGHTNESS + 0.17);
+		hueGenerator.addChroma("dark", BASE_SATURATION, BASE_LIGHTNESS - 0.17);
 
 		colors = hueGenerator.generateColors(numDistinct);
 
@@ -97,7 +97,7 @@ define(["HueGenerator"], function(HueGenerator){
 		canvas.height = height;
 		return canvas;
 	}
-	
+
 
 	return CellPalette;
 });
