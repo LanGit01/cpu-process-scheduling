@@ -1,16 +1,22 @@
 define(function(){
 
 	function View(component, x, y, w, h){
-		this.component = component;
-
 		this.setPosition(x, y);
 		this.resize(w, h);
+		this.setComponent(component);
 		this.setOffset(0, 0);
 	}
 
 
 	View.prototype = {
 		constructor: View,
+
+		setComponent: function(component){
+			this.component = component;
+			this._componentWidth = component.getWidth();
+			this._componentHeight = component.getHeight();
+			return this;
+		},
 
 		setPosition: function(x, y){
 			this._x = x;
@@ -25,8 +31,12 @@ define(function(){
 		},
 
 		setOffset: function(x, y){
-			this._xOffset = x;
-			this._yOffset = y;
+			if(x < 0) x = 0;
+			if(y < 0) y = 0;
+
+			this._xOffset = Math.min(x, Math.max(0, this._componentWidth - this._w));
+			this._yOffset = Math.min(y, Math.max(0, this._componentHeight - this._h));
+			
 			return this;
 		},
 
