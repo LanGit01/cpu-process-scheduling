@@ -1,8 +1,8 @@
-define(function(){
+define(["Gui/Rect"], function(Rect){
 
 	function View(component, x, y, w, h){
-		this.setPosition(x, y);
-		this.resize(w, h);
+		this._rect = new Rect(x, y, w, h);
+
 		this.setComponent(component);
 		this.setOffset(0, 0);
 	}
@@ -21,14 +21,14 @@ define(function(){
 		},
 
 		setPosition: function(x, y){
-			this._x = x;
-			this._y = y;
+			this._rect.x = x;
+			this._rect.y = y;
 			return this;
 		},
 
 		resize: function(w, h){
-			this._w = w;
-			this._h = h;
+			this._rect.w = w;
+			this._rect.h = h;
 			return this;
 		},
 
@@ -38,15 +38,16 @@ define(function(){
 			if(x < 0) x = 0;
 			if(y < 0) y = 0;
 
-			this._xOffset = Math.min(x, Math.max(0, this._componentWidth - this._w));
-			this._yOffset = Math.min(y, Math.max(0, this._componentHeight - this._h));
+			this._xOffset = Math.min(x, Math.max(0, this._componentWidth - this._rect.w));
+			this._yOffset = Math.min(y, Math.max(0, this._componentHeight - this._rect.h));
 
 			return this;
 		},
 
 		draw: function(ctx){
+			ctx.strokeRect(this._rect.x, this._rect.y, this._rect.w, this._rect.h);
 			if(this.component){
-				this.component.draw(ctx, this._x, this._y, this._w, this._h, this._xOffset, this._yOffset);	
+				this.component.draw(ctx, this._rect.clone(), this._xOffset, this._yOffset);	
 			}
 
 			return this;
