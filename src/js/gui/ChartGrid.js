@@ -25,43 +25,66 @@ define(["Gui/CellPalette"], function(CellPalette){
 	ChartGrid.prototype = {
 		constructor: ChartGrid,
 
-		draw: function(ctx, x, y, w, h, xOffset, yOffset){
-			var rowStart, rowEnd, colStart, colEnd,
-				x, y, row, col, running, waiting, i;
+		getWidth: function(){
+			return this._width;
+		},
 
-			// Range of visible grid cells
-			rowStart = ~~(yOffset / this._gridHeight);
-			rowEnd = ~~((yOffset + h - 1) / this._gridHeight);
-			colStart = ~~(xOffset / this._gridWidth);
-			colEnd = ~~((xOffset + w - 1) / this._gridWidth);
+		getHeight: function(){
+			return this._height;
+		},
 
-			// Draw cells
-			for(col = colStart; col <= colEnd; col++){
-				x = (col * this._gridWidth) - xOffset + this._cellMargin;
+		draw: function(ctx, xScreen, yScreen, wScreen, hScreen, xOffset, yOffset){
+			var rowRange, colRange, running, waiting, xDrawArea, yDrawArea, imgClip;
 
+			rowRange = gridRange(this._gridHeight, yOffset, hScreen);
+			colRange = gridRange(this._gridWidth, xOffset, wScreen);
+
+			for(col = colRange.start; col < colRange.end; col++){
+				xDrawArea = (col * this._gridWidth) - xOffset + this._cellMargin;
+				
 				running = this._chartData.getRunning(col);
 				waiting = this._chartData.getWaiting(col);
 
-				// Draw running
-				row = running && this._ids.indexOf(running.id);
-				if(row && row >= rowStart && row <= rowEnd){
-					// draw running
-					y = (row * this._gridHeight) - yOffset + this._cellMargin;
-					console.log(this._cellMargin);
-					ctx.drawImage(this._cellPalette.getCell(running.id, CellPalette.RAISED), x, y);
-				}
+				row = getRowWithinBounds(this._ids, running, rowRange);
+				if(row !== null){
+					var yDrawArea = (row * this._gridHeight) - yOffset + this._cellMargin,
+						sx = (xDrawArea < 0 ? -xDrawArea : 0),
+						sy = (yDrawArea < 0 ? -yDrawArea : 0),
+						sw = Math.min(wScreen - xDrawArea, this._cellWidth), 
+						sh = Math.min(hScreen - yDrawArea, this._cellHeight);
 
-				for(i = 0; i < waiting.length; i++){
-					row = this._ids.indexOf(waiting[i].id);
-					if(row > rowStart && row < rowEnd){
-						// draw waiting
-						y = (row * this._gridHeight) - yOffset + this._cellMargin;
-						ctx.drawImage(this._cellPalette.getCell(waiting[i].id, CellPalette.FLAT), x, y);
-					}
+					console.log(sx, sy, sw, sh);
 				}
 			}
 		}
 	};
+
+	// drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
+	// xScreen = x + (col * this._gridWidth) - xOffset + this._cellMargin
+	
+	function gridRange(gridSize, offset, screenSize){
+		return{
+			start: ~~(offset / gridSize),
+			end: ~~((offset + screenSize) / gridSize)
+		};
+	}
+
+	
+	function getRowWithinBounds(ids, cellData, range){
+		if(!cellData){
+			return null;
+		}
+
+		var row = ids.indexOf(cellData.id);
+		if(row >= range.start && row <= range.end){
+			return row;
+		}
+
+		return null;
+	}
+
+
+
 
 	return ChartGrid;
 });
