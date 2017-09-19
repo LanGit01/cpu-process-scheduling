@@ -31,6 +31,10 @@ define(["Utils/selectionSort"], function(selectionSort){
 			return this._logs.length;
 		},
 
+		getIDs: function(){
+			return this._ids;
+		},
+
 		getRunning: function(time){
 			if(time > -1 && time < this._logs.length){
 				return this._logs[time].running;
