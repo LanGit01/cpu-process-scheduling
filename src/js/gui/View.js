@@ -4,7 +4,6 @@ define(["Gui/Rect"], function(Rect){
 		this._rect = new Rect(x, y, w, h);
 
 		this.setComponent(component);
-		this.setOffset(0, 0);
 	}
 
 
@@ -17,6 +16,7 @@ define(["Gui/Rect"], function(Rect){
 				this._componentWidth = component.getWidth();
 				this._componentHeight = component.getHeight();
 			}
+			this.setOffset(0, 0);
 			return this;
 		},
 
@@ -45,7 +45,7 @@ define(["Gui/Rect"], function(Rect){
 		},
 
 		draw: function(ctx){
-			ctx.strokeRect(this._rect.x, this._rect.y, this._rect.w, this._rect.h);
+			ctx.strokeRect(this._rect.x + 0.5, this._rect.y + 0.5, this._rect.w, this._rect.h);
 			if(this.component){
 				this.component.draw(ctx, this._rect.clone(), this._xOffset, this._yOffset);	
 			}
