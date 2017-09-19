@@ -39,7 +39,7 @@ define(["Gui/CellPalette"], function(CellPalette){
 			rowRange = gridRange(this._gridHeight, yOffset, hScreen);
 			colRange = gridRange(this._gridWidth, xOffset, wScreen);
 
-			for(col = colRange.start; col < colRange.end; col++){
+			for(col = colRange.start; col <= colRange.end; col++){
 				xDrawArea = (col * this._gridWidth) - xOffset + this._cellMargin;
 				
 				running = this._chartData.getRunning(col);
@@ -47,13 +47,8 @@ define(["Gui/CellPalette"], function(CellPalette){
 
 				row = getRowWithinBounds(this._ids, running, rowRange);
 				if(row !== null){
-					var yDrawArea = (row * this._gridHeight) - yOffset + this._cellMargin,
-						sx = (xDrawArea < 0 ? -xDrawArea : 0),
-						sy = (yDrawArea < 0 ? -yDrawArea : 0),
-						sw = Math.min(wScreen - xDrawArea, this._cellWidth), 
-						sh = Math.min(hScreen - yDrawArea, this._cellHeight);
-
-					console.log(sx, sy, sw, sh);
+					yDrawArea = (row * this._gridHeight) - yOffset + this._cellMargin;
+					console.log(xDrawArea, yDrawArea, this._cellWidth, this._cellHeight, wScreen, hScreen);
 				}
 			}
 		}
@@ -61,7 +56,16 @@ define(["Gui/CellPalette"], function(CellPalette){
 
 	// drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
 	// xScreen = x + (col * this._gridWidth) - xOffset + this._cellMargin
-	
+	function cellClipVisible(x, y, cellWidth, cellHeight, screenWidth, screenHeight){
+		return {
+			x: (x < 0 ? -x : 0),
+			y: (y < 0 ? -y : 0),
+			w: Math.min(screenWidth - x, cellWidth),
+			h: Math.min(screenHeight - y, cellHeight)
+		};
+	}
+
+
 	function gridRange(gridSize, offset, screenSize){
 		return{
 			start: ~~(offset / gridSize),
