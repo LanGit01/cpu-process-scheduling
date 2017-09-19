@@ -34,15 +34,18 @@ define(function(){
 			};
 		},
 
-		draw: function(ctx, dx, dy, dw, dh, xOffset, yOffset){
-			var size = this.getSize();
+		getWidth: function(){
+			return this._canvas.width;
+		},
 
-			xOffset = Math.min(xOffset, dw - size.w);
-			yOffset = Math.min(yOffset, dh - size.h);
-			dw = Math.min(size.w - xOffset, dw);
-			dh = Math.min(size.h - yOffset, dh);
+		getHeight: function(){
+			return this._canvas.height;
+		},
 
-			ctx.drawImage(this._canvas, xOffset, yOffset, dw, dh, dx, dy, dw, dh);
+		draw: function(ctx, screenRect, xOffset, yOffset){
+			screenRect.w = Math.min(this.getWidth() - xOffset, screenRect.w);
+			screenRect.h = Math.min(this.getHeight() - yOffset, screenRect.h);
+			ctx.drawImage(this._canvas, xOffset, yOffset, screenRect.w, screenRect.h, screenRect.x, screenRect.y, screenRect.w, screenRect.h);
 		}
 	};
 	
