@@ -34,21 +34,23 @@ define(["Gui/CellPalette"], function(CellPalette){
 		},
 
 		draw: function(ctx, xScreen, yScreen, wScreen, hScreen, xOffset, yOffset){
-			var rowRange, colRange, running, waiting, xDrawArea, yDrawArea, imgClip;
+			var rowRange, colRange, running, waiting, xDrawArea, yDrawArea, imgClip,
+				cellMargin = this._cellMargin;
 
-			rowRange = gridRange(this._gridHeight, yOffset, hScreen);
-			colRange = gridRange(this._gridWidth, xOffset, wScreen);
+			rowRange = gridRange(this._gridHeight, yOffset + cellMargin, hScreen - cellMargin - 1);
+			colRange = gridRange(this._gridWidth, xOffset + cellMargin, wScreen - cellMargin - 1);
+
+			console.log(colRange, wScreen, xOffset + cellMargin, wScreen - cellMargin);
 
 			for(col = colRange.start; col <= colRange.end; col++){
-				xDrawArea = (col * this._gridWidth) - xOffset + this._cellMargin;
-				
+				xDrawArea = (col * this._gridWidth) - xOffset + cellMargin;
+
 				running = this._chartData.getRunning(col);
 				waiting = this._chartData.getWaiting(col);
 
 				row = getRowWithinBounds(this._ids, running, rowRange);
 				if(row !== null){
-					yDrawArea = (row * this._gridHeight) - yOffset + this._cellMargin;
-					console.log(xDrawArea, yDrawArea, this._cellWidth, this._cellHeight, wScreen, hScreen);
+					yDrawArea = (row * this._gridHeight) - yOffset + cellMargin;
 				}
 			}
 		}
