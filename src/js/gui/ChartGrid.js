@@ -31,7 +31,7 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 		},
 
 		draw: function(ctx, screenRect, xOffset, yOffset){
-			var rowRange, colRange, running, waiting, imgClipRect, i, cellData,
+			var rowRange, colRange, running, waiting, i,
 				cellMargin = this._cellMargin,
 				cellRect = this._cellDimensions.clone();
 
@@ -44,21 +44,19 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 				running = this._chartData.getRunning(col);
 				waiting = this._chartData.getWaiting(col);
 
-
+				// Draw running cell if one is visible
 				row = getRowWithinBounds(this._ids, running, rowRange);
 				if(row !== null){
 					cellRect.y = (row * this._gridHeight) - yOffset + cellMargin;
-					imgClipRect = cellClipVisible(cellRect, screenRect);
-					drawCell(ctx, screenRect.x + cellRect.x, screenRect.y + cellRect.y, this._cellPalette.getCell(running.id, CellPalette.RAISED), imgClipRect);
+					drawCell(ctx, this._cellPalette.getCell(row, CellPalette.RAISED), screenRect, cellRect);
 				}
 
+				// Draw waiting cells if visible
 				for(i = 0; i < waiting.length; i++){
-					cellData = waiting[i];
-					row = getRowWithinBounds(this._ids, cellData, rowRange);
+					row = getRowWithinBounds(this._ids, waiting[i], rowRange);
 					if(row !== null){
 						cellRect.y = (row * this._gridHeight) - yOffset + cellMargin;
-						imgClipRect = cellClipVisible(cellRect, screenRect);
-						drawCell(ctx, screenRect.x + cellRect.x, screenRect.y + cellRect.y, this._cellPalette.getCell(cellData.id, CellPalette.FLAT), imgClipRect);
+						drawCell(ctx, this._cellPalette.getCell(row, CellPalette.FLAT), screenRect, cellRect);
 					}
 				}
 			}
@@ -66,17 +64,23 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 	};
 
 
-	function drawCell(ctx, x, y, cellImage, cellClip){
-		ctx.drawImage(cellImage, cellClip.x, cellClip.y, cellClip.w, cellClip.h, x, y, cellClip.w, cellClip.h);
+	function drawCell(ctx, cellImage, screenRect, cellRect){
+		var x = Math.max(cellRect.x, 0),
+			y = Math.max(cellRect.y, 0),
+			imgClip = cellClipVisible(cellRect, screenRect);
+
+		ctx.drawImage(cellImage, imgClip.x, imgClip.y, imgClip.w, imgClip.h, screenRect.x + x, screenRect.y + y, imgClip.w, imgClip.h);
 	}
 
 
 	function cellClipVisible(cellRect, screenRect){
+		var x = (cellRect.x < 0 ? -cellRect.x : 0),
+			y = (cellRect.y < 0 ? -cellRect.y : 0);
+
 		return new Rect(
-			(cellRect.x < 0 ? -cellRect.x : 0),
-			(cellRect.y < 0 ? -cellRect.y : 0),
-			Math.min(screenRect.w - cellRect.x, cellRect.w),
-			Math.min(screenRect.h - cellRect.y, cellRect.h)
+			x, y,
+			Math.min(screenRect.w - cellRect.x, cellRect.w - x),
+			Math.min(screenRect.h - cellRect.y, cellRect.h - y)
 		);
 	}
 
