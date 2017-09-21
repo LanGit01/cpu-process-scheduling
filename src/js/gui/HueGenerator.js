@@ -1,4 +1,4 @@
-define(["RGB"], function(RGB){
+define(["Gui/RGB"], function(RGB){
 
 	var GOLDEN_RATIO = 1.61803398875;
 
