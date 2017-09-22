@@ -35,12 +35,15 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 				cellMargin = this._cellMargin,
 				cellRect = this._cellDimensions.clone();
 
+
+			drawGridLines(ctx, screenRect, xOffset, yOffset, this._gridWidth, this._gridHeight, 1);
+
 			rowRange = gridRange(this._gridHeight, yOffset + cellMargin, screenRect.h - cellMargin - 1);
 			colRange = gridRange(this._gridWidth, xOffset + cellMargin, screenRect.w - cellMargin - 1);
 
 			for(col = colRange.start; col <= colRange.end; col++){
 				cellRect.x = (col * this._gridWidth) - xOffset + cellMargin;
-
+		
 				running = this._chartData.getRunning(col);
 				waiting = this._chartData.getWaiting(col);
 
@@ -62,6 +65,39 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 			}
 		}
 	};
+
+
+
+
+	function drawGridLines(ctx, screenRect, xOffset, yOffset, gridWidth, gridHeight, margin){
+		var x, y, w, h,
+			distance = margin * 2;
+
+		xOffset = ((gridWidth - (xOffset % gridWidth)) % gridWidth) - margin;
+		yOffset = ((gridHeight - (yOffset % gridHeight)) % gridHeight) - margin;
+
+		ctx.fillStyle = "#eaeaea";
+		while(yOffset < screenRect.h){
+			if(yOffset + distance > 0){
+				y = Math.max(0, yOffset);
+				h = (yOffset < 0 ? distance - (yOffset + distance) : Math.min(screenRect.h - (yOffset + distance), distance));
+				ctx.fillRect(screenRect.x, screenRect.y + y, screenRect.w, h);
+			}
+
+			yOffset += gridHeight;
+		}
+
+		ctx.fillStyle = "#cfcfcf";
+		while(xOffset < screenRect.w){
+			if(xOffset + distance > 0){
+				x = Math.max(0, xOffset);
+				w = (xOffset < 0 ? distance - (xOffset + distance) : Math.min(screenRect.w - (xOffset + distance), distance));
+				ctx.fillRect(screenRect.x + x, screenRect.y, w, screenRect.h);
+			}
+
+			xOffset += gridWidth;
+		}
+	}
 
 
 	function drawCell(ctx, cellImage, screenRect, cellRect){

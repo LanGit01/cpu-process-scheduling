@@ -30,6 +30,7 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid"], function(View, LabelStri
 		this._canvas.width = config.guiWidth;
 		this._canvas.height = config.guiHeight;
 
+		// Create Components
 		this._idLabelView = new View(
 			LabelStrip.verticalStrip(ids, font, dimensions.rowLabel.w, dimensions.rowLabel.h, null, null), 
 			0, dimensions.colLabel.h, dimensions.rowLabel.w, config.guiHeight - dimensions.colLabel.h
@@ -38,16 +39,21 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid"], function(View, LabelStri
 			LabelStrip.horizontalStrip(timeLabels, font, dimensions.colLabel.w, dimensions.colLabel.h, null, null),
 			dimensions.rowLabel.w, 0, config.guiWidth - dimensions.rowLabel.w, dimensions.colLabel.h
 		);
-
 		this._chartGrid = new ChartGrid(chartData, dimensions.grid.w, dimensions.grid.h, 2);
 		this._chartGridView = new View(this._chartGrid, dimensions.rowLabel.w, dimensions.colLabel.h, config.guiWidth - dimensions.rowLabel.w, config.guiHeight - dimensions.colLabel.h);
+		
 		document.body.appendChild(this._canvas);
-		this._draw();
 	}
 
 
 	GanttChart.prototype = {
 		constructor: ChartGrid,
+
+		setOffset: function(x, y){
+			this._idLabelView.setOffset(x, y);
+			this._timeLabelView.setOffset(x, y);
+			this._chartGridView.setOffset(x, y);
+		},
 
 		_draw: function(){
 			this._idLabelView.draw(this._ctx);

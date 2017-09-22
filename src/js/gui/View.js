@@ -26,6 +26,10 @@ define(["Gui/Rect"], function(Rect){
 			return this;
 		},
 
+		getRect: function(){
+			return this._rect;
+		},
+
 		resize: function(w, h){
 			this._rect.w = w;
 			this._rect.h = h;
