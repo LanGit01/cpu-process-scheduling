@@ -1,5 +1,9 @@
 define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 
+	var VGRID_LINE_COLOR = "#c8c8c8",
+		HGRID_LINE_COLOR = "#eaeaea";
+
+
 	function ChartGrid(chartData, gridWidth, gridHeight, cellMargin, bgColor){
 		this._chartData = chartData;
 		this._ids = chartData.getIDs();
@@ -7,12 +11,10 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 		this._numCols = chartData.getNumLogs();
 		this._numRows = this._ids.length;
 
-		this._gridWidth = gridWidth;
-		this._gridHeight = gridHeight;
-
+		this._gridDimensions = new Rect(0, 0, gridWidth, gridHeight);
 		this._chartDimensions = new Rect(0, 0, this._numCols * gridWidth, this._numRows * gridHeight);
-
 		this._cellDimensions = new Rect(0, 0, gridWidth - (cellMargin * 2), gridHeight - (cellMargin * 2));
+		
 		this._cellMargin = cellMargin;
 
 		this._cellPalette = new CellPalette(this._numRows, this._cellDimensions.w, this._cellDimensions.h, 4);
@@ -32,17 +34,18 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 
 		draw: function(ctx, screenRect, xOffset, yOffset){
 			var rowRange, colRange, running, waiting, i,
+				gridRect = this._gridDimensions,
 				cellMargin = this._cellMargin,
 				cellRect = this._cellDimensions.clone();
 
 
-			drawGridLines(ctx, screenRect, xOffset, yOffset, this._gridWidth, this._gridHeight, 1);
+			drawGridLines(ctx, screenRect, xOffset, yOffset, gridRect, 1);
 
-			rowRange = gridRange(this._gridHeight, yOffset + cellMargin, screenRect.h - cellMargin - 1);
-			colRange = gridRange(this._gridWidth, xOffset + cellMargin, screenRect.w - cellMargin - 1);
+			rowRange = gridRange(gridRect.h, yOffset + cellMargin, screenRect.h - cellMargin - 1);
+			colRange = gridRange(gridRect.w, xOffset + cellMargin, screenRect.w - cellMargin - 1);
 
 			for(col = colRange.start; col <= colRange.end; col++){
-				cellRect.x = (col * this._gridWidth) - xOffset + cellMargin;
+				cellRect.x = (col * gridRect.w) - xOffset + cellMargin;
 		
 				running = this._chartData.getRunning(col);
 				waiting = this._chartData.getWaiting(col);
@@ -50,7 +53,7 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 				// Draw running cell if one is visible
 				row = getRowWithinBounds(this._ids, running, rowRange);
 				if(row !== null){
-					cellRect.y = (row * this._gridHeight) - yOffset + cellMargin;
+					cellRect.y = (row * gridRect.h) - yOffset + cellMargin;
 					drawCell(ctx, this._cellPalette.getCell(row, CellPalette.RAISED), screenRect, cellRect);
 				}
 
@@ -58,7 +61,7 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 				for(i = 0; i < waiting.length; i++){
 					row = getRowWithinBounds(this._ids, waiting[i], rowRange);
 					if(row !== null){
-						cellRect.y = (row * this._gridHeight) - yOffset + cellMargin;
+						cellRect.y = (row * gridRect.h) - yOffset + cellMargin;
 						drawCell(ctx, this._cellPalette.getCell(row, CellPalette.FLAT), screenRect, cellRect);
 					}
 				}
@@ -69,14 +72,14 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 
 
 
-	function drawGridLines(ctx, screenRect, xOffset, yOffset, gridWidth, gridHeight, margin){
+	function drawGridLines(ctx, screenRect, xOffset, yOffset, gridRect, margin){
 		var x, y, w, h,
 			distance = margin * 2;
 
-		xOffset = ((gridWidth - (xOffset % gridWidth)) % gridWidth) - margin;
-		yOffset = ((gridHeight - (yOffset % gridHeight)) % gridHeight) - margin;
+		xOffset = ((gridRect.w - (xOffset % gridRect.w)) % gridRect.w) - margin;
+		yOffset = ((gridRect.h - (yOffset % gridRect.h)) % gridRect.h) - margin;
 
-		ctx.fillStyle = "#eaeaea";
+		ctx.fillStyle = HGRID_LINE_COLOR;
 		while(yOffset < screenRect.h){
 			if(yOffset + distance > 0){
 				y = Math.max(0, yOffset);
@@ -84,10 +87,10 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 				ctx.fillRect(screenRect.x, screenRect.y + y, screenRect.w, h);
 			}
 
-			yOffset += gridHeight;
+			yOffset += gridRect.h;
 		}
 
-		ctx.fillStyle = "#cfcfcf";
+		ctx.fillStyle = VGRID_LINE_COLOR;
 		while(xOffset < screenRect.w){
 			if(xOffset + distance > 0){
 				x = Math.max(0, xOffset);
@@ -95,7 +98,7 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 				ctx.fillRect(screenRect.x + x, screenRect.y, w, screenRect.h);
 			}
 
-			xOffset += gridWidth;
+			xOffset += gridRect.w;
 		}
 	}
 
