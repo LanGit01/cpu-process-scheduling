@@ -14,7 +14,7 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 		this._gridDimensions = new Rect(0, 0, gridWidth, gridHeight);
 		this._chartDimensions = new Rect(0, 0, this._numCols * gridWidth, this._numRows * gridHeight);
 		this._cellDimensions = new Rect(0, 0, gridWidth - (cellMargin * 2), gridHeight - (cellMargin * 2));
-		
+
 		this._cellMargin = cellMargin;
 
 		this._cellPalette = new CellPalette(this._numRows, this._cellDimensions.w, this._cellDimensions.h, 4);
@@ -83,7 +83,7 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 		while(yOffset < screenRect.h){
 			if(yOffset + distance > 0){
 				y = Math.max(0, yOffset);
-				h = (yOffset < 0 ? distance - (yOffset + distance) : Math.min(screenRect.h - (yOffset + distance), distance));
+				h = (yOffset < 0 ? distance - (yOffset + distance) : Math.min(screenRect.h - yOffset, distance));
 				ctx.fillRect(screenRect.x, screenRect.y + y, screenRect.w, h);
 			}
 
@@ -94,7 +94,7 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 		while(xOffset < screenRect.w){
 			if(xOffset + distance > 0){
 				x = Math.max(0, xOffset);
-				w = (xOffset < 0 ? distance - (xOffset + distance) : Math.min(screenRect.w - (xOffset + distance), distance));
+				w = (xOffset < 0 ? distance - (xOffset + distance) : Math.min(screenRect.w - xOffset, distance));
 				ctx.fillRect(screenRect.x + x, screenRect.y, w, screenRect.h);
 			}
 
