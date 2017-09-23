@@ -43,6 +43,7 @@ define(function(){
 		},
 
 		draw: function(ctx, screenRect, xOffset, yOffset){
+			ctx.clearRect(screenRect.x, screenRect.y, screenRect.w, screenRect.h);
 			screenRect.w = Math.min(this.getWidth() - xOffset, screenRect.w);
 			screenRect.h = Math.min(this.getHeight() - yOffset, screenRect.h);
 			ctx.drawImage(this._canvas, xOffset, yOffset, screenRect.w, screenRect.h, screenRect.x, screenRect.y, screenRect.w, screenRect.h);

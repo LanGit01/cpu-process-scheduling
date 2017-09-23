@@ -76,6 +76,8 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 		var x, y, w, h,
 			distance = margin * 2;
 
+		ctx.clearRect(screenRect.x, screenRect.y, screenRect.w, screenRect.h);
+
 		xOffset = ((gridRect.w - (xOffset % gridRect.w)) % gridRect.w) - margin;
 		yOffset = ((gridRect.h - (yOffset % gridRect.h)) % gridRect.h) - margin;
 
