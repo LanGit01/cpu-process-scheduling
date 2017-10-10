@@ -11,6 +11,10 @@ define(function(){
 	Rect.prototype = {
 		constructor: Rect,
 
+		pointInRect: function(x, y){
+			return !(x < this.x || x > this.x + this.w - 1 || y < this.y || y > this.y + this.h - 1);
+		},
+
 		intersection: function(other){
 
 		},
