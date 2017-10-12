@@ -33,6 +33,7 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 		this._ctx = this._canvas.getContext("2d");
 		this._canvas.width = config.guiWidth;
 		this._canvas.height = config.guiHeight;
+		this._canvas.tabIndex = -1;
 		
 		dim = calculateComponentDimensions(config,
 			labelMinSize(this._ctx, config, ids),

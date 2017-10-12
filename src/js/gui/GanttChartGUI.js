@@ -33,35 +33,45 @@ define(["Gui/GanttChart"], function(GanttChart){
 			
 		},
 
+		addEventListener: function(componentId, eventType, fn){
+			var elem, isMouseEvent, isKeyboardEvent, listenerMapItem;
 
-		addMouseListener: function(componentId, eventType, fn){
-			// null componentId means listener for the whole chart
-			var elem, hasListener, listenerMapItem;
+			// Validation
+			if(typeof fn !== "function") throw new TypeError("argument 'fn' is not a function");
 
-			if(typeof fn !== "function") throw new TypeError("'fn' is not a function"); // Throw error
-			if(MOUSE_EVENTS.indexOf(eventType) === -1) throw new Error("'" + eventType + " is not supported");
+			isMouseEvent = (MOUSE_EVENTS.indexOf(eventType) !== -1);
+			isKeyboardEvent = (KEYBOARD_EVENTS.indexOf(eventType) !== -1);
+			if(!isMouseEvent && !isKeyboardEvent) throw new Error("'" + eventType + "' is not supported");
 
+			// Check for duplicates
 			if(!this._listeners[eventType]){
 				this._listeners[eventType] = [];
 			}else
 			if(this._listeners[eventType].some(listenerItemCompare(fn))){
-				// Already has listener
 				return false;
 			}
 
 			elem = this._ganttChart.getCanvas();
+			if(isMouseEvent){
+				listenerMapItem = {
+					orig: fn,
+					wrapped: createMouseHandler(
+						getClientRect.bind(elem),
+						createGetComponentRect(componentId).bind(this._ganttChart),
+						fn
+					)
+				};
+			}else
+			if(isKeyboardEvent){
+				listenerMapItem = {
+					orig: fn
+				};
+			}
 
-			listenerMapItem = {
-				orig: fn,
-				wrapped: createMouseHandler(
-					getClientRect.bind(elem),
-					createGetComponentRect(componentId).bind(this._ganttChart),
-					fn
-				)
-			};
 
-			elem.addEventListener(eventType, listenerMapItem.wrapped);
+			elem.addEventListener(eventType, listenerMapItem.wrapped || listenerMapItem.orig);
 			this._listeners[eventType].push(listenerMapItem);
+
 			return true;
 		},
 
