@@ -1,5 +1,9 @@
 define(["Gui/GanttChart"], function(GanttChart){
 
+	var MOUSE_EVENTS = ["mousemove", "mousedown", "mouseup", "click", "dblclick", "wheel"],
+		KEYBOARD_EVENTS = ["keydown", "keypress", "keyup"];
+
+
 	function GanttChartGUI(container, options){
 		this._container = container;
 		this._options = options;
@@ -8,11 +12,6 @@ define(["Gui/GanttChart"], function(GanttChart){
 		this._ganttChart = null;
 	}
 
-	/*
-	GanttChartGUI.CHART_GRID = GanttChart.CHART_GRID;
-	GanttChartGUI.ROW_LABELS = GanttChart.ROW_LABELS;
-	GanttChartGUI.COL_LABELS = GanttChart.COL_LABELS;
-	*/
 
 	GanttChartGUI.prototype = {
 		constructor: constructor,
@@ -34,21 +33,21 @@ define(["Gui/GanttChart"], function(GanttChart){
 			
 		},
 
+
 		addMouseListener: function(componentId, eventType, fn){
-			// Checks
+			// null componentId means listener for the whole chart
 			var elem, hasListener, listenerMapItem;
 
-			if(typeof fn !== "function") return; // Throw error
+			if(typeof fn !== "function") throw new TypeError("'fn' is not a function"); // Throw error
+			if(MOUSE_EVENTS.indexOf(eventType) === -1) throw new Error("'" + eventType + " is not supported");
 
 			if(!this._listeners[eventType]){
 				this._listeners[eventType] = [];
+			}else
+			if(this._listeners[eventType].some(listenerItemCompare(fn))){
+				// Already has listener
+				return false;
 			}
-
-			hasListener = this._listeners[eventType].some(function(item){
-				return item.orig == fn;
-			});
-
-			if(hasListener) return false;
 
 			elem = this._ganttChart.getCanvas();
 
@@ -68,7 +67,15 @@ define(["Gui/GanttChart"], function(GanttChart){
 
 
 		removeMouseListener: function(componentId, eventType, fn){
+			var index;
 
+			if(typeof fn !== "function" || this._listeners[eventType] === null) return;
+
+			index = this._listeners[eventType].findIndex(listenerItemCompare(fn));
+			if(index !== -1){
+				this._ganttChart.getCanvas().removeEventListener(eventType, this._listeners[eventType][index].wrapped);
+				this._listeners[eventType].splice(index, 1);
+			}
 		},
 
 		addKeyboardListener: function(eventType, fn){
@@ -78,7 +85,11 @@ define(["Gui/GanttChart"], function(GanttChart){
 
 
 
-
+	function listenerItemCompare(fn){
+		return function(item){
+			return item.orig === fn;
+		}
+	}
 
 
 	function getClientRect(){
