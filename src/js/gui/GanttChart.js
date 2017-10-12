@@ -1,4 +1,4 @@
-define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid"], function(View, LabelStrip, ChartGrid){
+define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(View, LabelStrip, ChartGrid, Rect){
 
 	var Defaults = {
 			FONT_SIZE: 18,
@@ -10,55 +10,84 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid"], function(View, LabelStri
 			LABEL_VPAD_MIN: 4,
 		};
 
+	var CHART_GRID = 1,
+		ROW_LABELS = 2,
+		COLUMN_LABELS = 3,
+		CANVAS = 4;
+
+	var componentIds = [CHART_GRID, ROW_LABELS, COLUMN_LABELS];
+
+	// Note: GUI window width/height should not be auto-generated
+	// I plan to make this class independent of DOM
+
 	
 	function GanttChart(chartData, options){
 		var config = createConfig(options),
 			ids, timeLabels, font;
 
-		this._canvas = document.createElement("canvas");
-		this._ctx = this._canvas.getContext("2d");
-
 		font = config.fontSize + "px " + config.font;
 		ids = chartData.getIDs();
 		timeLabels = fillArrayIncremental(chartData.getNumLogs());
 
-		dimensions = calculateComponentDimensions(config,
+		this._canvas = document.createElement("canvas");
+		this._ctx = this._canvas.getContext("2d");
+		this._canvas.width = config.guiWidth;
+		this._canvas.height = config.guiHeight;
+		
+		dim = calculateComponentDimensions(config,
 			labelMinSize(this._ctx, config, ids),
 			labelMinSize(this._ctx, config, timeLabels)
 		);
 
-		this._canvas.width = config.guiWidth;
-		this._canvas.height = config.guiHeight;
-
+				
 		// Create Components
-		this._idLabelView = new View(
-			LabelStrip.verticalStrip(ids, font, dimensions.rowLabel.w, dimensions.rowLabel.h, null, null), 
-			0, dimensions.colLabel.h, dimensions.rowLabel.w, config.guiHeight - dimensions.colLabel.h
+		this._components = {};
+		this._components[ROW_LABELS] = new View(
+			LabelStrip.verticalStrip(ids, font, dim.rowLabel.w, dim.rowLabel.h, null, null), 
+			0, dim.colLabel.h, dim.rowLabel.w, config.guiHeight - dim.colLabel.h
 		);
-		this._timeLabelView = new View(
-			LabelStrip.horizontalStrip(timeLabels, font, dimensions.colLabel.w, dimensions.colLabel.h, null, null),
-			dimensions.rowLabel.w, 0, config.guiWidth - dimensions.rowLabel.w, dimensions.colLabel.h
+		this._components[COLUMN_LABELS] = new View(
+			LabelStrip.horizontalStrip(timeLabels, font, dim.colLabel.w, dim.colLabel.h, null, null),
+			dim.rowLabel.w, 0, config.guiWidth - dim.rowLabel.w, dim.colLabel.h
 		);
-		this._chartGrid = new ChartGrid(chartData, dimensions.grid.w, dimensions.grid.h, 2);
-		this._chartGridView = new View(this._chartGrid, dimensions.rowLabel.w, dimensions.colLabel.h, config.guiWidth - dimensions.rowLabel.w, config.guiHeight - dimensions.colLabel.h);
-		
-		document.body.appendChild(this._canvas);
+		this._chartGrid = new ChartGrid(chartData, dim.grid.w, dim.grid.h, 2);
+		this._components[CHART_GRID] = new View(this._chartGrid, dim.rowLabel.w, dim.colLabel.h, config.guiWidth - dim.rowLabel.w, config.guiHeight - dim.colLabel.h);	
 	}
 
+
+	GanttChart.CHART_GRID = CHART_GRID;
+	GanttChart.ROW_LABELS = ROW_LABELS;
+	GanttChart.COLUMN_LABELS = COLUMN_LABELS;
+	
 
 	GanttChart.prototype = {
 		constructor: ChartGrid,
 
-		setOffset: function(x, y){
-			this._idLabelView.setOffset(x, y);
-			this._timeLabelView.setOffset(x, y);
-			this._chartGridView.setOffset(x, y);
+		CHART_GRID: CHART_GRID,
+		ROW_LABELS: ROW_LABELS,
+		COLUMN_LABELS: COLUMN_LABELS,
+
+		getCanvas: function(){
+			return this._canvas;
 		},
 
-		_draw: function(){
-			this._idLabelView.draw(this._ctx);
-			this._timeLabelView.draw(this._ctx);
-			this._chartGridView.draw(this._ctx);
+		getComponentRect: function(componentId){
+			if(!(componentId in this._components)) return null; // Throw error maybe
+
+			var component = this._components[componentId];
+			return Rect.prototype.clone.call(component);
+		},
+
+		setOffset: function(x, y){
+			for(var i = 0; i < componentIds.length; i++){
+				this._components[componentIds[i]].setOffset(x, y);
+			}
+		},
+
+		draw: function(){
+			for(var i = 0; i < componentIds.length; i++){
+				this._components[componentIds[i]].draw(this._ctx);
+			}
 		}
 	};
 
