@@ -3,13 +3,19 @@ define(["Gui/GanttChart"], function(GanttChart){
 	var MOUSE_EVENTS = ["mousemove", "mousedown", "mouseup", "click", "dblclick", "wheel"],
 		KEYBOARD_EVENTS = ["keydown", "keypress", "keyup"];
 
+	var DEFAULT_TICKS_PER_SECOND = 20;
+
+
 
 	function GanttChartGUI(container, options){
 		this._container = container;
 		this._options = options;
 
+		this._controls = [];
 		this._listeners = {};
 		this._ganttChart = null;
+
+		this._runEventThrottler(DEFAULT_TICKS_PER_SECOND);
 	}
 
 
@@ -71,21 +77,73 @@ define(["Gui/GanttChart"], function(GanttChart){
 			return true;
 		},
 
-
-		removeMouseListener: function(componentId, eventType, fn){
-			var index;
+		removeEventListener: function(componentId, eventType, fn){
+			var index, listeners;
 
 			if(typeof fn !== "function" || this._listeners[eventType] === null) return;
 
-			index = this._listeners[eventType].findIndex(listenerItemCompare(fn));
+			listeners = this._listeners[eventType];
+			index = listeners.findIndex(listenerItemCompare(fn));
+			
 			if(index !== -1){
-				this._ganttChart.getCanvas().removeEventListener(eventType, this._listeners[eventType][index].wrapped);
-				this._listeners[eventType].splice(index, 1);
+				fn = listeners[index].wrapped || fn;
+				this._ganttChart.getCanvas().removeEventListener(eventType, fn);
+				listeners.splice(index, 1);
 			}
 		},
 
-		addKeyboardListener: function(eventType, fn){
+		addControl: function(control){
+			// Validate
+			if(typeof control !== "object" || typeof control.setup !== "function" || 
+			   typeof control.cleanup !== "function" || typeof control.update !== "function"){
+				throw new Error("Invalid argument: does not conform to api");
+			}
 
+
+			if(this._controls.indexOf(control) === -1){
+				this._controls.push(control);
+				control.setup(this.addEventListener.bind(this));
+				return true;
+			}
+
+			return false;
+		},
+
+		removeControl: function(control){
+
+		},
+
+		stop: function(){
+			this._stopEventThrottler();
+		},
+
+		_runEventThrottler: function(ticksPerSecond){
+			var timePerFrame = 1000 / ticksPerSecond,
+				lastTime = 0, tickFunc;
+
+			tickFunc = (function tick(timestamp){
+				var i;
+
+				if(this._rafHandle === null) return;
+
+				if(lastTime + timePerFrame < timestamp){
+					for(i = 0; i < this._controls.length; i++){
+						this._controls[i].update();
+					}
+					lastTime = timestamp;
+				}
+
+				requestAnimationFrame(tickFunc);
+			}).bind(this);
+
+			this._rafHandle = requestAnimationFrame(tickFunc);
+		},
+
+		_stopEventThrottler: function(){
+			if(this._rafHandle){
+				cancelAnimationFrame(this._rafHandle);
+				this._rafHandle = null;
+			}
 		}
 	};
 
