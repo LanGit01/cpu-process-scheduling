@@ -12,6 +12,7 @@ define(["Gui/HueGenerator"], function(HueGenerator){
 		hueGenerator.addChroma("base", BASE_SATURATION, BASE_LIGHTNESS);
 		hueGenerator.addChroma("light", BASE_SATURATION, BASE_LIGHTNESS + 0.17);
 		hueGenerator.addChroma("dark", BASE_SATURATION, BASE_LIGHTNESS - 0.17);
+		hueGenerator.addChroma("greyed", BASE_SATURATION * 0.4, BASE_LIGHTNESS);
 
 		colors = hueGenerator.generateColors(numDistinct);
 
@@ -19,7 +20,7 @@ define(["Gui/HueGenerator"], function(HueGenerator){
 
 		for(i = 0; i < numDistinct; i++){
 			this._cells.push([
-				createCell(width, height, bevel, colors.base[i]),
+				createCell(width, height, bevel, colors.greyed[i]),
 				createCell(width, height, bevel, colors.base[i], colors.light[i], colors.dark[i]),
 			]);
 		}
