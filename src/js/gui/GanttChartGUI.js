@@ -3,7 +3,7 @@ define(["Gui/GanttChart"], function(GanttChart){
 	var MOUSE_EVENTS = ["mousemove", "mousedown", "mouseup", "click", "dblclick", "wheel"],
 		KEYBOARD_EVENTS = ["keydown", "keypress", "keyup"];
 
-	var DEFAULT_TICKS_PER_SECOND = 20;
+	var DEFAULT_TICKS_PER_SECOND = 16;
 
 
 
