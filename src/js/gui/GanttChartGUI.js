@@ -99,7 +99,6 @@ define(["Gui/GanttChart"], function(GanttChart){
 				throw new Error("Invalid argument: does not conform to api");
 			}
 
-
 			if(this._controls.indexOf(control) === -1){
 				this._controls.push(control);
 				control.setup(this.addEventListener.bind(this));
@@ -122,18 +121,14 @@ define(["Gui/GanttChart"], function(GanttChart){
 				lastTime = 0, tickFunc;
 
 			tickFunc = (function tick(timestamp){
-				var i;
-
-				if(this._rafHandle === null) return;
-
 				if(lastTime + timePerFrame < timestamp){
-					for(i = 0; i < this._controls.length; i++){
+					for(var i = 0; i < this._controls.length; i++){
 						this._controls[i].update();
 					}
 					lastTime = timestamp;
 				}
 
-				requestAnimationFrame(tickFunc);
+				this._rafHandle = requestAnimationFrame(tickFunc);
 			}).bind(this);
 
 			this._rafHandle = requestAnimationFrame(tickFunc);
@@ -142,7 +137,6 @@ define(["Gui/GanttChart"], function(GanttChart){
 		_stopEventThrottler: function(){
 			if(this._rafHandle){
 				cancelAnimationFrame(this._rafHandle);
-				this._rafHandle = null;
 			}
 		}
 	};
