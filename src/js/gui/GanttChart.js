@@ -53,6 +53,9 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 		);
 		this._chartGrid = new ChartGrid(chartData, dim.grid.w, dim.grid.h, 2);
 		this._components[CHART_GRID] = new View(this._chartGrid, dim.rowLabel.w, dim.colLabel.h, config.guiWidth - dim.rowLabel.w, config.guiHeight - dim.colLabel.h);	
+
+		this._xOffset = 0;
+		this._yOffset = 0;
 	}
 
 
@@ -79,10 +82,24 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 			return Rect.prototype.clone.call(component);
 		},
 
+		getOffset: function(){
+			return {
+				x: this._xOffset,
+				y: this._yOffset
+			};
+		},
+
 		setOffset: function(x, y){
+			var chartGridView = this._components[CHART_GRID];
+			x = Math.max(0, Math.min(x, this._chartGrid.getWidth() - chartGridView.w));
+			y = Math.max(0, Math.min(y, this._chartGrid.getHeight() - chartGridView.h));
+			
 			for(var i = 0; i < componentIds.length; i++){
 				this._components[componentIds[i]].setOffset(x, y);
 			}
+
+			this._xOffset = x;
+			this._yOffset = y;
 		},
 
 		draw: function(){
