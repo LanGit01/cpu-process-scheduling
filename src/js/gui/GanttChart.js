@@ -130,8 +130,8 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 		ctx.font = config.fontSize + "px " + config.font;
 
 		size = {
-			w: (config.labelHPad * 2) + maxStringWidth(ctx, labels),
-			h: (config.labelVPad * 2) + (config.fontSize * 1.25)
+			w: Math.round((config.labelHPad * 2) + maxStringWidth(ctx, labels)),
+			h: Math.round((config.labelVPad * 2) + (config.fontSize * 1.25))
 		};
 
 		ctx.font = prevFont;
@@ -177,7 +177,6 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 			}
 		};
 	}
-
 
 
 	function maxStringWidth(ctx, strArr){
