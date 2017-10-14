@@ -109,7 +109,13 @@ define(["Gui/GanttChart"], function(GanttChart){
 		},
 
 		removeControl: function(control){
+			var control,
+				index = this._controls.indexOf(control);
 
+			if(index !== -1){
+				this._controls.splice(index, 1);
+				control.cleanup();
+			}
 		},
 
 		stop: function(){
