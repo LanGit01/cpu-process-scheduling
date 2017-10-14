@@ -114,7 +114,7 @@ define(["Gui/GanttChart"], function(GanttChart){
 
 			if(index !== -1){
 				this._controls.splice(index, 1);
-				control.cleanup();
+				control.cleanup(this.removeEventListener.bind(this));
 			}
 		},
 
@@ -129,7 +129,8 @@ define(["Gui/GanttChart"], function(GanttChart){
 			tickFunc = (function tick(timestamp){
 				if(lastTime + timePerFrame < timestamp){
 					for(var i = 0; i < this._controls.length; i++){
-						this._controls[i].update();
+						this._controls[i].update(this._ganttChart);
+						this._ganttChart.draw();
 					}
 					lastTime = timestamp;
 				}
