@@ -1,11 +1,12 @@
 define(["Gui/Rect"], function(Rect){
 
-	function View(component, x, y, w, h){
+	function View(component, x, y, w, h, borderWidth, borderColor){
 		this.x = x;
 		this.y = y;
 		this.w = w;
 		this.h = h;
 		
+		this.setBorder(borderWidth, borderColor);
 		this.setComponent(component);
 	}
 
@@ -31,6 +32,13 @@ define(["Gui/Rect"], function(Rect){
 	};
 
 	
+	View.prototype.setBorder = function(width, color){
+		this._borderWidth = width || 0;
+		this._borderColor = color || null;
+		return this;
+	};
+
+
 	View.prototype.resize = function(w, h){
 		this.w = w;
 		this.h = h;
@@ -51,13 +59,40 @@ define(["Gui/Rect"], function(Rect){
 	};
 
 	View.prototype.draw =  function(ctx){
-			//ctx.strokeRect(this._rect.x + 0.5, this._rect.y + 0.5, this._rect.w, this._rect.h);
-		if(this.component){
-			this.component.draw(ctx, this.clone(), this._xOffset, this._yOffset);	
+		var rect;
+
+		if(this._borderWidth && this._borderColor){
+			drawBorder(ctx, this, this._borderWidth, this._borderColor);
 		}
 
-		return this;
+		if(this.component){
+			rect = this.clone();
+			rect.x += this._borderWidth;
+			rect.y += this._borderWidth;
+			rect.w -= (2 * this._borderWidth);
+			rect.h -= (2 * this._borderWidth);
+			this.component.draw(ctx, rect, this._xOffset, this._yOffset);	
+		}
 	};
+
+
+	function drawBorder(ctx, rect, borderSize, color){
+		var prevStrokeStyle, prevLineWidth,
+			translate = (borderSize % 2 === 0 ? 0 : 0.5),
+			half = ~~(borderSize / 2);
+
+		// Save previous
+		prevStrokeStyle = ctx.strokeStyle;
+		prevLineWidth = ctx.lineWidth;
+
+		ctx.strokeStyle = color;
+		ctx.lineWidth = borderSize;
+		ctx.strokeRect(rect.x + half + translate, rect.y + half + translate, rect.w - borderSize, rect.h - borderSize);
+
+		// Restore previous
+		ctx.strokeStyle = prevStrokeStyle;
+		ctx.lineWidth = prevLineWidth;
+	}
 
 
 	return View;

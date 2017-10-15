@@ -13,7 +13,9 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 	var CHART_GRID = 1,
 		ROW_LABELS = 2,
 		COLUMN_LABELS = 3,
-		CANVAS = 4;
+		CANVAS = 4,
+		CHART_BORDER_WIDTH = 1,
+		CHART_BORDER_COLOR = "#666666";
 
 	var componentIds = [CHART_GRID, ROW_LABELS, COLUMN_LABELS];
 
@@ -51,8 +53,10 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 			LabelStrip.horizontalStrip(timeLabels, font, dim.colLabel.w, dim.colLabel.h, null, null),
 			dim.rowLabel.w, 0, config.guiWidth - dim.rowLabel.w, dim.colLabel.h
 		);
+
 		this._chartGrid = new ChartGrid(chartData, dim.grid.w, dim.grid.h, 2);
 		this._components[CHART_GRID] = new View(this._chartGrid, dim.rowLabel.w, dim.colLabel.h, config.guiWidth - dim.rowLabel.w, config.guiHeight - dim.colLabel.h);	
+		this._components[CHART_GRID].setBorder(CHART_BORDER_WIDTH, CHART_BORDER_COLOR);
 
 		this._xOffset = 0;
 		this._yOffset = 0;
