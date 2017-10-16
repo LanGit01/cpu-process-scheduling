@@ -20,9 +20,13 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 	var componentIds = [CHART_GRID, ROW_LABELS, COLUMN_LABELS];
 
 	// Note: GUI window width/height should not be auto-generated
-	// I plan to make this class independent of DOM
-
 	
+
+	/**
+	 *	A display for Gantt Chart data.
+	 *
+	 *	The display is composed of three components: CHART_GRID, ROW_LABELS, COLUMN_LABELS.
+	 */
 	function GanttChart(chartData, options){
 		var config = createConfig(options),
 			ids, timeLabels, font;
@@ -75,10 +79,16 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 		ROW_LABELS: ROW_LABELS,
 		COLUMN_LABELS: COLUMN_LABELS,
 
+		/**
+		 *	@return {HTMLCanvasElement} a Canvas that serves as the display for this object
+		 */
 		getCanvas: function(){
 			return this._canvas;
 		},
 
+		/**
+		 *	@return {Rect} returns the area of the canvas where the component is drawn to
+		 */
 		getComponentRect: function(componentId){
 			if(!(componentId in this._components)) return null; // Throw error maybe
 
@@ -86,6 +96,9 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 			return Rect.prototype.clone.call(component);
 		},
 
+		/**
+		 *	@return {Object} returns the top-left position of the chart in chart coordinates(not screen).
+		 */
 		getOffset: function(){
 			return {
 				x: this._xOffset,
@@ -93,6 +106,9 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 			};
 		},
 
+		/**
+		 *	Sets the position of the top-left position of the chart in chart coordinates
+		 */
 		setOffset: function(x, y){
 			var chartGridView = this._components[CHART_GRID];
 			x = Math.max(0, Math.min(x, this._chartGrid.getWidth() - chartGridView.w));
@@ -217,14 +233,7 @@ define(["Gui/View", "Gui/LabelStrip", "Gui/ChartGrid", "Gui/Rect"], function(Vie
 
 		return arr;
 	}
-
-
-	function dimension(w, h){
-		return {
-			w: w,
-			h: h
-		};
-	}
+	
 
 	return GanttChart;
 });

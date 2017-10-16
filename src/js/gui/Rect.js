@@ -1,5 +1,10 @@
 define(function(){
 
+	/**
+	 *	Constructor: Rect
+	 *
+	 *	Representation of a rectangle
+	 */
 	function Rect(x, y, w, h){
 		this.x = x;
 		this.y = y;
@@ -11,6 +16,10 @@ define(function(){
 	Rect.prototype = {
 		constructor: Rect,
 
+		/**
+		 *	@return true if point is inside the rectangle
+		 *			false otherwise
+		 */
 		pointInRect: function(x, y){
 			return !(x < this.x || x > this.x + this.w - 1 || y < this.y || y > this.y + this.h - 1);
 		},

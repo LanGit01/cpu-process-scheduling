@@ -5,6 +5,19 @@ define(["Gui/HueGenerator"], function(HueGenerator){
 		BASE_SATURATION = 0.55,
 		BASE_LIGHTNESS = 0.6;
 
+
+	/**
+	 *	Constructor: CellPalette
+	 *
+	 *	Creates pre-rendered Gantt Chart grid cell images.
+	 *	Generates `numDistinct` number of cells for each type: FLAT, RAISED. RAISED cells have
+	 *	a bevel on the edges, while FLAT does not.
+	 *
+	 *	@param {int} numDistinct - number of cells to create for each type
+	 *	@param {int} width - width of a cell
+	 *	@param {int} height - height of a cell
+	 *	@param {int} bevel - width of the bevel for RAISED cells
+	 */
 	function CellPalette(numDistinct, width, height, bevel){
 		var hueGenerator = new HueGenerator(),
 			colors, i;
@@ -30,6 +43,7 @@ define(["Gui/HueGenerator"], function(HueGenerator){
 	CellPalette.FLAT = FLAT;
 	CellPalette.RAISED = RAISED;
 
+
 	CellPalette.prototype = {
 		constructor: CellPalette,
 
@@ -37,6 +51,11 @@ define(["Gui/HueGenerator"], function(HueGenerator){
 			return this._cells.length;
 		},
 
+		/**
+		 *	@param index
+		 *	@param type
+		 *	@return {HTMLCanvasElement} - the cell image
+		 */
 		getCell: function(index, type){
 			if(index < 0 || index > this._cells.length - 1){
 				return null;
@@ -46,7 +65,15 @@ define(["Gui/HueGenerator"], function(HueGenerator){
 		}
 	};
 
-
+	/**
+	 *	@param {int} width - width of the cell
+	 *	@param {int} height - height of the cell
+	 *	@param {int} bevel - width of the bevel
+	 *	@param cBase - a CSS color specifying the base color of the cell
+	 *	@param cLight - a CSS color specifying the color of the lighter bevel edge
+	 *	@param cDark - a CSS color specifying the color of the darker bevel edge
+	 *	@return {HTMLCanvasElement} - the cell image
+	 */
 	function createCell(width, height, bevel, cBase, cLight, cDark){
 		var canvas = createCanvas(width, height),
 			ctx = canvas.getContext("2d");

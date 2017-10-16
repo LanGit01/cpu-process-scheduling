@@ -10,7 +10,17 @@ define(function(){
 		},
 	};
 
-	
+	/**
+	 *	Renders an array of labels horizontally(left-to-right) or vertically(top-to-bottom)
+	 *
+	 *	@param {Array<String>} strArr - the array of labels to render
+	 *	@param font - CSS font to use
+	 *	@param labelWidth - width of a label
+	 *	@param labelHeight - height of a label
+	 *	@param hPad - amount of left/right padding
+	 *	@param vPad - amount of top/bottom padding
+	 *	@param {boolean} horizontal - render the labels horizontally if true, vertically if false
+	 */
 	function LabelStrip(strArr, font, labelWidth, labelHeight, hPad, vPad, horizontal){
 		var hAlignObj = findAlignment(hPad, labelWidth, "left", "center", "right"),
 			vAlignObj = findAlignment(vPad, labelHeight, "top", "middle", "bottom");

@@ -3,7 +3,14 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 	var VGRID_LINE_COLOR = "#c8c8c8",
 		HGRID_LINE_COLOR = "#eaeaea";
 
-
+	/**
+	 *	Component that handles drawing of the Gantt Chart cell grid
+	 *
+	 *	@param {Object} chartData
+	 *	@param {int} gridWidth - width of a grid cell
+	 *	@param {int} gridHeight - height of a grid cell
+	 *	@param {int} cellMargin
+	 */
 	function ChartGrid(chartData, gridWidth, gridHeight, cellMargin, bgColor){
 		this._chartData = chartData;
 		this._ids = chartData.getIDs();
@@ -70,8 +77,14 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 	};
 
 
-
-
+	/**
+	 *	@param ctx
+	 *	@param {Rect} screenRect - area to draw the grid lines
+	 *	@param {number} xOffset - x-coordinate of left edge in chart coordinates(not screen).
+	 *	@param {number} yOffset - y-coordinate of top edge in chart coordinates.
+	 *	@param {Rect} gridRect - grid cell dimensions
+	 * 	@param {int} margin - margin between cells
+	 */
 	function drawGridLines(ctx, screenRect, xOffset, yOffset, gridRect, margin){
 		var x, y, w, h,
 			distance = margin * 2;
@@ -146,8 +159,6 @@ define(["Gui/CellPalette", "Gui/Rect"], function(CellPalette, Rect){
 
 		return null;
 	}
-
-
 
 
 	return ChartGrid;

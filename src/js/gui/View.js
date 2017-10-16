@@ -1,5 +1,12 @@
 define(["Gui/Rect"], function(Rect){
 
+	/**
+	 *	Constructor: View
+	 *
+	 *	A View object is used to draw only the part of a component that fits into a specified area on the screen.
+	 *	This essentially hides the rest of the component, and can be scrolled(move which part is displayed), by
+	 *	calling the `setOffset` method.
+	 */
 	function View(component, x, y, w, h, borderWidth, borderColor){
 		this.x = x;
 		this.y = y;
@@ -24,7 +31,9 @@ define(["Gui/Rect"], function(Rect){
 		return this;
 	};
 
-
+	/**
+	 *	Sets the position of this view on the screen
+	 */
 	View.prototype.setPosition = function(x, y){
 		this.x = x;
 		this.y = y;
@@ -45,7 +54,10 @@ define(["Gui/Rect"], function(Rect){
 		return this;
 	};
 
-
+	/**
+	 *	Sets which part of the component to draw. Sets the top-left origin of the rectangular
+	 *	area of the component to draw
+	 */
 	View.prototype.setOffset = function(x, y){
 		if(!this.component) return this;
 
@@ -57,6 +69,7 @@ define(["Gui/Rect"], function(Rect){
 
 		return this;
 	};
+
 
 	View.prototype.draw =  function(ctx){
 		var rect;
